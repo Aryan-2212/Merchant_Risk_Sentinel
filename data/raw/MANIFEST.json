@@ -1,0 +1,1475 @@
+{
+  "source_repo": "Fraud-Detection-Handbook/simulated-data-raw",
+  "source_branch": "main",
+  "source_commit": "6e67dbd0a3bfe0d7ec33abc4bce5f37cd4ff0d6a",
+  "description": "Fraud Detection Handbook simulated benchmark dataset. Public synthetic data \u2014 not real payment traffic (Dev Plan \u00a72).",
+  "file_count": 183,
+  "total_bytes": 107121710,
+  "manifest_written_utc": "2026-08-24T10:06:35+00:00",
+  "files": [
+    {
+      "filename": "2018-04-01.pkl",
+      "sha256": "6bb3398e858be68532e22522ed8dd52601fe507b6537f6bc2dde0abcdd3e4717",
+      "git_blob_sha": "9873e06c45ac65d24dd52f42edfd081444e3d0c0",
+      "size_bytes": 562791,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-01.pkl",
+      "retrieved_utc": "2026-08-24T10:03:58+00:00"
+    },
+    {
+      "filename": "2018-04-02.pkl",
+      "sha256": "69266b74f810840c6a7649a2bd35ef08b5bce0501919fe1f8a05810a173790c8",
+      "git_blob_sha": "3c83f3e8f3fc438d0de456aa7faf22cefb75b268",
+      "size_bytes": 585309,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-02.pkl",
+      "retrieved_utc": "2026-08-24T10:03:59+00:00"
+    },
+    {
+      "filename": "2018-04-03.pkl",
+      "sha256": "1c4d08a002b61ada9529c5fe6bf2a493f29c902b70fa9f59fb70b5eccef23ae8",
+      "git_blob_sha": "9baa9446a3ac09b7c8a661716de40da4bb506cc4",
+      "size_bytes": 595319,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-03.pkl",
+      "retrieved_utc": "2026-08-24T10:04:00+00:00"
+    },
+    {
+      "filename": "2018-04-04.pkl",
+      "sha256": "03f1f3f3cf2ba96ecdd6df95194c1446ca5add2b0213f5acbe183427cd455ba3",
+      "git_blob_sha": "73b26bfd9c48b28a6d5aa7057a54d794c7151918",
+      "size_bytes": 582088,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-04.pkl",
+      "retrieved_utc": "2026-08-24T10:04:00+00:00"
+    },
+    {
+      "filename": "2018-04-05.pkl",
+      "sha256": "7dee3a41bd5b2fe2590c7d83c528f556dc79286e54d623dc0ab1577e2274f647",
+      "git_blob_sha": "b65e6cb3cec815f757a5a04de6d0f7b7a1a601d2",
+      "size_bytes": 589446,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-05.pkl",
+      "retrieved_utc": "2026-08-24T10:04:01+00:00"
+    },
+    {
+      "filename": "2018-04-06.pkl",
+      "sha256": "1aba6f2aedc9fd1988cb6b832bf01b40c3930b5a6761b5aa82cfd95b5860da4f",
+      "git_blob_sha": "c468dfc5731564f32ac0087c1b9fd60805c22f90",
+      "size_bytes": 582653,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-06.pkl",
+      "retrieved_utc": "2026-08-24T10:04:02+00:00"
+    },
+    {
+      "filename": "2018-04-07.pkl",
+      "sha256": "396901e31f1037f4472899559bb4a4d6039dba321b682f7d26206478c3809dd9",
+      "git_blob_sha": "c2b99e113f14756b63c62eec4c255f4531521b5e",
+      "size_bytes": 576442,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-07.pkl",
+      "retrieved_utc": "2026-08-24T10:04:03+00:00"
+    },
+    {
+      "filename": "2018-04-08.pkl",
+      "sha256": "a589e0c224b9cefc99336341567d84e68a85c41c7108e4fded51a5c3de32f049",
+      "git_blob_sha": "07a93dd6498a5a418216bd9ae6d6149122ab627d",
+      "size_bytes": 578254,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-08.pkl",
+      "retrieved_utc": "2026-08-24T10:04:04+00:00"
+    },
+    {
+      "filename": "2018-04-09.pkl",
+      "sha256": "05f044777611714ce1b7b2245712e54fb7b155f03e2503d686b487060d1e9063",
+      "git_blob_sha": "077bf8856f1bb3c3e6d349baec62b3f320327499",
+      "size_bytes": 592367,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-09.pkl",
+      "retrieved_utc": "2026-08-24T10:04:05+00:00"
+    },
+    {
+      "filename": "2018-04-10.pkl",
+      "sha256": "985e93b53ab12a924ff74c99e5ff9a4fdad716299cc05baf9edc62717a2d89d8",
+      "git_blob_sha": "1d60db92b1b8854cdbb304eaf0c74b9db40a6b21",
+      "size_bytes": 590706,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-10.pkl",
+      "retrieved_utc": "2026-08-24T10:04:06+00:00"
+    },
+    {
+      "filename": "2018-04-11.pkl",
+      "sha256": "fd07e14b8005ee651f4846ff0d2ab4ecff7d1b68bc367d5e855d24d37e1bc022",
+      "git_blob_sha": "21a6ce27d266fe41ca8d01eacbabcfecc31c71a1",
+      "size_bytes": 587671,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-11.pkl",
+      "retrieved_utc": "2026-08-24T10:04:07+00:00"
+    },
+    {
+      "filename": "2018-04-12.pkl",
+      "sha256": "ea9a0d2253d2ef34be994bc2ff5126fd98bfea9a0810a1cd70cd5e6d069cb55e",
+      "git_blob_sha": "f5dbead92751d7e88485db9d46c64467be1e9f23",
+      "size_bytes": 582742,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-12.pkl",
+      "retrieved_utc": "2026-08-24T10:04:07+00:00"
+    },
+    {
+      "filename": "2018-04-13.pkl",
+      "sha256": "6775ba253ad7602d7cb5a2eaf358c39351fe4022311dade4dadbf932f6db6cb7",
+      "git_blob_sha": "4ac895a3e4aebb17439e9be2ad6b4c041032fd92",
+      "size_bytes": 595657,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-13.pkl",
+      "retrieved_utc": "2026-08-24T10:04:08+00:00"
+    },
+    {
+      "filename": "2018-04-14.pkl",
+      "sha256": "a7c4f570be3e485b757b6eb5e04cf21f239a57289269f27f49a03e8387be2044",
+      "git_blob_sha": "8f2cb71fac66fca3fe7a9009d491d9c50c79bfc1",
+      "size_bytes": 583697,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-14.pkl",
+      "retrieved_utc": "2026-08-24T10:04:08+00:00"
+    },
+    {
+      "filename": "2018-04-15.pkl",
+      "sha256": "9562e021001ba0adbc7346872a6eb8119f88e6b15088c98d16d0194a9f44792e",
+      "git_blob_sha": "b2e9d7085f51202ce5bdba555aafd2f15b1a8b27",
+      "size_bytes": 578898,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-15.pkl",
+      "retrieved_utc": "2026-08-24T10:04:09+00:00"
+    },
+    {
+      "filename": "2018-04-16.pkl",
+      "sha256": "8d42941cd7e1fc8ea1c81ddd68259ca0dde38754c70516ca5bb6d5142e42e068",
+      "git_blob_sha": "d03e3fac39f42c305756ca3d5f9f9c3dc661a35f",
+      "size_bytes": 582712,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-16.pkl",
+      "retrieved_utc": "2026-08-24T10:04:10+00:00"
+    },
+    {
+      "filename": "2018-04-17.pkl",
+      "sha256": "aaac96c9938195fbaddb2a3f40ec9e83a060554ea549c21be91aa5fc24e83d7b",
+      "git_blob_sha": "39cd70c6666f4c88ba180d94301bc5f8ae0d7351",
+      "size_bytes": 585150,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-17.pkl",
+      "retrieved_utc": "2026-08-24T10:04:11+00:00"
+    },
+    {
+      "filename": "2018-04-18.pkl",
+      "sha256": "dccfabca4c3fbbd6a2142b02e94d5551bb54070d0525152840d760129692b745",
+      "git_blob_sha": "7c2ea1045764c7968927cb71e5e71935d12d6900",
+      "size_bytes": 587327,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-18.pkl",
+      "retrieved_utc": "2026-08-24T10:04:12+00:00"
+    },
+    {
+      "filename": "2018-04-19.pkl",
+      "sha256": "8080a07ac1694a726dbebf21d2d847046e53ceb1a2dd03a1a0450a93f1ef6edb",
+      "git_blob_sha": "def7f5abd277d389a5e46cef45f3c518a26f67aa",
+      "size_bytes": 582598,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-19.pkl",
+      "retrieved_utc": "2026-08-24T10:04:13+00:00"
+    },
+    {
+      "filename": "2018-04-20.pkl",
+      "sha256": "fb8658f89edf3c8dcca4326da4f9196bf9c41d40e6311076b6bf143ec39bc75b",
+      "git_blob_sha": "1dfb504cab1301595353d0ddc1c658cc8edf8231",
+      "size_bytes": 584483,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-20.pkl",
+      "retrieved_utc": "2026-08-24T10:04:14+00:00"
+    },
+    {
+      "filename": "2018-04-21.pkl",
+      "sha256": "e12c7c65b0f838762a4ab99900447992cb6f04c3d81a959833c344ca7f55ed02",
+      "git_blob_sha": "8f6e31395f91a854544a4a0fcae2d02199ddf561",
+      "size_bytes": 589114,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-21.pkl",
+      "retrieved_utc": "2026-08-24T10:04:15+00:00"
+    },
+    {
+      "filename": "2018-04-22.pkl",
+      "sha256": "56008737b5acada58d598f458fedf0c03652e6b9829ecc69f3e459872b71b30f",
+      "git_blob_sha": "2299861462b0c5a14893624d51848e11e404c47c",
+      "size_bytes": 595323,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-22.pkl",
+      "retrieved_utc": "2026-08-24T10:04:16+00:00"
+    },
+    {
+      "filename": "2018-04-23.pkl",
+      "sha256": "48f65c62174eb75a291b4b0cee28e98a6c22dc228242207766c3bebbb33b66db",
+      "git_blob_sha": "16c0eb1b7d0e3828b7438e33efd822e6f0fabe5b",
+      "size_bytes": 595128,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-23.pkl",
+      "retrieved_utc": "2026-08-24T10:04:16+00:00"
+    },
+    {
+      "filename": "2018-04-24.pkl",
+      "sha256": "6ee0691d43914334119401becdbf5b8b24a34fa117d83727958716b288b01c77",
+      "git_blob_sha": "b8068664aa9bef291c8541fc51207dd0a5f6acd8",
+      "size_bytes": 583171,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-24.pkl",
+      "retrieved_utc": "2026-08-24T10:04:17+00:00"
+    },
+    {
+      "filename": "2018-04-25.pkl",
+      "sha256": "25fe5846f1a34c6433a064c0cac9515433012b21d3fe3b54442b74481279f07d",
+      "git_blob_sha": "97507d4c0f358d52fc5ed4c2744bf382b4542bed",
+      "size_bytes": 587717,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-25.pkl",
+      "retrieved_utc": "2026-08-24T10:04:18+00:00"
+    },
+    {
+      "filename": "2018-04-26.pkl",
+      "sha256": "db612645d1fdf2b7456c759c9c3b1f5db8cf64c5acdd736c560ec1f6907db1f8",
+      "git_blob_sha": "b0d5102fd2507200fe59e6037db92998e2131b8f",
+      "size_bytes": 583394,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-26.pkl",
+      "retrieved_utc": "2026-08-24T10:04:18+00:00"
+    },
+    {
+      "filename": "2018-04-27.pkl",
+      "sha256": "c70254f03bc10d8da37f500f99d6abeba75b2ea92c62f8f0545b2360d28cf617",
+      "git_blob_sha": "9351654abdede07f8ed36a3d17d3bd78f428f727",
+      "size_bytes": 586946,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-27.pkl",
+      "retrieved_utc": "2026-08-24T10:04:19+00:00"
+    },
+    {
+      "filename": "2018-04-28.pkl",
+      "sha256": "2ce3591a66df34b8852c1cdb2ec200f4569e7489ea31c481e71e7cf120f23dab",
+      "git_blob_sha": "058248fbbcaa7b10c10539e410025a98a86aeb51",
+      "size_bytes": 585595,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-28.pkl",
+      "retrieved_utc": "2026-08-24T10:04:19+00:00"
+    },
+    {
+      "filename": "2018-04-29.pkl",
+      "sha256": "7aa5d6cc838b4c1610303d3dffe2aca91221a272ac7d9e7827ab50d8f9b233a7",
+      "git_blob_sha": "aae9e8d07608dc09b3acb1f99042d9156df90829",
+      "size_bytes": 588400,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-29.pkl",
+      "retrieved_utc": "2026-08-24T10:04:20+00:00"
+    },
+    {
+      "filename": "2018-04-30.pkl",
+      "sha256": "50e35c707ea8c47731f78e1d4a12c15ea4c283f66858645cd43a842b870a664b",
+      "git_blob_sha": "bb42e9a1a33bcd1323912ad27bd44c3562608403",
+      "size_bytes": 596087,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-04-30.pkl",
+      "retrieved_utc": "2026-08-24T10:04:21+00:00"
+    },
+    {
+      "filename": "2018-05-01.pkl",
+      "sha256": "f7173ee8aa505af434306e3d09b302d201be746d5d2802672a69b0695d5d57fd",
+      "git_blob_sha": "f67055abd0dc47ae773722ce9a6829d4e97a818d",
+      "size_bytes": 584958,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-01.pkl",
+      "retrieved_utc": "2026-08-24T10:04:22+00:00"
+    },
+    {
+      "filename": "2018-05-02.pkl",
+      "sha256": "4c7a13dd6db176d270bf21896c33f330151ac0c305092ed5881c53f4e1eddf7b",
+      "git_blob_sha": "30e47bb4e16fd0270af99374d51f08efe7a0c137",
+      "size_bytes": 580643,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-02.pkl",
+      "retrieved_utc": "2026-08-24T10:04:22+00:00"
+    },
+    {
+      "filename": "2018-05-03.pkl",
+      "sha256": "6222a4d45742c1c1556a5c9dcaa32944ca811803e9670f368516a83d884f5af7",
+      "git_blob_sha": "f1f6fa04f70b288e58eeec50e073f4601653ae73",
+      "size_bytes": 596730,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-03.pkl",
+      "retrieved_utc": "2026-08-24T10:04:23+00:00"
+    },
+    {
+      "filename": "2018-05-04.pkl",
+      "sha256": "7ad653e5c7a28be59575601c265a5b1fa55cbc014e4d02084af14e15d0ea2954",
+      "git_blob_sha": "80b78f2cd2fb1636e89d060a62663e50f0439e13",
+      "size_bytes": 579690,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-04.pkl",
+      "retrieved_utc": "2026-08-24T10:04:23+00:00"
+    },
+    {
+      "filename": "2018-05-05.pkl",
+      "sha256": "0c6bf47415fa5285164a09379d20b5bc8b85af40a60a797e24534b50b590a635",
+      "git_blob_sha": "974af359fa0bef7d1fbdb3b6d0e1394c3fa2ff97",
+      "size_bytes": 580351,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-05.pkl",
+      "retrieved_utc": "2026-08-24T10:04:24+00:00"
+    },
+    {
+      "filename": "2018-05-06.pkl",
+      "sha256": "f382545256fe1c69a6194a33bf8551ddcd149c15d2ccff5d73207e4afe45c3f3",
+      "git_blob_sha": "62eec874c32e31150da4fa8aaf2f07623d09562c",
+      "size_bytes": 589987,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-06.pkl",
+      "retrieved_utc": "2026-08-24T10:04:25+00:00"
+    },
+    {
+      "filename": "2018-05-07.pkl",
+      "sha256": "e1e8d6a8195d85426968058fb63500b9a6d84deee8628a68d422bf95ee04237a",
+      "git_blob_sha": "5e775d9afbdb38638aa55035a38f6ff2ff573f67",
+      "size_bytes": 592507,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-07.pkl",
+      "retrieved_utc": "2026-08-24T10:04:26+00:00"
+    },
+    {
+      "filename": "2018-05-08.pkl",
+      "sha256": "3bb683a5dfc604d567ae557b185fa1c53fabe6fca50ddae4ec4c05f9f673535b",
+      "git_blob_sha": "7344f3eab17ca295af85b804b8048e6b0787fccd",
+      "size_bytes": 576056,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-08.pkl",
+      "retrieved_utc": "2026-08-24T10:04:26+00:00"
+    },
+    {
+      "filename": "2018-05-09.pkl",
+      "sha256": "e102739f36bd0784540b750e41d24c4126d61a2721ee2ae13b612d2ac0b8e2e3",
+      "git_blob_sha": "9ec387290ece4e5f1e06ed589ccc1e84872b9cc0",
+      "size_bytes": 585752,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-09.pkl",
+      "retrieved_utc": "2026-08-24T10:04:27+00:00"
+    },
+    {
+      "filename": "2018-05-10.pkl",
+      "sha256": "6f2516f5af21223c1559a3f733ac0d0594722cfbe8e214750f58dae9467f61c9",
+      "git_blob_sha": "a38fd70385d489e7112a246dc36d3ffb7f22128c",
+      "size_bytes": 595369,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-10.pkl",
+      "retrieved_utc": "2026-08-24T10:04:28+00:00"
+    },
+    {
+      "filename": "2018-05-11.pkl",
+      "sha256": "2ab79873c43ee9cd43a6993e2edcccec600d99cb1579955d8d199e3ede1d55e1",
+      "git_blob_sha": "f77e6d6dd3ed433a5238b2d861f81e882b637bda",
+      "size_bytes": 582463,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-11.pkl",
+      "retrieved_utc": "2026-08-24T10:04:30+00:00"
+    },
+    {
+      "filename": "2018-05-12.pkl",
+      "sha256": "3c2fb262b7592837e8c923b71973940ddf01a493a3235d3044b1b6c6fe95b52d",
+      "git_blob_sha": "c7fe7e98ba09201c918bfaede06c6707c93613c6",
+      "size_bytes": 585630,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-12.pkl",
+      "retrieved_utc": "2026-08-24T10:04:31+00:00"
+    },
+    {
+      "filename": "2018-05-13.pkl",
+      "sha256": "9052376e9f1a2b9dd753b3cdb02ddfdee347a4de17d0023556056906094bf614",
+      "git_blob_sha": "94caebcfe86ecbbbfbd93005b08c7a09d00e3996",
+      "size_bytes": 579978,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-13.pkl",
+      "retrieved_utc": "2026-08-24T10:04:32+00:00"
+    },
+    {
+      "filename": "2018-05-14.pkl",
+      "sha256": "3f7d54de48e15d0720df13d0a099faa503be8437a19d20340352554d16f088f0",
+      "git_blob_sha": "42e231f04483740fb4fd23854dc6d865aa6d7b21",
+      "size_bytes": 591150,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-14.pkl",
+      "retrieved_utc": "2026-08-24T10:04:33+00:00"
+    },
+    {
+      "filename": "2018-05-15.pkl",
+      "sha256": "2fbd8785ea3f7f072f3e4cc87f44abf7f36316720d2ace183edd26102551e082",
+      "git_blob_sha": "c6be97560b51a095e9af917a5548d10bbfc1b785",
+      "size_bytes": 576224,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-15.pkl",
+      "retrieved_utc": "2026-08-24T10:04:34+00:00"
+    },
+    {
+      "filename": "2018-05-16.pkl",
+      "sha256": "6be06bed1958a5fceaa8c4fa441f48b84c3415c4a35c7e467d01272d5f8b3983",
+      "git_blob_sha": "6d46e1e7e725d5a15596f2151206ff249d872e05",
+      "size_bytes": 596496,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-16.pkl",
+      "retrieved_utc": "2026-08-24T10:04:34+00:00"
+    },
+    {
+      "filename": "2018-05-17.pkl",
+      "sha256": "818c166b2fd08e02eb8283feaef41925a7bf86cf41f47a1b27c547916394e2f9",
+      "git_blob_sha": "a114dd4e1c29dabad0569c29a0e8a9fd790ee12c",
+      "size_bytes": 591866,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-17.pkl",
+      "retrieved_utc": "2026-08-24T10:04:35+00:00"
+    },
+    {
+      "filename": "2018-05-18.pkl",
+      "sha256": "fa1fbc257884b1c63d7e11f2d10838c030784c04b31fdef04fe7a604721c82bf",
+      "git_blob_sha": "25815e00b2068f6c3a27a4a4968907fa2a9a85f2",
+      "size_bytes": 590304,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-18.pkl",
+      "retrieved_utc": "2026-08-24T10:04:36+00:00"
+    },
+    {
+      "filename": "2018-05-19.pkl",
+      "sha256": "1a2ba2319708110c11328060945eedaf1b29d5d93358d5ef1a4dd14c2f78ea05",
+      "git_blob_sha": "76c624265f262f13e39c41d5f235b25de0637d3f",
+      "size_bytes": 586011,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-19.pkl",
+      "retrieved_utc": "2026-08-24T10:04:36+00:00"
+    },
+    {
+      "filename": "2018-05-20.pkl",
+      "sha256": "787269c96fdd81e3467900104c9ba75550b71a520219c8248daacf430ce8fcb6",
+      "git_blob_sha": "e68fe439ac80bd4188f52aaec050a24c1994ab7f",
+      "size_bytes": 595088,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-20.pkl",
+      "retrieved_utc": "2026-08-24T10:04:38+00:00"
+    },
+    {
+      "filename": "2018-05-21.pkl",
+      "sha256": "2431571cfb439a1fdc2c0cc2bf5f5af58cd2948b13f85046dfbf3ab76a96391e",
+      "git_blob_sha": "81120017972eea39fa16ae2ecf7733c27477d32c",
+      "size_bytes": 591725,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-21.pkl",
+      "retrieved_utc": "2026-08-24T10:04:38+00:00"
+    },
+    {
+      "filename": "2018-05-22.pkl",
+      "sha256": "56661dbdcdf152a934f66a4b382bf6cd3970b5ec40dd10db7fc0c4bb64909af6",
+      "git_blob_sha": "39c039b76152ff4c9323edf65f6f32082afe6949",
+      "size_bytes": 578577,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-22.pkl",
+      "retrieved_utc": "2026-08-24T10:04:39+00:00"
+    },
+    {
+      "filename": "2018-05-23.pkl",
+      "sha256": "92c366470dd48f2dd2841b8843b996d68d89724f7d955aa700d269a7bf2667fa",
+      "git_blob_sha": "94510efbcddf5ee65a9a4c1c2d690c7990750a6f",
+      "size_bytes": 574109,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-23.pkl",
+      "retrieved_utc": "2026-08-24T10:04:40+00:00"
+    },
+    {
+      "filename": "2018-05-24.pkl",
+      "sha256": "487e92cb21d2e22b8448b3dc8499c6eec46d9e10d0a9e2fe18bad427f0766fc5",
+      "git_blob_sha": "bd7681e85f8dc81f5bdc3434524ed9085a324e7d",
+      "size_bytes": 572690,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-24.pkl",
+      "retrieved_utc": "2026-08-24T10:04:40+00:00"
+    },
+    {
+      "filename": "2018-05-25.pkl",
+      "sha256": "3bfd4560ba7d1f150b7f8cbaa126e2018ab7216e352fff879295e92135074392",
+      "git_blob_sha": "a8ff4181a2a07fb671c0483fd3502310c19cdab4",
+      "size_bytes": 587383,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-25.pkl",
+      "retrieved_utc": "2026-08-24T10:04:42+00:00"
+    },
+    {
+      "filename": "2018-05-26.pkl",
+      "sha256": "d276d4ceb244ed47150f9e8b9e2a42609f6006b345aad93dd0c74427689e8046",
+      "git_blob_sha": "8640ceb2b78351a50e7ad52c0aa42217fcf8de26",
+      "size_bytes": 589917,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-26.pkl",
+      "retrieved_utc": "2026-08-24T10:04:43+00:00"
+    },
+    {
+      "filename": "2018-05-27.pkl",
+      "sha256": "c58460ba10daf45bd1319fd63d02593b86afb4be48de8bc27e887b34d9697932",
+      "git_blob_sha": "abf01b5e4f984f4e26b7d66a8dc7d354ec542f61",
+      "size_bytes": 594886,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-27.pkl",
+      "retrieved_utc": "2026-08-24T10:04:43+00:00"
+    },
+    {
+      "filename": "2018-05-28.pkl",
+      "sha256": "5d7c0ed2dc24873fb2955f48b62c67ecbbf96cd9be827128f8084973b9601959",
+      "git_blob_sha": "e3fa6139a23b1c598b95c7a232576325fa6068d1",
+      "size_bytes": 584471,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-28.pkl",
+      "retrieved_utc": "2026-08-24T10:04:44+00:00"
+    },
+    {
+      "filename": "2018-05-29.pkl",
+      "sha256": "310a7f8a471f759efc47b2b001628197e27fc10f9119c3cf0a243c32004ce84b",
+      "git_blob_sha": "f4718a9f659478634049e8cc200734f5403151a9",
+      "size_bytes": 583676,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-29.pkl",
+      "retrieved_utc": "2026-08-24T10:04:45+00:00"
+    },
+    {
+      "filename": "2018-05-30.pkl",
+      "sha256": "831d0dbfe5cb8832346fcc4c0368b87d83ad6968999ec6f4746003a33bf789f1",
+      "git_blob_sha": "0b5c0cf7d9fa7037be8352adab79b69fb0252170",
+      "size_bytes": 576901,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-30.pkl",
+      "retrieved_utc": "2026-08-24T10:04:46+00:00"
+    },
+    {
+      "filename": "2018-05-31.pkl",
+      "sha256": "12ef99a8e78ad98be60efa996777e5d6e1e7de963401210e852633f336f45c14",
+      "git_blob_sha": "e8ef4b54da48d38fe9a76c01ca7df3cccd6a8aed",
+      "size_bytes": 575463,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-05-31.pkl",
+      "retrieved_utc": "2026-08-24T10:04:47+00:00"
+    },
+    {
+      "filename": "2018-06-01.pkl",
+      "sha256": "ce8af782d1d0a031db59b1e8066197cc8551cbd4f93705d5b11334106d924826",
+      "git_blob_sha": "91151489b9a9e8e73c42ae73ccb572c0f0d14baf",
+      "size_bytes": 583746,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-01.pkl",
+      "retrieved_utc": "2026-08-24T10:04:48+00:00"
+    },
+    {
+      "filename": "2018-06-02.pkl",
+      "sha256": "bdebcc40a8c478bdacf77919a60e64ae26fce434dd67580ca6279c68f7537443",
+      "git_blob_sha": "c37d90cd91059a3b1aff8a451703b94573d4daa3",
+      "size_bytes": 584912,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-02.pkl",
+      "retrieved_utc": "2026-08-24T10:04:48+00:00"
+    },
+    {
+      "filename": "2018-06-03.pkl",
+      "sha256": "e54d7a9140e8e0931f4234b0309cec1deeff175e043dd5b7842f331bc094574e",
+      "git_blob_sha": "7bfa26362270a648fbbd276f38c3a1fa9c9d87a7",
+      "size_bytes": 585459,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-03.pkl",
+      "retrieved_utc": "2026-08-24T10:04:50+00:00"
+    },
+    {
+      "filename": "2018-06-04.pkl",
+      "sha256": "c5f666165c8a97d341e4af960d787a0c708211e1c38e957427eaacf1c8dfce9b",
+      "git_blob_sha": "cb7b0d490f87ff79a838be1ebbd8ab503b083fd5",
+      "size_bytes": 584847,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-04.pkl",
+      "retrieved_utc": "2026-08-24T10:04:51+00:00"
+    },
+    {
+      "filename": "2018-06-05.pkl",
+      "sha256": "b20748c891d614767ff2a7153109303cbbe1bb7a1ca0e1d3706c69afb49dc8bf",
+      "git_blob_sha": "06bace17c5cf2d1c37c55f0b568afbbaf087ed1e",
+      "size_bytes": 583101,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-05.pkl",
+      "retrieved_utc": "2026-08-24T10:04:51+00:00"
+    },
+    {
+      "filename": "2018-06-06.pkl",
+      "sha256": "5eb92b974325452591ba641a5cb37110b07b2c01dc7c3afaac8ab4f45a0017ed",
+      "git_blob_sha": "e4b8af131bbad3538215fb247dd822a30d21fd8b",
+      "size_bytes": 583402,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-06.pkl",
+      "retrieved_utc": "2026-08-24T10:04:52+00:00"
+    },
+    {
+      "filename": "2018-06-07.pkl",
+      "sha256": "6100e3dc1b2e5e3dd031c2c8c5127378ce15b36b0a8870a961b7b983630c6389",
+      "git_blob_sha": "f968613c15521e03993322377e6424ee152505b9",
+      "size_bytes": 584989,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-07.pkl",
+      "retrieved_utc": "2026-08-24T10:04:53+00:00"
+    },
+    {
+      "filename": "2018-06-08.pkl",
+      "sha256": "7c39ff081f835738c725cd4fb1186f810487de31f431af6bbdfeaab82692511e",
+      "git_blob_sha": "1adf25bfcc6a2fdd45c28b15e51eee1b88852869",
+      "size_bytes": 587649,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-08.pkl",
+      "retrieved_utc": "2026-08-24T10:04:54+00:00"
+    },
+    {
+      "filename": "2018-06-09.pkl",
+      "sha256": "ee13cb03b32062a55673ec505c2353716fdf8222005fc5fa1db97b7b1b2055d1",
+      "git_blob_sha": "b6083769cb3777947bd4ddab5eff8b3cbe3a5634",
+      "size_bytes": 580919,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-09.pkl",
+      "retrieved_utc": "2026-08-24T10:04:55+00:00"
+    },
+    {
+      "filename": "2018-06-10.pkl",
+      "sha256": "45e6d22dbe3a58b67976a4b85d210d3f7ef029eb3e3ddf253db2600857d67a37",
+      "git_blob_sha": "68b426f8190fc118047d631b0e4cc4bd5d2f1157",
+      "size_bytes": 586588,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-10.pkl",
+      "retrieved_utc": "2026-08-24T10:04:56+00:00"
+    },
+    {
+      "filename": "2018-06-11.pkl",
+      "sha256": "21bd5a57bad9d758a880aeadb119b09f1d796a650c25d6cdd11195476e459ec7",
+      "git_blob_sha": "55c4166b7fe6ccd9ca5a344d0cf5a5b2ebb22c9e",
+      "size_bytes": 588009,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-11.pkl",
+      "retrieved_utc": "2026-08-24T10:04:57+00:00"
+    },
+    {
+      "filename": "2018-06-12.pkl",
+      "sha256": "151c8686394e8ab29f3cdbcde8c50c9b08a6e1d91ca8b47e2c80ff93dfe97caf",
+      "git_blob_sha": "7723caf04fa77a2c1d5632a8625ca2ebc5dd56fe",
+      "size_bytes": 587879,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-12.pkl",
+      "retrieved_utc": "2026-08-24T10:04:58+00:00"
+    },
+    {
+      "filename": "2018-06-13.pkl",
+      "sha256": "c6c25d07048231dd2068d554528e335ed2f09b2e341ebdf1463e681d71f67f9b",
+      "git_blob_sha": "f8ca5af9d6538ed86977fccaf86524465ee8503d",
+      "size_bytes": 579519,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-13.pkl",
+      "retrieved_utc": "2026-08-24T10:04:59+00:00"
+    },
+    {
+      "filename": "2018-06-14.pkl",
+      "sha256": "db7474c5528107e960edb5b7e63f7093651c604e66a71abd6a399d708b81874a",
+      "git_blob_sha": "f7edba6bc73217c84bdf6ec19bb79178ef9a65bf",
+      "size_bytes": 591232,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-14.pkl",
+      "retrieved_utc": "2026-08-24T10:04:59+00:00"
+    },
+    {
+      "filename": "2018-06-15.pkl",
+      "sha256": "b0eeca84c495cff7d1057da50a91604b8f8e0eee013066e9ee5e7ad48b0c932b",
+      "git_blob_sha": "89e022641f35c6b275ef73e213eb7afeda0d60e9",
+      "size_bytes": 577031,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-15.pkl",
+      "retrieved_utc": "2026-08-24T10:05:01+00:00"
+    },
+    {
+      "filename": "2018-06-16.pkl",
+      "sha256": "0b52ff9f3af0e8d1b3586cdcccb199a0227ca2e78882262178c62abf004f1eea",
+      "git_blob_sha": "aa4a72bf34767566b9c20d6bf5bd67269269c9b0",
+      "size_bytes": 592538,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-16.pkl",
+      "retrieved_utc": "2026-08-24T10:05:02+00:00"
+    },
+    {
+      "filename": "2018-06-17.pkl",
+      "sha256": "50e71b0c616c7672a85b8bee0e78a2cfbba0a1f743fcb63ef1682c1cded1f919",
+      "git_blob_sha": "75b06217342af38f79b1aa05378c9afac101489b",
+      "size_bytes": 586929,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-17.pkl",
+      "retrieved_utc": "2026-08-24T10:05:03+00:00"
+    },
+    {
+      "filename": "2018-06-18.pkl",
+      "sha256": "a89499c0a9653125e037e25c4ae6368272fd8218dcf61e930cefbb5dc6424f91",
+      "git_blob_sha": "94707a1697c3e79f266fec4e6ccac6676d31478f",
+      "size_bytes": 594712,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-18.pkl",
+      "retrieved_utc": "2026-08-24T10:05:04+00:00"
+    },
+    {
+      "filename": "2018-06-19.pkl",
+      "sha256": "8d4cc660ab4ae195aafe9abe88a65405930e41c1bacdb6ec11ebff24e995366e",
+      "git_blob_sha": "df4b2b6646b1868ab36b3c0d40f77048839ce09c",
+      "size_bytes": 582422,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-19.pkl",
+      "retrieved_utc": "2026-08-24T10:05:06+00:00"
+    },
+    {
+      "filename": "2018-06-20.pkl",
+      "sha256": "407881ba39a1167998aabeabd100da757dd2592809d9e512bebf6bbfd737a332",
+      "git_blob_sha": "a29dd30086557642dddb10e9690b16feccb96e2a",
+      "size_bytes": 581680,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-20.pkl",
+      "retrieved_utc": "2026-08-24T10:05:07+00:00"
+    },
+    {
+      "filename": "2018-06-21.pkl",
+      "sha256": "a6155129dd4740391551a034406116aec78c601fef0f204502289d61e6235599",
+      "git_blob_sha": "74f935c19a9a003d9f96da50ecc4c471c8e0f6b9",
+      "size_bytes": 579321,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-21.pkl",
+      "retrieved_utc": "2026-08-24T10:05:08+00:00"
+    },
+    {
+      "filename": "2018-06-22.pkl",
+      "sha256": "47aa38ec09926601f0bd80486acba6df98603f80831d83154a415eaea3c4cf92",
+      "git_blob_sha": "568c4f2c77defc9f4f2f34551bc6399ce26600fd",
+      "size_bytes": 583064,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-22.pkl",
+      "retrieved_utc": "2026-08-24T10:05:09+00:00"
+    },
+    {
+      "filename": "2018-06-23.pkl",
+      "sha256": "6c2f51373cf45bac38cc1da6f3afc16b0a633a5c8a8e17b7799cdcae20bbe344",
+      "git_blob_sha": "f9929f3b6e4189bd5fce4f38c6750a30a9a27729",
+      "size_bytes": 589600,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-23.pkl",
+      "retrieved_utc": "2026-08-24T10:05:10+00:00"
+    },
+    {
+      "filename": "2018-06-24.pkl",
+      "sha256": "2159503348895f3d9294547fa65b0f5fca19f9bdb2ec4b10e331fa89993dbc49",
+      "git_blob_sha": "49a279cd44672e0e0d936e72e80c1710a02223f8",
+      "size_bytes": 583509,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-24.pkl",
+      "retrieved_utc": "2026-08-24T10:05:11+00:00"
+    },
+    {
+      "filename": "2018-06-25.pkl",
+      "sha256": "ca2c8d4e1751705fda0edc82e4c12ff65ea1f0650193aa00f516b2d020f32329",
+      "git_blob_sha": "17253476dc4edae039a15c07852d97b375b768a2",
+      "size_bytes": 585769,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-25.pkl",
+      "retrieved_utc": "2026-08-24T10:05:11+00:00"
+    },
+    {
+      "filename": "2018-06-26.pkl",
+      "sha256": "e91792221ffa2501a24198353af1078a0d8d092649026e4d1537b24824c39f1f",
+      "git_blob_sha": "41fa8cc690b34c70420b2212c9b6add9b03fa8ff",
+      "size_bytes": 580970,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-26.pkl",
+      "retrieved_utc": "2026-08-24T10:05:12+00:00"
+    },
+    {
+      "filename": "2018-06-27.pkl",
+      "sha256": "ee89fa00e440114fadaec2e0846559ab753c0f28a3f3c45314ff7d861c51b03d",
+      "git_blob_sha": "b790e8f460c54bf32b87bba6c11ff78f59b5cbeb",
+      "size_bytes": 584208,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-27.pkl",
+      "retrieved_utc": "2026-08-24T10:05:13+00:00"
+    },
+    {
+      "filename": "2018-06-28.pkl",
+      "sha256": "24cdb8895d0c9f918f7d2f24fba5ee8f4c12a1bda2b61811357daeb78f400d13",
+      "git_blob_sha": "bcd40979fc45191b96648de37a61d784281f9d5c",
+      "size_bytes": 592030,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-28.pkl",
+      "retrieved_utc": "2026-08-24T10:05:13+00:00"
+    },
+    {
+      "filename": "2018-06-29.pkl",
+      "sha256": "c4141abd5dc12e25b2c631ba04170c49adcc6ab9c3170d98b4637d7be602baac",
+      "git_blob_sha": "990c82eb07894a147605df2855cddacfe8d1f8ef",
+      "size_bytes": 583007,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-29.pkl",
+      "retrieved_utc": "2026-08-24T10:05:14+00:00"
+    },
+    {
+      "filename": "2018-06-30.pkl",
+      "sha256": "e964e7f5879ede5ddc5dcadbba06ffde8ccfc7ab320b696af9b3674d1d3f082f",
+      "git_blob_sha": "70cec978768368279ad0d93906ab7db4d2803677",
+      "size_bytes": 597865,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-06-30.pkl",
+      "retrieved_utc": "2026-08-24T10:05:15+00:00"
+    },
+    {
+      "filename": "2018-07-01.pkl",
+      "sha256": "568604a89fb2392013e02163710d8f333b5a8a41f2f9b8ef1839715aeab45239",
+      "git_blob_sha": "4a14cef3e86606fb2ee26eec472dcb5a16b1af6c",
+      "size_bytes": 591895,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-01.pkl",
+      "retrieved_utc": "2026-08-24T10:05:17+00:00"
+    },
+    {
+      "filename": "2018-07-02.pkl",
+      "sha256": "776bfa2e273442df983047e9be7066e539588d80304c771e2bc01b9bff18481a",
+      "git_blob_sha": "7d618ff98e2faa8f34c940c752a5e93b569e434e",
+      "size_bytes": 590592,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-02.pkl",
+      "retrieved_utc": "2026-08-24T10:05:19+00:00"
+    },
+    {
+      "filename": "2018-07-03.pkl",
+      "sha256": "0ca6db224d90f8f011260c1687fbd8ae79cebef07aae3fded66349892073e4b2",
+      "git_blob_sha": "42e0bc8a81162fec1dbbc4180c2c23b38953ac15",
+      "size_bytes": 587536,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-03.pkl",
+      "retrieved_utc": "2026-08-24T10:05:19+00:00"
+    },
+    {
+      "filename": "2018-07-04.pkl",
+      "sha256": "3bc2c083b2ec1aeba8ea477709c76b96e334113e4510c7c3e8f55cae94e82fa4",
+      "git_blob_sha": "b8273416a1fb47523654d108029b5e19c2b0ec5f",
+      "size_bytes": 582810,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-04.pkl",
+      "retrieved_utc": "2026-08-24T10:05:20+00:00"
+    },
+    {
+      "filename": "2018-07-05.pkl",
+      "sha256": "2219ad41803494bb0cd6cdb8f8d2ac9fdbdf06fbcc63863ac22aed5c9899923f",
+      "git_blob_sha": "61db4c3574267b8d8a41a5a4bc3b1bf3572a0e2f",
+      "size_bytes": 597506,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-05.pkl",
+      "retrieved_utc": "2026-08-24T10:05:21+00:00"
+    },
+    {
+      "filename": "2018-07-06.pkl",
+      "sha256": "b260ef1999f8c82b964d71374af1ed9241c62376e21444910a7b27089bbcd99a",
+      "git_blob_sha": "f937d2aa64be7faf14cd45d8e390aa318dc96e84",
+      "size_bytes": 589018,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-06.pkl",
+      "retrieved_utc": "2026-08-24T10:05:22+00:00"
+    },
+    {
+      "filename": "2018-07-07.pkl",
+      "sha256": "f10276a4aac4018e6c4e42cca0545fdd4aee16e3a418ad1872a19829705729e1",
+      "git_blob_sha": "5c8c2f37052c06592d42ec64bf6035f0b81dcde7",
+      "size_bytes": 584220,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-07.pkl",
+      "retrieved_utc": "2026-08-24T10:05:23+00:00"
+    },
+    {
+      "filename": "2018-07-08.pkl",
+      "sha256": "f78573f481832095d8928e5e94e0739ea75a7d66b2e214fd3ea15b5fa24bb6ce",
+      "git_blob_sha": "21af86c9633163f259bfc7ec604af98441581b2f",
+      "size_bytes": 577729,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-08.pkl",
+      "retrieved_utc": "2026-08-24T10:05:24+00:00"
+    },
+    {
+      "filename": "2018-07-09.pkl",
+      "sha256": "ca54a6c703cd5a9ab2815b5491d93f7335ae6cec0c9f888619533e873144c713",
+      "git_blob_sha": "efd0b2a57f12372e5715bfc4a40b734b7e4e57a9",
+      "size_bytes": 577669,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-09.pkl",
+      "retrieved_utc": "2026-08-24T10:05:25+00:00"
+    },
+    {
+      "filename": "2018-07-10.pkl",
+      "sha256": "fbe0c4c4e8243dc08065ccef3cf87dd9a26da54f9b0a369c415ef263dc8a045b",
+      "git_blob_sha": "c584d191fd17ee675660b03d1f1da2bf5f9f9d6f",
+      "size_bytes": 580378,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-10.pkl",
+      "retrieved_utc": "2026-08-24T10:05:26+00:00"
+    },
+    {
+      "filename": "2018-07-11.pkl",
+      "sha256": "8b18a7461ed0016e5e642b3adda8a66a96a507a01866c1ba4d6abcdd90fbc600",
+      "git_blob_sha": "9fb60691407cf4374063170100fa32258cdf58f4",
+      "size_bytes": 585658,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-11.pkl",
+      "retrieved_utc": "2026-08-24T10:05:27+00:00"
+    },
+    {
+      "filename": "2018-07-12.pkl",
+      "sha256": "9f0ba4f9afa7ec4f91814533f5901fbc349a6699300a3879591e8735455dc0a3",
+      "git_blob_sha": "412e8ef6f78601e44b88721119288d9e913f18c8",
+      "size_bytes": 582491,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-12.pkl",
+      "retrieved_utc": "2026-08-24T10:05:28+00:00"
+    },
+    {
+      "filename": "2018-07-13.pkl",
+      "sha256": "31106772188ea3e57830e31350e7fac792f18fd37b544a1730966f53cf2732e0",
+      "git_blob_sha": "91b9fc06a8beff9338a5c814806e9f7ab36fbd19",
+      "size_bytes": 586631,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-13.pkl",
+      "retrieved_utc": "2026-08-24T10:05:28+00:00"
+    },
+    {
+      "filename": "2018-07-14.pkl",
+      "sha256": "c56b05a6bcd3df0dc1715dbab196372e38e71dfb0902db3737ec9106f3bceb10",
+      "git_blob_sha": "c482ee9bdc3a862aa89040c9514eca0443156c2e",
+      "size_bytes": 581488,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-14.pkl",
+      "retrieved_utc": "2026-08-24T10:05:29+00:00"
+    },
+    {
+      "filename": "2018-07-15.pkl",
+      "sha256": "0cb9bdba43e50382427f4ac6cd285a748906a0247bc9d0352918d35218261095",
+      "git_blob_sha": "1cf619cc8e16d165a99d5cf62c0e8fecf03b1574",
+      "size_bytes": 581663,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-15.pkl",
+      "retrieved_utc": "2026-08-24T10:05:30+00:00"
+    },
+    {
+      "filename": "2018-07-16.pkl",
+      "sha256": "6eead27c4faef8918e95520ecac3b4c2e6a450634271431fe15f69984d1652a7",
+      "git_blob_sha": "9b916c1bb73452bf86690a4f39ac40930c3a1222",
+      "size_bytes": 581756,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-16.pkl",
+      "retrieved_utc": "2026-08-24T10:05:31+00:00"
+    },
+    {
+      "filename": "2018-07-17.pkl",
+      "sha256": "886dba04e691a87e1d8eec36e2e481a88362d3f99a1eb01fc4852152c81c4e5c",
+      "git_blob_sha": "d96792427751be9b51637d491a071eb5de7e66eb",
+      "size_bytes": 588023,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-17.pkl",
+      "retrieved_utc": "2026-08-24T10:05:31+00:00"
+    },
+    {
+      "filename": "2018-07-18.pkl",
+      "sha256": "fbe1d561b314783361d2bc305c848ea12a230d3d3d8d06d6582253298d08c32d",
+      "git_blob_sha": "72c9305a4768957b1be70e3e8f0fe1074b6fe3ba",
+      "size_bytes": 582132,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-18.pkl",
+      "retrieved_utc": "2026-08-24T10:05:32+00:00"
+    },
+    {
+      "filename": "2018-07-19.pkl",
+      "sha256": "b01b8d47837defe21c083e459e0c16235ed40360e3ea7c5bc7ba59080d0358b1",
+      "git_blob_sha": "5b8f9153901f1696071a9774a27029fb84de41db",
+      "size_bytes": 583772,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-19.pkl",
+      "retrieved_utc": "2026-08-24T10:05:33+00:00"
+    },
+    {
+      "filename": "2018-07-20.pkl",
+      "sha256": "75e5fb866d92f9a84a8b5f99d6727c3862c517ace37ef240c78700a388158f5c",
+      "git_blob_sha": "853e5c39601e17d59a2dd43bc2689348d64963b1",
+      "size_bytes": 592419,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-20.pkl",
+      "retrieved_utc": "2026-08-24T10:05:33+00:00"
+    },
+    {
+      "filename": "2018-07-21.pkl",
+      "sha256": "42289bfe3f880e79ad1b698ad52e07222cca562a8b1b5321c6ecd5e22c516ff8",
+      "git_blob_sha": "9ae06fc58b3eddf91b69cae98bb2e96388e4f625",
+      "size_bytes": 585079,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-21.pkl",
+      "retrieved_utc": "2026-08-24T10:05:34+00:00"
+    },
+    {
+      "filename": "2018-07-22.pkl",
+      "sha256": "72b94dd723c1dd776bf597e89d2f8f607eb2e51f60036a43f61d1289d6c962a6",
+      "git_blob_sha": "ecbc8c3a3de05eb6af7b166eb0c15a3644e4b3a9",
+      "size_bytes": 576567,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-22.pkl",
+      "retrieved_utc": "2026-08-24T10:05:35+00:00"
+    },
+    {
+      "filename": "2018-07-23.pkl",
+      "sha256": "5a641ce71810385708b58027b334f87a51bf66277704a98ec81fcfee4c2e443c",
+      "git_blob_sha": "f085bacb9e87ff67d060fc0343d89ee1054d6d37",
+      "size_bytes": 581516,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-23.pkl",
+      "retrieved_utc": "2026-08-24T10:05:36+00:00"
+    },
+    {
+      "filename": "2018-07-24.pkl",
+      "sha256": "59083637dceef57c294207669b7e59888b88f1462078f86cbebe89afe715a2b8",
+      "git_blob_sha": "18d3a5bf3923451db331c427dd17be9952a71df6",
+      "size_bytes": 580036,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-24.pkl",
+      "retrieved_utc": "2026-08-24T10:05:36+00:00"
+    },
+    {
+      "filename": "2018-07-25.pkl",
+      "sha256": "3102ff064dfa955f0e5b51be48a3cfb4a67cb09952d7bfa326de76ffa23d1e3f",
+      "git_blob_sha": "ba78b14e9922a34236aa3e257f9b1eaba831583d",
+      "size_bytes": 582727,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-25.pkl",
+      "retrieved_utc": "2026-08-24T10:05:37+00:00"
+    },
+    {
+      "filename": "2018-07-26.pkl",
+      "sha256": "a8def38ff13d120e89b118e6778be325b5b85cb891dea9fd488658569ce02e1e",
+      "git_blob_sha": "c09470b605fed12badaf631607583e0c66b6e0f0",
+      "size_bytes": 597699,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-26.pkl",
+      "retrieved_utc": "2026-08-24T10:05:38+00:00"
+    },
+    {
+      "filename": "2018-07-27.pkl",
+      "sha256": "694031a2fa3db000d730ce23c6bce17a783f496bb0a8d6fb8c7ed4c0bd7fcbc7",
+      "git_blob_sha": "9569d2d6b6026567b26525808e33170313491283",
+      "size_bytes": 582151,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-27.pkl",
+      "retrieved_utc": "2026-08-24T10:05:39+00:00"
+    },
+    {
+      "filename": "2018-07-28.pkl",
+      "sha256": "baa77ef237b810d843b7c19e076d34ae83f42f16b19703b39674102ebd29d33a",
+      "git_blob_sha": "0a8b436f0cc2c09fe22da4e9f33b05f605021942",
+      "size_bytes": 580003,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-28.pkl",
+      "retrieved_utc": "2026-08-24T10:05:39+00:00"
+    },
+    {
+      "filename": "2018-07-29.pkl",
+      "sha256": "0114b79903fa59c07ba97becda80d9d9679e57adeb7cbd349b4f1b829454385e",
+      "git_blob_sha": "4147d7e713457d55981f8fc1943e2554405ea57a",
+      "size_bytes": 582199,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-29.pkl",
+      "retrieved_utc": "2026-08-24T10:05:40+00:00"
+    },
+    {
+      "filename": "2018-07-30.pkl",
+      "sha256": "15d530b1d45f93d2651c154f51307c9608148dd5ddd898e48e8c7b88f5f8511a",
+      "git_blob_sha": "7ced7886dedda62726c80df33970fcd09086695b",
+      "size_bytes": 589277,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-30.pkl",
+      "retrieved_utc": "2026-08-24T10:05:41+00:00"
+    },
+    {
+      "filename": "2018-07-31.pkl",
+      "sha256": "a567e0616dfd580e8fbe234f74a4a768bacecb8c44a4363c90ba24a98f4293bb",
+      "git_blob_sha": "5ea93dee600facf7307fb438333ccacaa0ba46a8",
+      "size_bytes": 592702,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-07-31.pkl",
+      "retrieved_utc": "2026-08-24T10:05:41+00:00"
+    },
+    {
+      "filename": "2018-08-01.pkl",
+      "sha256": "bb2da318842f6385903da969e43d5a943f01361d5b48e0d4d4cfb9e4c2e9b44a",
+      "git_blob_sha": "32c9e90f609ab1c32199fa43d3e6b71c7909a985",
+      "size_bytes": 583400,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-01.pkl",
+      "retrieved_utc": "2026-08-24T10:05:42+00:00"
+    },
+    {
+      "filename": "2018-08-02.pkl",
+      "sha256": "aea8bbcc7e3f35c8df31499473b034a5858d7ff5f4f59aaa0c237c49cc05becc",
+      "git_blob_sha": "300a9f4f7c30ab518d7a1caed8e6510123b6e8ac",
+      "size_bytes": 589887,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-02.pkl",
+      "retrieved_utc": "2026-08-24T10:05:43+00:00"
+    },
+    {
+      "filename": "2018-08-03.pkl",
+      "sha256": "44112cfb7089d25c0932313e251894a57f0264c04033a674e11c893035681cf8",
+      "git_blob_sha": "9df051738678cc366ee07457f9076d75c9b7103c",
+      "size_bytes": 578769,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-03.pkl",
+      "retrieved_utc": "2026-08-24T10:05:45+00:00"
+    },
+    {
+      "filename": "2018-08-04.pkl",
+      "sha256": "17caccb922da2ff363499a701da0a2905023679fc03fe518571da9a35a6fe5d5",
+      "git_blob_sha": "7bf13d651f0a48a67cbc7d0f91d63e416b5d1ecc",
+      "size_bytes": 588582,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-04.pkl",
+      "retrieved_utc": "2026-08-24T10:05:46+00:00"
+    },
+    {
+      "filename": "2018-08-05.pkl",
+      "sha256": "372b5a109748f2b9851483b272f3716cab332823f994200f86ddbd8c7cd1b6a8",
+      "git_blob_sha": "2975e68622711658a328d3f50ba99efc6513ed2d",
+      "size_bytes": 581913,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-05.pkl",
+      "retrieved_utc": "2026-08-24T10:05:47+00:00"
+    },
+    {
+      "filename": "2018-08-06.pkl",
+      "sha256": "603b1dee00aee70b9259effbe743b5bfa8edc936f176389bf3325eff62fa1b7a",
+      "git_blob_sha": "fc069295a7a154b02a21281c87ccf444b21a382f",
+      "size_bytes": 575160,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-06.pkl",
+      "retrieved_utc": "2026-08-24T10:05:48+00:00"
+    },
+    {
+      "filename": "2018-08-07.pkl",
+      "sha256": "f568ce517ae2cc3e1d5d16513541acbcf3c7afacb9248d8ba724257d762e53e0",
+      "git_blob_sha": "6bdaad03afac077451294119eb0a3b0082fa2360",
+      "size_bytes": 592905,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-07.pkl",
+      "retrieved_utc": "2026-08-24T10:05:49+00:00"
+    },
+    {
+      "filename": "2018-08-08.pkl",
+      "sha256": "a4f4bd85bf5cbf675d992e6bedb985919b41e0a6372b8a0933b81d26d33e2163",
+      "git_blob_sha": "ea49acf9eff00e9a2b5884930e1904545ad94532",
+      "size_bytes": 594849,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-08.pkl",
+      "retrieved_utc": "2026-08-24T10:05:50+00:00"
+    },
+    {
+      "filename": "2018-08-09.pkl",
+      "sha256": "5aa75ccbf357ef97e393aec3afc5c5146c6a7da21cf482e2ba9e01dde1cbba0e",
+      "git_blob_sha": "5f84ff69280418b01591901b928e05b65da5c60f",
+      "size_bytes": 588843,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-09.pkl",
+      "retrieved_utc": "2026-08-24T10:05:51+00:00"
+    },
+    {
+      "filename": "2018-08-10.pkl",
+      "sha256": "503df3e0842b16c615379c5f61744c3b28762914eab545821646fc77a9730a61",
+      "git_blob_sha": "614c384cd095914b55d41cabdd91acf72a847604",
+      "size_bytes": 581662,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-10.pkl",
+      "retrieved_utc": "2026-08-24T10:05:52+00:00"
+    },
+    {
+      "filename": "2018-08-11.pkl",
+      "sha256": "7121ca84480ed292103b0461f250cb511632e93e92b0312300d76ea02f0e627b",
+      "git_blob_sha": "abcf25c4c2fd15aa0af583c8bafcc7f3413678c7",
+      "size_bytes": 575807,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-11.pkl",
+      "retrieved_utc": "2026-08-24T10:05:53+00:00"
+    },
+    {
+      "filename": "2018-08-12.pkl",
+      "sha256": "107e55afc405ee67bfd444c919bbf8f8149e4c465ac95ca2fa51d3dbcf3fa362",
+      "git_blob_sha": "a5888173f7340f4b43a0c21a4d04277fb70335f7",
+      "size_bytes": 591228,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-12.pkl",
+      "retrieved_utc": "2026-08-24T10:05:54+00:00"
+    },
+    {
+      "filename": "2018-08-13.pkl",
+      "sha256": "55c2637325882bcd4a1a62549c6cc75031d5f59726cc6584eb426c02bbf561df",
+      "git_blob_sha": "d35b1362d16e389259957ed0ec23783676039f91",
+      "size_bytes": 580484,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-13.pkl",
+      "retrieved_utc": "2026-08-24T10:05:54+00:00"
+    },
+    {
+      "filename": "2018-08-14.pkl",
+      "sha256": "dea3f3e44e0d48954cc58175ed0b5e78740142306cc662425b2bc0ecc450d4ed",
+      "git_blob_sha": "09963318b1561bcfb8fd73e53aeafde856594fd3",
+      "size_bytes": 584150,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-14.pkl",
+      "retrieved_utc": "2026-08-24T10:05:55+00:00"
+    },
+    {
+      "filename": "2018-08-15.pkl",
+      "sha256": "da6f77787fce9afcf3484b3b8d50a63a590987c0c5b484c099904dd537bfb79a",
+      "git_blob_sha": "9c35be450a84cd991de7a48f9c4cd108461ac48c",
+      "size_bytes": 592480,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-15.pkl",
+      "retrieved_utc": "2026-08-24T10:05:56+00:00"
+    },
+    {
+      "filename": "2018-08-16.pkl",
+      "sha256": "920a8a23cc7dc6f18a48593356b9cec94fc629b71c9140fb14f3234a8a4b97c5",
+      "git_blob_sha": "6c8b7a45cfbc997f489cf384e937a3984a8e8201",
+      "size_bytes": 575517,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-16.pkl",
+      "retrieved_utc": "2026-08-24T10:05:57+00:00"
+    },
+    {
+      "filename": "2018-08-17.pkl",
+      "sha256": "8d3820d32e8e1c53d1ebe865b331f8b28c8203a0900b578793dffc6e599aae7c",
+      "git_blob_sha": "a35a451090da0c679587cd65fe81804154bac5e1",
+      "size_bytes": 581204,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-17.pkl",
+      "retrieved_utc": "2026-08-24T10:05:58+00:00"
+    },
+    {
+      "filename": "2018-08-18.pkl",
+      "sha256": "88367285c25491aca472f2d49d1578ae16dcfb60e88143e5e679f92417f323f2",
+      "git_blob_sha": "e5bd968bb5990f129e899801525fdda97372309d",
+      "size_bytes": 581186,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-18.pkl",
+      "retrieved_utc": "2026-08-24T10:05:59+00:00"
+    },
+    {
+      "filename": "2018-08-19.pkl",
+      "sha256": "2a3e87ecbd68b083463b46e1e19a8d4ea0f472c90026ba1600aa949fdd494c04",
+      "git_blob_sha": "a48b269b8e7fb44fba821e9c9b294bd003380025",
+      "size_bytes": 590707,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-19.pkl",
+      "retrieved_utc": "2026-08-24T10:06:00+00:00"
+    },
+    {
+      "filename": "2018-08-20.pkl",
+      "sha256": "3737f705deae68f65a27856766aef4b37aafd62a06a5e45fb6d79e446d214742",
+      "git_blob_sha": "c0d764dbe6d8d45f75effde3417437a7c46c1ed0",
+      "size_bytes": 587297,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-20.pkl",
+      "retrieved_utc": "2026-08-24T10:06:02+00:00"
+    },
+    {
+      "filename": "2018-08-21.pkl",
+      "sha256": "8f83453e45f71366f35ace824ab8823977055965349fae9225b1b02a141f3953",
+      "git_blob_sha": "26bfcfcbcefb3ffa3e1f8530071732cb275854cc",
+      "size_bytes": 586603,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-21.pkl",
+      "retrieved_utc": "2026-08-24T10:06:02+00:00"
+    },
+    {
+      "filename": "2018-08-22.pkl",
+      "sha256": "271f0d1c9a989c16cbe6a13e686f3f2004c329d4adf333db54af799f312f105c",
+      "git_blob_sha": "454884536865832bc3b0ebf99be1e35f0f153d5b",
+      "size_bytes": 588018,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-22.pkl",
+      "retrieved_utc": "2026-08-24T10:06:03+00:00"
+    },
+    {
+      "filename": "2018-08-23.pkl",
+      "sha256": "19ed2cdf9bdffa5e999b17b1b92aaba93b155a2341f24533fbf57c086d413b28",
+      "git_blob_sha": "8e47c9865df9e249895577d3452b4cad03daf9a0",
+      "size_bytes": 577224,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-23.pkl",
+      "retrieved_utc": "2026-08-24T10:06:05+00:00"
+    },
+    {
+      "filename": "2018-08-24.pkl",
+      "sha256": "8b62a214df082e22677e444de708100bf3537e4609343c67f8813ec7663c0848",
+      "git_blob_sha": "3406d175a6897b05d1aafc760d67c7f4fcdd9c26",
+      "size_bytes": 586772,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-24.pkl",
+      "retrieved_utc": "2026-08-24T10:06:05+00:00"
+    },
+    {
+      "filename": "2018-08-25.pkl",
+      "sha256": "af92958e2b66596120d0bd2ac2837bd1d2ae694fa4f20d3bbf561ae593d278fa",
+      "git_blob_sha": "751c72c83e7d96f56a6e3cd85561986f7870ac80",
+      "size_bytes": 580166,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-25.pkl",
+      "retrieved_utc": "2026-08-24T10:06:07+00:00"
+    },
+    {
+      "filename": "2018-08-26.pkl",
+      "sha256": "927adc893b34290e42427d42518d97e99da23a4f20e6c997da89f5c5bec36dd4",
+      "git_blob_sha": "c2a301904a92961c5d0c967229018b77390cd70c",
+      "size_bytes": 594103,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-26.pkl",
+      "retrieved_utc": "2026-08-24T10:06:08+00:00"
+    },
+    {
+      "filename": "2018-08-27.pkl",
+      "sha256": "54e202fc1c30d62453ef3a086ab65380d13b46b5205bf0038d2c407cdd7d54a5",
+      "git_blob_sha": "c55bb5ccfdbd0a2633604be2228ff1494b32d1e4",
+      "size_bytes": 586150,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-27.pkl",
+      "retrieved_utc": "2026-08-24T10:06:09+00:00"
+    },
+    {
+      "filename": "2018-08-28.pkl",
+      "sha256": "ccd1551f5bd93ce89281edcb23883924b19c50c42b597f9192331d724f4f4f32",
+      "git_blob_sha": "7dd25961b5b5109375af84ea653b2305474835f5",
+      "size_bytes": 587676,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-28.pkl",
+      "retrieved_utc": "2026-08-24T10:06:09+00:00"
+    },
+    {
+      "filename": "2018-08-29.pkl",
+      "sha256": "c0c03f11274e7d3e3aa951a3d356a78bdbf5d4c1c3c48d104b02509a7c9ed060",
+      "git_blob_sha": "bf7caa149530b22507311c3d116f3935c2e86659",
+      "size_bytes": 567125,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-29.pkl",
+      "retrieved_utc": "2026-08-24T10:06:10+00:00"
+    },
+    {
+      "filename": "2018-08-30.pkl",
+      "sha256": "54764232750888b4e576e19396cab2f2f32bfce022778528c1fb93ba51540396",
+      "git_blob_sha": "b3680097608d5d683f36bcf7eede3a2fcaf1d6c8",
+      "size_bytes": 582374,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-30.pkl",
+      "retrieved_utc": "2026-08-24T10:06:11+00:00"
+    },
+    {
+      "filename": "2018-08-31.pkl",
+      "sha256": "7c2652649ec36a4ce1cd6a5645f2b146ff795a2456166978c17ac6101fe52ecd",
+      "git_blob_sha": "69d557543622d857336fc08908be17ba549988b5",
+      "size_bytes": 580464,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-08-31.pkl",
+      "retrieved_utc": "2026-08-24T10:06:11+00:00"
+    },
+    {
+      "filename": "2018-09-01.pkl",
+      "sha256": "46c31b33e177102901af475aeebb651ea7d17c191de61196e9a4acb7f1b2cdae",
+      "git_blob_sha": "35b3de50f85bd1b6b4df55aeb59d93526e04c8d8",
+      "size_bytes": 577879,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-01.pkl",
+      "retrieved_utc": "2026-08-24T10:06:12+00:00"
+    },
+    {
+      "filename": "2018-09-02.pkl",
+      "sha256": "50566aefc78ec247aba91f232d700e3f7c0ad80b1c4cb903243ab96c27812537",
+      "git_blob_sha": "a9d2f93087863f420ca0b1914945648ea48d5121",
+      "size_bytes": 594650,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-02.pkl",
+      "retrieved_utc": "2026-08-24T10:06:13+00:00"
+    },
+    {
+      "filename": "2018-09-03.pkl",
+      "sha256": "2920b63b527b2aef1f6e3f4326536fe442f93ea29392e36101a9dc5cdfda41e5",
+      "git_blob_sha": "9cefd12717849afc6135522c28d44bc7d3f1ee06",
+      "size_bytes": 581905,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-03.pkl",
+      "retrieved_utc": "2026-08-24T10:06:14+00:00"
+    },
+    {
+      "filename": "2018-09-04.pkl",
+      "sha256": "439b87826344c555b092f9f6c4c434ae5415b34f0e9f40e550ff7983018acdad",
+      "git_blob_sha": "a3e0bb4d1fdb020e45f18ecfdf6894591dc4c29c",
+      "size_bytes": 587640,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-04.pkl",
+      "retrieved_utc": "2026-08-24T10:06:15+00:00"
+    },
+    {
+      "filename": "2018-09-05.pkl",
+      "sha256": "48bf05474b8a0bb41539e11928ddacdcb0a33c157e8670d24554e15b569a1b7c",
+      "git_blob_sha": "f020b2659dbf26b07ab6e711bee4702734c6ab32",
+      "size_bytes": 577206,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-05.pkl",
+      "retrieved_utc": "2026-08-24T10:06:16+00:00"
+    },
+    {
+      "filename": "2018-09-06.pkl",
+      "sha256": "8e6f780909fdbf96257955114bf63dcd01d27a3e44231d030eff8c4575a6096a",
+      "git_blob_sha": "e7ddebfd2e16dda5d7c35bbdfc02eab99d84293b",
+      "size_bytes": 590318,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-06.pkl",
+      "retrieved_utc": "2026-08-24T10:06:16+00:00"
+    },
+    {
+      "filename": "2018-09-07.pkl",
+      "sha256": "d62d947549cc47930f9ca01ceb53d3c90fdeb459b77d3108d421a5170c456c19",
+      "git_blob_sha": "842ca4c4d86be06ab7aa8712af1d15cdcc73e8e9",
+      "size_bytes": 581777,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-07.pkl",
+      "retrieved_utc": "2026-08-24T10:06:17+00:00"
+    },
+    {
+      "filename": "2018-09-08.pkl",
+      "sha256": "1e4a5ba546dba8128d3e81710b0da270e59d7aaa33345e02aaba7de67e67a9c3",
+      "git_blob_sha": "c260139f34535fcd0c57309bc39937d0964495c3",
+      "size_bytes": 590900,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-08.pkl",
+      "retrieved_utc": "2026-08-24T10:06:18+00:00"
+    },
+    {
+      "filename": "2018-09-09.pkl",
+      "sha256": "79259bfe280db64555cb6a13f11bec8b54fe4cc9d11261bf5dd76abfbc9752eb",
+      "git_blob_sha": "cf960c14c4dda653e2b2f924196bf9e353699b15",
+      "size_bytes": 596239,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-09.pkl",
+      "retrieved_utc": "2026-08-24T10:06:18+00:00"
+    },
+    {
+      "filename": "2018-09-10.pkl",
+      "sha256": "cfe507ca72fd1d16ba6b4a8b687623478f24ccc6b3b66e2503f56e97f9e1481d",
+      "git_blob_sha": "6a3f6854c8b7004771ab6ec61bdee67fafda9699",
+      "size_bytes": 591730,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-10.pkl",
+      "retrieved_utc": "2026-08-24T10:06:19+00:00"
+    },
+    {
+      "filename": "2018-09-11.pkl",
+      "sha256": "45f1e75f566edc311273959ae540d40ff1700cb720cf15287406acc2a3bd71f9",
+      "git_blob_sha": "22e13f2ab8036bb2a326a522806aff04a44c8bc0",
+      "size_bytes": 579864,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-11.pkl",
+      "retrieved_utc": "2026-08-24T10:06:20+00:00"
+    },
+    {
+      "filename": "2018-09-12.pkl",
+      "sha256": "5b81801a12c47712e8eb9144e147ab21f4f47f06b990482ffe242ee8134d1634",
+      "git_blob_sha": "425eb4044b5d3feccd30fbc5aa8559d325a4f4f7",
+      "size_bytes": 588261,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-12.pkl",
+      "retrieved_utc": "2026-08-24T10:06:20+00:00"
+    },
+    {
+      "filename": "2018-09-13.pkl",
+      "sha256": "c278a13404127bca53bd158299d4230f94991ec68971c142d8b28cbacda97c57",
+      "git_blob_sha": "b0bc8456490a3f4bb2f634cb616b8b534b0648c3",
+      "size_bytes": 589654,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-13.pkl",
+      "retrieved_utc": "2026-08-24T10:06:21+00:00"
+    },
+    {
+      "filename": "2018-09-14.pkl",
+      "sha256": "da29826836979870f237677e46e2d32316f0ac3531c16d2da9b4583ba397cfaa",
+      "git_blob_sha": "2e36320d0935d181a97c41151f737f847096445c",
+      "size_bytes": 579062,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-14.pkl",
+      "retrieved_utc": "2026-08-24T10:06:22+00:00"
+    },
+    {
+      "filename": "2018-09-15.pkl",
+      "sha256": "a0e37e63043ce2bb94dabd79591762ed0a440ba975fc7f2c5bf6250421181589",
+      "git_blob_sha": "61cedbfa4b428d8cfcf2eb656f6e2a8f3f801445",
+      "size_bytes": 583748,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-15.pkl",
+      "retrieved_utc": "2026-08-24T10:06:23+00:00"
+    },
+    {
+      "filename": "2018-09-16.pkl",
+      "sha256": "63eefc1241773950a32ebb3bb583039188f64abe8f2214722f7f11827cfd162d",
+      "git_blob_sha": "73fb83a1a044418d95f2689616b1d408a454c789",
+      "size_bytes": 587459,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-16.pkl",
+      "retrieved_utc": "2026-08-24T10:06:23+00:00"
+    },
+    {
+      "filename": "2018-09-17.pkl",
+      "sha256": "7970c3416d9d0af5dacd3a43f6351ae5baf8dc07bbdbf0f58140e1a408b96f58",
+      "git_blob_sha": "6558514eb79696a1aeb38286f668788d06cfdca8",
+      "size_bytes": 587532,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-17.pkl",
+      "retrieved_utc": "2026-08-24T10:06:24+00:00"
+    },
+    {
+      "filename": "2018-09-18.pkl",
+      "sha256": "a16dd946bcb3155dd4be5b8fb5e5c91487ff495d636db0487f1a7ce60a3fbeb8",
+      "git_blob_sha": "3de06f76a4303c563ae63d4d5fd81f5e462203a9",
+      "size_bytes": 588493,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-18.pkl",
+      "retrieved_utc": "2026-08-24T10:06:24+00:00"
+    },
+    {
+      "filename": "2018-09-19.pkl",
+      "sha256": "e36d1625da3ad1ed0c3c38a44cc21171e32e1f489acc82086c311ef3ceadca74",
+      "git_blob_sha": "ce8b83869753550610d7b0488d4f19837793df0b",
+      "size_bytes": 590163,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-19.pkl",
+      "retrieved_utc": "2026-08-24T10:06:25+00:00"
+    },
+    {
+      "filename": "2018-09-20.pkl",
+      "sha256": "1cc945be8ceb4303320b872f2a16e1cb231e854846758116069b2f01c7f08a41",
+      "git_blob_sha": "44832668da5ed870d42d760c6f69ac84882dd3d4",
+      "size_bytes": 592375,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-20.pkl",
+      "retrieved_utc": "2026-08-24T10:06:26+00:00"
+    },
+    {
+      "filename": "2018-09-21.pkl",
+      "sha256": "a8786c19f2b3baf58d42d971267b16940b5ba5ca74d5e88ce8ba046b4476562f",
+      "git_blob_sha": "60d235e879aee7af0939203666ce85acf978b215",
+      "size_bytes": 586104,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-21.pkl",
+      "retrieved_utc": "2026-08-24T10:06:27+00:00"
+    },
+    {
+      "filename": "2018-09-22.pkl",
+      "sha256": "6e5d4f0242a90917a0347aab867d732775c42a1e57f079b00e9afe8f9be2f6c4",
+      "git_blob_sha": "3ac111e48085318d5270160ad0bc47a5f2cc01c8",
+      "size_bytes": 593921,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-22.pkl",
+      "retrieved_utc": "2026-08-24T10:06:27+00:00"
+    },
+    {
+      "filename": "2018-09-23.pkl",
+      "sha256": "8a772ea610ba33a75e5169fb070a17cac1ece6a73eb35b03f920e9a1ab5d556c",
+      "git_blob_sha": "ee45c0506262711ddc2160fd5fe18f9a2a5e651b",
+      "size_bytes": 590854,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-23.pkl",
+      "retrieved_utc": "2026-08-24T10:06:28+00:00"
+    },
+    {
+      "filename": "2018-09-24.pkl",
+      "sha256": "204a54b0e3cf74eb3d04627cb35dec1f2fd5eefea72e189698620192e34a5ae1",
+      "git_blob_sha": "889a4099cd5a90fc2c6f9bae87cb7603cdb89107",
+      "size_bytes": 575568,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-24.pkl",
+      "retrieved_utc": "2026-08-24T10:06:28+00:00"
+    },
+    {
+      "filename": "2018-09-25.pkl",
+      "sha256": "a06dd8ab4d19250861b015529f233e523de307d41559fef542dec79d076870c1",
+      "git_blob_sha": "8e845b49988b80e4d48835121780d55921150b60",
+      "size_bytes": 582211,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-25.pkl",
+      "retrieved_utc": "2026-08-24T10:06:29+00:00"
+    },
+    {
+      "filename": "2018-09-26.pkl",
+      "sha256": "08b7f1222f7e81089e5399e2e1d5bea4f629b21b4c32bd03ff9689f85c0d15f8",
+      "git_blob_sha": "8f8618ebb6aac2bc05edaee41aa11e53aa2089cd",
+      "size_bytes": 588598,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-26.pkl",
+      "retrieved_utc": "2026-08-24T10:06:30+00:00"
+    },
+    {
+      "filename": "2018-09-27.pkl",
+      "sha256": "cdf95ca283df7c87dc19c37035d5902836ad54cbd866a8c544a21829226f069d",
+      "git_blob_sha": "d3614abe5f6a1d4fda239f0dd8c085424517e855",
+      "size_bytes": 577744,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-27.pkl",
+      "retrieved_utc": "2026-08-24T10:06:32+00:00"
+    },
+    {
+      "filename": "2018-09-28.pkl",
+      "sha256": "2a47a5887dedc90fa7e24e1b82880ff575b0cf3ec84ec57d7b4c8ebf551fa5dc",
+      "git_blob_sha": "10dcb222dc0cfe88eed049fca3981856ce033b54",
+      "size_bytes": 585771,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-28.pkl",
+      "retrieved_utc": "2026-08-24T10:06:33+00:00"
+    },
+    {
+      "filename": "2018-09-29.pkl",
+      "sha256": "d6df8ec0d731341cc71707cfadca868883161d5fc5302130b67af050afdfd089",
+      "git_blob_sha": "0bea61cfc7226ee7b0a4b57d352e5cbe2128a54c",
+      "size_bytes": 575576,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-29.pkl",
+      "retrieved_utc": "2026-08-24T10:06:34+00:00"
+    },
+    {
+      "filename": "2018-09-30.pkl",
+      "sha256": "ea01eba4473492463af10b408141ee30729f925317c3e927681121baa85196c3",
+      "git_blob_sha": "4156ce393b949bc337f61f3c62321fe625c27ec1",
+      "size_bytes": 589319,
+      "source_url": "https://raw.githubusercontent.com/Fraud-Detection-Handbook/simulated-data-raw/main/data/2018-09-30.pkl",
+      "retrieved_utc": "2026-08-24T10:06:35+00:00"
+    }
+  ]
+}

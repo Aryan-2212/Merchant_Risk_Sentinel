@@ -1,0 +1,15 @@
+# Merchant Risk Sentinel — Phase 1 dependency constraints.
+#
+# Exact resolved versions are frozen in requirements.lock.txt (Dev Plan §33.4).
+#
+# pandas is pinned below 3.0 deliberately: the Fraud Detection Handbook raw .pkl files
+# were written by pandas 1.x and reference pandas.core.indexes.numeric.Int64Index, which
+# was removed in pandas 2.0. pandas 2.x still ships pandas.compat.pickle_compat, which
+# maps that legacy class back to pandas.Index when reading. See
+# src/mrs/data/legacy_pickle.py for the read path and its fallback.
+
+pandas>=2.2,<3
+numpy>=1.26,<3
+pyarrow>=15
+requests>=2.31
+pytest>=8.0

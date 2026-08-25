@@ -1,0 +1,23 @@
+# Data layers are never committed (Dev Plan §33.5): the raw dataset alone is ~107 MB.
+# Git cannot un-ignore a file inside a directory matched by a bare "data/" pattern, so
+# this un-ignores one directory at a time down to the one file that must stay tracked.
+data/*
+!data/raw/
+data/raw/*
+!data/raw/MANIFEST.json
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Secrets (Dev Plan §33.10) — .env.example is committed, .env never is.
+.env
+
+# Raw dataset format; also guards against a stray .pkl outside data/.
+*.pkl
+
+# macOS
+.DS_Store
