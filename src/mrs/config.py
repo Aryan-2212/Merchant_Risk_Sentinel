@@ -2,10 +2,12 @@
 
 Scope note (Phase 1): this module records only what Phase 1 has *verified* — where data
 lives, where it came from, and the temporal coverage observed in the source. It
-deliberately contains no train/validation/test split boundaries. Those are determined
-from the Phase 2 dataset analysis (Dev Plan §6) and must not exist as placeholder
-constants beforehand, because a placeholder quietly becomes the answer while the caveat
-beside it stops being read.
+deliberately contains no train/validation/test split boundaries; a placeholder here would
+have quietly become the answer while the caveat beside it stopped being read.
+
+Update (Phase 2): those split boundaries have now been decided from the actual dataset
+distribution (Dev Plan §6) and live in :mod:`mrs.data.splits`, not here — kept separate
+because "where data lives" and "how it is evaluated" are different concerns.
 """
 
 from __future__ import annotations
