@@ -36,6 +36,16 @@ RAW_MANIFEST_PATH = RAW_DIR / "MANIFEST.json"
 
 PROCESSED_TRANSACTIONS_DIR = PROCESSED_DIR / "transactions"
 
+#: Phase 3 feature layer output (mrs.features.build.build_feature_frame), partitioned by
+#: split. Read-only from Phase 4 onward -- Phase 4 never regenerates or edits it.
+FEATURES_DIR = DATA_DIR / "features"
+
+#: Trained model artifacts (Phase 4+): one subdirectory per model version, each holding
+#: a serialized pipeline plus a metadata.json recording feature/split/threshold lineage
+#: (Dev Plan §33.4, §36). Lives at the repo root, parallel to data/, since these are
+#: model outputs rather than dataset stages.
+MODELS_DIR = REPO_ROOT / "models"
+
 # --------------------------------------------------------------------- data source
 
 #: Public simulated benchmark data. This is NOT Razorpay production traffic and must

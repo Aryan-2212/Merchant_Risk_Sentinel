@@ -1,0 +1,51 @@
+{
+  "detected_fraud_by_scenario": {
+    "1": 47,
+    "2": 1237,
+    "3": 584
+  },
+  "false_negative_amount": {
+    "mean": 81.35926362297496,
+    "median": 58.23
+  },
+  "false_negative_count": 679,
+  "false_negative_score": {
+    "max": 0.9298582525990895,
+    "mean": 0.5707619554104844
+  },
+  "false_negatives_by_scenario": {
+    "1": 97,
+    "2": 399,
+    "3": 183
+  },
+  "false_positive_amount": {
+    "mean": 61.83794226921978,
+    "median": 50.12
+  },
+  "false_positive_count": 3499,
+  "recall_by_scenario": {
+    "1": {
+      "detected": 47,
+      "recall": 0.3263888888888889,
+      "total_fraud": 144
+    },
+    "2": {
+      "detected": 1237,
+      "recall": 0.7561124694376528,
+      "total_fraud": 1636
+    },
+    "3": {
+      "detected": 584,
+      "recall": 0.7614080834419817,
+      "total_fraud": 767
+    }
+  },
+  "total_actual_fraud": 2547,
+  "total_genuine": 285326,
+  "true_negative_count": 281827,
+  "true_positive_amount": {
+    "mean": 147.02238222698074,
+    "median": 76.99000000000001
+  },
+  "true_positive_count": 1868
+}

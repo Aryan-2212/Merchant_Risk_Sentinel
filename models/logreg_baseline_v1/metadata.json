@@ -1,0 +1,119 @@
+{
+  "feature_lineage": {
+    "feature_columns": [
+      "customer_amount_deviation",
+      "customer_amount_zscore",
+      "customer_hist_amount_mean",
+      "customer_hist_amount_std",
+      "customer_hour_deviation",
+      "customer_new_terminal_flag",
+      "customer_prior_tx_count",
+      "customer_time_since_prev_tx_seconds",
+      "customer_tx_count_10min",
+      "customer_tx_count_1h",
+      "customer_tx_count_24h",
+      "customer_unique_terminals_count",
+      "pair_is_new_relationship",
+      "pair_prior_interaction_count",
+      "terminal_fraud_rate_deviation",
+      "terminal_hist_amount_mean",
+      "terminal_hist_amount_std",
+      "terminal_hist_fraud_count",
+      "terminal_hist_fraud_rate",
+      "terminal_prior_tx_count",
+      "terminal_recent_fraud_count_24h",
+      "terminal_recent_fraud_rate_24h",
+      "terminal_time_since_prev_tx_seconds",
+      "terminal_tx_count_10min",
+      "terminal_tx_count_1h",
+      "terminal_tx_count_24h",
+      "terminal_unique_customers_count",
+      "terminal_volume_deviation",
+      "tx_amount",
+      "tx_day_of_week",
+      "tx_hour",
+      "tx_is_night",
+      "tx_is_weekend"
+    ],
+    "feature_count": 33,
+    "package_version": "0.1.0"
+  },
+  "hyperparameters": {
+    "class_weight": "balanced",
+    "max_iter": 1000
+  },
+  "model_type": "LogisticRegression",
+  "model_version": "logreg_baseline_v1",
+  "output_type": "uncalibrated_probability_estimate",
+  "output_type_notes": "sklearn LogisticRegression.predict_proba() output. NOT a calibrated probability against the true ~0.84% base fraud rate: class_weight='balanced' reweights the training loss, which shifts predict_proba's scale away from the empirical prior. Treat values as a relative ranking/risk score, not as P(fraud) in absolute terms. No calibration step (Platt scaling, isotonic regression) has been applied.",
+  "random_seed": 42,
+  "split_lineage": {
+    "test": {
+      "configured_range": {
+        "end": "2018-09-30",
+        "start": "2018-09-01"
+      },
+      "fraud_count": 2547,
+      "fraud_rate": 0.008847651568573641,
+      "observed_date_max": "2018-09-30 23:59:57",
+      "observed_date_min": "2018-09-01 00:01:18",
+      "row_count": 287873
+    },
+    "train": {
+      "configured_range": {
+        "end": "2018-07-31",
+        "start": "2018-04-01"
+      },
+      "fraud_count": 9465,
+      "fraud_rate": 0.008091659307374481,
+      "observed_date_max": "2018-07-31 23:58:53",
+      "observed_date_min": "2018-04-01 00:00:31",
+      "row_count": 1169723
+    },
+    "validation": {
+      "configured_range": {
+        "end": "2018-08-31",
+        "start": "2018-08-01"
+      },
+      "fraud_count": 2669,
+      "fraud_rate": 0.008999895467680968,
+      "observed_date_max": "2018-08-31 23:59:07",
+      "observed_date_min": "2018-08-01 00:00:19",
+      "row_count": 296559
+    }
+  },
+  "test_metrics": {
+    "f1": 0.47207480414455394,
+    "false_negatives": 679,
+    "false_positive_rate": 0.012263165642107623,
+    "false_positives": 3499,
+    "pr_auc": 0.41200510158094866,
+    "precision": 0.3480529159679523,
+    "recall": 0.7334118570867687,
+    "roc_auc": 0.9623994937663668,
+    "threshold": 0.93,
+    "true_negatives": 281827,
+    "true_positives": 1868
+  },
+  "threshold": 0.93,
+  "threshold_selection": {
+    "criterion": "max_f1",
+    "evaluated_on": "validation",
+    "grid_max": 0.99,
+    "grid_min": 0.01,
+    "grid_size": 99
+  },
+  "validation_metrics": {
+    "f1": 0.5025308241401687,
+    "false_negatives": 733,
+    "false_positive_rate": 0.010548164279152063,
+    "false_positives": 3100,
+    "pr_auc": 0.3553529470647762,
+    "precision": 0.38443208895949166,
+    "recall": 0.725365305357812,
+    "roc_auc": 0.9633156827715862,
+    "threshold": 0.93,
+    "true_negatives": 290790,
+    "true_positives": 1936
+  }
+}
