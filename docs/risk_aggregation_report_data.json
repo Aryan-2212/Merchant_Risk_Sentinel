@@ -1,0 +1,34 @@
+{
+  "customer_unavailable": 49578,
+  "input_files": [
+    "data/processed/transactions/*.parquet",
+    "data/features/features_train.parquet",
+    "data/features/features_validation.parquet",
+    "data/features/features_test.parquet"
+  ],
+  "insufficient_evidence_count": 0,
+  "level_distribution": {
+    "CRITICAL": 9773,
+    "HIGH": 14038,
+    "LOW": 1666954,
+    "MEDIUM": 63390
+  },
+  "output_rows": 1754155,
+  "runtime_seconds": {
+    "aggregation": 3.834542989730835,
+    "customer_engine": 1.5976979732513428,
+    "terminal_engine": 2.3022959232330322,
+    "transaction_scoring": 1.8509271144866943
+  },
+  "sanity_check_failures": {
+    "bad_critical": 0,
+    "bad_empty_signals": 0,
+    "bad_high": 0,
+    "bad_insufficient_evidence": 0,
+    "bad_low": 0
+  },
+  "terminal_unavailable": 106794,
+  "threshold": 0.97,
+  "total_rows": 1754155,
+  "transaction_unavailable": 0
+}
