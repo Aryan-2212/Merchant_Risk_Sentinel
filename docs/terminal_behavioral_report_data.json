@@ -1,0 +1,34 @@
+{
+  "distinct_terminals": 10000,
+  "episode_duration_hours_max": 1519.638611111111,
+  "episode_duration_hours_median": 115.42875000000001,
+  "episode_length_transactions_max": 63,
+  "episode_length_transactions_median": 6.0,
+  "high_risk_rows_by_scenario": {
+    "0": 8987,
+    "1": 10,
+    "2": 8208,
+    "3": 117
+  },
+  "high_risk_rows_total": 17322,
+  "n_episodes": 3656,
+  "n_high_risk_episodes": 3647,
+  "rows_per_second": 731373.3446337725,
+  "runtime_seconds": 2.398439884185791,
+  "scenario2_flagged_elevated": 8298,
+  "scenario2_flagged_high_risk": 8208,
+  "scenario2_total": 9077,
+  "state_distribution": {
+    "HIGH_RISK": 17322,
+    "INSUFFICIENT_HISTORY": 106794,
+    "NORMAL": 1618536,
+    "RECOVERY": 11383,
+    "RISK_RISING": 120
+  },
+  "terminals_ever_high_risk": 2986,
+  "terminals_ever_recovery": 2906,
+  "terminals_ever_risk_rising": 23,
+  "terminals_only_insufficient_history": 0,
+  "terminals_pure_normal": 7011,
+  "total_rows": 1754155
+}
