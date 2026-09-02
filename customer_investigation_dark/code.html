@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Risk Sentinel - Customer Investigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface": "#111316",
+                "on-secondary": "#2e3036",
+                "on-error": "#690005",
+                "on-surface-variant": "#c5c6cb",
+                "on-tertiary-container": "#443a33",
+                "surface-bright": "#37393d",
+                "surface-variant": "#333538",
+                "on-background": "#e2e2e6",
+                "on-error-container": "#ffdad6",
+                "surface-container-low": "#1a1c1f",
+                "inverse-primary": "#5b5f64",
+                "secondary-container": "#46494f",
+                "on-primary-fixed-variant": "#43474c",
+                "primary": "#c4c6cd",
+                "on-secondary-fixed": "#191c21",
+                "outline": "#8f9195",
+                "on-primary-container": "#393d42",
+                "tertiary-container": "#b2a49a",
+                "on-secondary-fixed-variant": "#44474c",
+                "surface-dim": "#111316",
+                "on-surface": "#e2e2e6",
+                "inverse-surface": "#e2e2e6",
+                "surface-tint": "#c4c6cd",
+                "on-tertiary-fixed": "#221a13",
+                "on-tertiary": "#382f27",
+                "on-primary-fixed": "#181c20",
+                "tertiary-fixed": "#f0e0d5",
+                "primary-fixed-dim": "#c4c6cd",
+                "inverse-on-surface": "#2f3034",
+                "surface-container-high": "#282a2d",
+                "secondary-fixed": "#e1e2e9",
+                "outline-variant": "#45474a",
+                "tertiary-fixed-dim": "#d3c4b9",
+                "surface-container-highest": "#333538",
+                "secondary": "#c4c6cd",
+                "primary-container": "#a4a7ad",
+                "on-secondary-container": "#b6b8bf",
+                "secondary-fixed-dim": "#c4c6cd",
+                "surface-container-lowest": "#0c0e11",
+                "on-tertiary-fixed-variant": "#4f453d",
+                "error": "#ffb4ab",
+                "primary-fixed": "#e0e2e9",
+                "on-primary": "#2d3136",
+                "error-container": "#93000a",
+                "tertiary": "#d3c4b9",
+                "background": "#111316",
+                "surface-container": "#1e2023"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "gutter": "1.5rem",
+                "stack-compact": "0.5rem",
+                "stack-default": "1rem",
+                "sidebar-expanded": "220px",
+                "container-padding": "2rem",
+                "sidebar-width": "64px"
+        },
+        "fontFamily": {
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "IBM Plex Sans"
+                ],
+                "label-caps": [
+                        "IBM Plex Sans"
+                ],
+                "score-display": [
+                        "IBM Plex Sans"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "data-mono": [
+                        "Space Mono", "monospace"
+                ],
+                "headline-lg-mobile": [
+                        "IBM Plex Sans"
+                ],
+                "headline-lg": [
+                        "IBM Plex Sans"
+                ]
+        },
+        "fontSize": {
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "label-caps": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.06em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "score-display": [
+                        "48px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "data-mono": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: theme('colors.background');
+    color: theme('colors.on-surface');
+  }
+  h1, h2, h3, h4, h5, h6, .font-headline {
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .font-mono {
+    font-family: 'Space Mono', monospace;
+  }
+  
+  /* Custom scrollbar for dark mode */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: theme('colors.surface-container-low'); 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.surface-variant'); 
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.outline'); 
+  }
+</style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden flex h-screen w-full">
+<!-- Sidebar -->
+<aside class="w-sidebar-width flex flex-col items-center py-4 bg-surface-container-lowest border-r border-outline-variant shrink-0 z-20">
+<div class="mb-8 flex items-center justify-center w-full">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="policy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">policy</span>
+</div>
+<nav class="flex flex-col gap-4 w-full">
+<a class="w-full flex justify-center py-3 text-outline hover:text-on-surface hover:bg-surface-container transition-colors relative group" href="#" title="Overview">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+</a>
+<a class="w-full flex justify-center py-3 text-outline hover:text-on-surface hover:bg-surface-container transition-colors relative group" href="#" title="Terminal Investigation">
+<span class="material-symbols-outlined text-xl" data-icon="terminal">terminal</span>
+</a>
+<a class="w-full flex justify-center py-3 text-primary bg-surface-container-high border-l-2 border-primary relative group" href="#" title="Customer Investigation">
+<span class="material-symbols-outlined text-xl" data-icon="person_search" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person_search</span>
+</a>
+<a class="w-full flex justify-center py-3 text-outline hover:text-on-surface hover:bg-surface-container transition-colors relative group" href="#" title="Rules">
+<span class="material-symbols-outlined text-xl" data-icon="rule">rule</span>
+</a>
+<a class="w-full flex justify-center py-3 text-outline hover:text-on-surface hover:bg-surface-container transition-colors relative group" href="#" title="Network Graph">
+<span class="material-symbols-outlined text-xl" data-icon="hub">hub</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-4 w-full">
+<a class="w-full flex justify-center py-3 text-outline hover:text-on-surface hover:bg-surface-container transition-colors" href="#" title="Settings">
+<span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+</a>
+<button class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant mx-auto mb-2 focus:outline-none focus:ring-2 focus:ring-primary">
+<img class="w-full h-full object-cover" data-alt="A macro photograph of an abstract metallic surface with a deep charcoal and brushed silver finish, high contrast lighting, technical and precise aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNYM47UmZYdV4OyDzgUw7sxA0tBEV-dox-alT65p6cEDTec62gSPPe_e1P-iYEXf2mys1zNGvvII37YEyzYC9FYRN0GV6uT2Q80UBXVBcFBIrfgDewdgVbPzNcrNjpRF-SYm_00oUtla3xYI0YxvvEu4oJZeYyK3i9yhesDz65xOIYa4CnhChI3SiYLEArjFYQZ7h67-pz_CY26NxOnEXv82ZhhEFtVNtsm9HMSt9KkcOBHAqtMa-JqA"/>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+<!-- Top Bar -->
+<header class="h-14 bg-surface-container-low border-b border-outline-variant flex items-center justify-between px-6 shrink-0 z-10">
+<div class="flex items-center gap-3">
+<h2 class="font-headline text-headline-md text-on-surface tracking-tight">Risk Sentinel</h2>
+<div class="h-4 w-px bg-outline-variant mx-2"></div>
+<span class="text-body-md text-on-surface-variant">Customer Investigation</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-surface-container border border-outline-variant rounded px-3 py-1.5 h-8">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] mr-2" data-icon="calendar_today">calendar_today</span>
+<span class="text-data-mono text-on-surface text-[12px]">Last 7 Days</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] ml-2" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto p-container-padding">
+<div class="max-w-[1400px] mx-auto flex flex-col gap-gutter">
+<!-- Header Section -->
+<div class="flex items-start justify-between w-full">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-2xl" data-icon="person">person</span>
+<h1 class="font-headline text-headline-lg text-on-surface m-0">Customer ID: <span class="font-mono text-primary">C-9842</span></h1>
+<span class="px-2 py-0.5 rounded text-[11px] font-bold tracking-wider font-headline uppercase bg-error/20 text-error border border-error/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="warning">warning</span>
+                            FLAGGED
+                        </span>
+</div>
+<div class="flex items-center gap-4 text-data-mono text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="mail">mail</span>
+                            j***.d**@example.com
+                        </span>
+<span class="text-outline-variant">|</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="phone">phone</span>
+                            +1 (***) ***-8921
+                        </span>
+<span class="text-outline-variant">|</span>
+<span>Account Age: 18 Months</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-9 px-4 rounded border border-outline-variant bg-surface hover:bg-surface-container-high text-body-md text-on-surface transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="lock">lock</span>
+                        Freeze Account
+                    </button>
+<button class="h-9 px-4 rounded border border-primary bg-primary text-on-primary text-body-md font-medium hover:bg-primary-fixed transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="assignment_turned_in">assignment_turned_in</span>
+                        Resolve Case
+                    </button>
+</div>
+</div>
+<!-- Top Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+<!-- Risk Score Card (Prominent) -->
+<div class="col-span-1 md:col-span-1 bg-surface-container border border-outline-variant rounded p-5 flex flex-col justify-between relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-error/5 rounded-bl-full -mr-4 -mt-4"></div>
+<div class="flex items-center justify-between mb-2 relative z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant">CURRENT RISK SCORE</span>
+<span class="material-symbols-outlined text-error text-[20px]" data-icon="crisis_alert">crisis_alert</span>
+</div>
+<div class="flex items-end gap-3 mt-4 relative z-10">
+<span class="font-score-display text-score-display text-error leading-none">82<span class="text-2xl text-outline">/100</span></span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-data-mono text-error">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+<span>+12 pts (7d)</span>
+</div>
+</div>
+<!-- Stats Cards -->
+<div class="col-span-1 md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="bg-surface-container border border-outline-variant rounded p-4 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-3">TOTAL TRANSACTIONS (YTD)</span>
+<span class="font-mono text-headline-lg text-on-surface mb-2">$42,500.00</span>
+<div class="mt-auto flex items-center gap-1 text-data-mono text-tertiary">
+<span class="material-symbols-outlined text-[16px]" data-icon="show_chart">show_chart</span>
+<span>+15.2% vs avg</span>
+</div>
+</div>
+<div class="bg-surface-container border border-error/30 rounded p-4 flex flex-col relative overflow-hidden">
+<div class="absolute bottom-0 left-0 w-full h-1 bg-error"></div>
+<span class="font-label-caps text-label-caps text-error mb-3">CHARGEBACK RATE</span>
+<span class="font-mono text-headline-lg text-error mb-2">3.2%</span>
+<div class="mt-auto flex items-center gap-1 text-data-mono text-error">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning">warning</span>
+<span>Critical Threshold &gt; 1.5%</span>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded p-4 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-3">LINKED IDENTITIES</span>
+<span class="font-mono text-headline-lg text-on-surface mb-2">4 Devices</span>
+<div class="mt-auto flex items-center gap-1 text-data-mono text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="devices">devices</span>
+<span>Across 2 regions</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column (Activity & Behavior) -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<!-- Risk Summary Banner -->
+<div class="bg-surface-container-high border-l-4 border-l-error border-y border-r border-y-outline-variant border-r-outline-variant rounded-r p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+<div class="p-3 bg-error/10 rounded-full shrink-0">
+<span class="material-symbols-outlined text-error text-2xl" data-icon="report">report</span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline text-headline-md text-on-surface mb-1">Risk Summary</h3>
+<p class="text-body-md text-on-surface-variant">High risk of chargeback due to multiple recent high-value transactions matching known velocity patterns, originating from a newly linked device.</p>
+</div>
+<button class="shrink-0 h-8 px-3 rounded border border-outline bg-transparent hover:bg-surface-variant text-data-mono text-on-surface transition-colors whitespace-nowrap">
+                            View Rule Details
+                        </button>
+</div>
+<!-- Recent Activity Table -->
+<div class="bg-surface border border-outline-variant rounded flex flex-col overflow-hidden">
+<div class="px-5 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline text-headline-md text-on-surface">Recent Activity</h3>
+<button class="text-primary hover:text-primary-fixed text-data-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="download">download</span>
+                                Export
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-lowest">
+<th class="px-5 py-3 font-label-caps text-label-caps text-on-surface-variant">TIMESTAMP</th>
+<th class="px-5 py-3 font-label-caps text-label-caps text-on-surface-variant">EVENT TYPE</th>
+<th class="px-5 py-3 font-label-caps text-label-caps text-on-surface-variant">AMOUNT</th>
+<th class="px-5 py-3 font-label-caps text-label-caps text-on-surface-variant">IP ADDRESS</th>
+<th class="px-5 py-3 font-label-caps text-label-caps text-on-surface-variant text-right">STATUS</th>
+</tr>
+</thead>
+<tbody class="text-data-mono">
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container transition-colors">
+<td class="px-5 py-3 text-on-surface">2023-10-27 14:32:01</td>
+<td class="px-5 py-3">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="shopping_cart">shopping_cart</span>
+                                                Purchase
+                                            </div>
+</td>
+<td class="px-5 py-3 text-on-surface font-mono">$1,250.00</td>
+<td class="px-5 py-3 text-outline">192.168.1.14</td>
+<td class="px-5 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-error/10 text-error border border-error/20">
+                                                DECLINED
+                                            </span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container transition-colors">
+<td class="px-5 py-3 text-on-surface">2023-10-27 14:15:44</td>
+<td class="px-5 py-3">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-error" data-icon="login">login</span>
+                                                Login (New Device)
+                                            </div>
+</td>
+<td class="px-5 py-3 text-on-surface font-mono">-</td>
+<td class="px-5 py-3 text-outline">192.168.1.14</td>
+<td class="px-5 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-primary/10 text-primary border border-primary/20">
+                                                SUCCESS
+                                            </span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container transition-colors">
+<td class="px-5 py-3 text-on-surface">2023-10-26 09:12:33</td>
+<td class="px-5 py-3">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="credit_card">credit_card</span>
+                                                Add Payment Method
+                                            </div>
+</td>
+<td class="px-5 py-3 text-on-surface font-mono">-</td>
+<td class="px-5 py-3 text-outline">10.0.0.42</td>
+<td class="px-5 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-primary/10 text-primary border border-primary/20">
+                                                SUCCESS
+                                            </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-5 py-3 text-on-surface">2023-10-25 18:45:12</td>
+<td class="px-5 py-3">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="shopping_cart">shopping_cart</span>
+                                                Purchase
+                                            </div>
+</td>
+<td class="px-5 py-3 text-on-surface font-mono">$45.00</td>
+<td class="px-5 py-3 text-outline">10.0.0.42</td>
+<td class="px-5 py-3 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-primary/10 text-primary border border-primary/20">
+                                                SUCCESS
+                                            </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column (Context & Details) -->
+<div class="lg:col-span-1 flex flex-col gap-6">
+<!-- Behavioral Evidence Panel -->
+<div class="bg-surface border border-outline-variant rounded flex flex-col">
+<div class="px-5 py-4 border-b border-outline-variant bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="psychology">psychology</span>
+<h3 class="font-headline text-headline-md text-on-surface">Behavioral Evidence</h3>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-data-mono">
+<span class="text-on-surface-variant">Velocity Pattern</span>
+<span class="text-error font-mono">High</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded overflow-hidden">
+<div class="h-full bg-error w-[85%] rounded"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-data-mono">
+<span class="text-on-surface-variant">Device Anomaly</span>
+<span class="text-tertiary font-mono">Medium</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded overflow-hidden">
+<div class="h-full bg-tertiary w-[60%] rounded"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-data-mono">
+<span class="text-on-surface-variant">Location Risk</span>
+<span class="text-primary font-mono">Low</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded overflow-hidden">
+<div class="h-full bg-primary w-[25%] rounded"></div>
+</div>
+</div>
+<hr class="border-outline-variant my-2"/>
+<ul class="text-data-mono text-on-surface-variant space-y-2">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-error mt-0.5" data-icon="close">close</span>
+<span>3 failed CVV attempts in 5 mins.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-error mt-0.5" data-icon="close">close</span>
+<span>New IP address (VPN suspected).</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary mt-0.5" data-icon="check">check</span>
+<span>Shipping address matches billing.</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Payment Methods -->
+<div class="bg-surface border border-outline-variant rounded flex flex-col">
+<div class="px-5 py-4 border-b border-outline-variant bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="account_balance_wallet">account_balance_wallet</span>
+<h3 class="font-headline text-headline-md text-on-surface">Linked Methods</h3>
+</div>
+<div class="p-0">
+<div class="flex items-center justify-between p-4 border-b border-outline-variant hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-6 bg-surface-container-high border border-outline-variant rounded flex items-center justify-center text-[10px] font-bold text-on-surface">VISA</div>
+<div class="flex flex-col">
+<span class="text-data-mono text-on-surface font-mono">**** **** **** 4921</span>
+<span class="text-[11px] text-on-surface-variant">Added: 2023-10-26</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline hover:text-on-surface cursor-pointer text-[18px]" data-icon="more_vert">more_vert</span>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-6 bg-surface-container-high border border-outline-variant rounded flex items-center justify-center text-[10px] font-bold text-on-surface">MC</div>
+<div class="flex flex-col">
+<span class="text-data-mono text-outline font-mono">**** **** **** 8812</span>
+<span class="text-[11px] text-on-surface-variant">Added: 2022-04-12</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline hover:text-on-surface cursor-pointer text-[18px]" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

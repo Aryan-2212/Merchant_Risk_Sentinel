@@ -1,0 +1,94 @@
+.decomp {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+
+.decomp-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+
+.decomp-header h3 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.decomp-caption {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.decomp-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.decomp-row {
+  display: grid;
+  grid-template-columns: 132px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.decomp-row:last-child {
+  border-bottom: none;
+}
+
+.decomp-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.decomp-value {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+
+.decomp-threshold {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.decomp-detail {
+  grid-column: 2 / -1;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.sev-meter {
+  display: flex;
+  gap: 3px;
+}
+
+.sev-seg {
+  width: 16px;
+  height: 5px;
+  border-radius: 2px;
+  transition: background var(--dur-base) var(--ease);
+}
+
+.decomp-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-strong);
+}
+
+.decomp-result-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}

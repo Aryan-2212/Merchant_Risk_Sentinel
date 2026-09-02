@@ -1,0 +1,495 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Risk Sentinel - Dashboard Overview</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-tertiary": "#382f27",
+                "outline-variant": "#45474a",
+                "on-secondary-fixed-variant": "#44474c",
+                "on-primary-container": "#393d42",
+                "on-secondary-fixed": "#191c21",
+                "inverse-surface": "#e2e2e6",
+                "on-tertiary-container": "#443a33",
+                "surface-variant": "#333538",
+                "surface-container-highest": "#333538",
+                "on-tertiary-fixed": "#221a13",
+                "on-error": "#690005",
+                "secondary-fixed": "#e1e2e9",
+                "primary-fixed": "#e0e2e9",
+                "on-tertiary-fixed-variant": "#4f453d",
+                "secondary": "#c4c6cd",
+                "surface-tint": "#c4c6cd",
+                "outline": "#8f9195",
+                "surface-container": "#1e2023",
+                "surface-bright": "#37393d",
+                "tertiary-fixed-dim": "#d3c4b9",
+                "secondary-container": "#46494f",
+                "error-container": "#93000a",
+                "on-secondary-container": "#b6b8bf",
+                "inverse-primary": "#5b5f64",
+                "primary-fixed-dim": "#c4c6cd",
+                "on-surface-variant": "#c5c6cb",
+                "tertiary-fixed": "#f0e0d5",
+                "secondary-fixed-dim": "#c4c6cd",
+                "tertiary-container": "#b2a49a",
+                "surface-dim": "#111316",
+                "primary": "#c4c6cd",
+                "surface-container-lowest": "#0c0e11",
+                "on-surface": "#e2e2e6",
+                "surface-container-high": "#282a2d",
+                "on-error-container": "#ffdad6",
+                "on-primary": "#2d3136",
+                "on-secondary": "#2e3036",
+                "surface-container-low": "#1a1c1f",
+                "on-primary-fixed": "#181c20",
+                "inverse-on-surface": "#2f3034",
+                "error": "#ffb4ab",
+                "on-background": "#e2e2e6",
+                "tertiary": "#d3c4b9",
+                "on-primary-fixed-variant": "#43474c",
+                "background": "#111316",
+                "surface": "#111316",
+                "primary-container": "#a4a7ad"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-padding": "2rem",
+                "sidebar-expanded": "220px",
+                "stack-default": "1rem",
+                "stack-compact": "0.5rem",
+                "gutter": "1.5rem",
+                "sidebar-width": "64px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "IBM Plex Sans"
+                ],
+                "score-display": [
+                        "IBM Plex Sans"
+                ],
+                "headline-lg": [
+                        "IBM Plex Sans"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "IBM Plex Sans"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "data-mono": [
+                        "monospace"
+                ],
+                "headline-md": [
+                        "IBM Plex Sans"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "score-display": [
+                        "48px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.06em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "data-mono": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen font-body-md selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- Shared Component: SideNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest border-r border-outline-variant fixed left-0 top-0 bottom-0 z-50 flex flex-col py-stack-default docked h-full w-sidebar-width lg:w-sidebar-expanded overflow-y-auto hide-scrollbar">
+<!-- Header -->
+<div class="px-4 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary-container flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">security</span>
+</div>
+<div class="flex flex-col hidden lg:flex">
+<span class="font-headline-md text-headline-md text-primary">Sentinel</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">V2.4.0</span>
+</div>
+</div>
+<!-- Main Tabs -->
+<div class="flex flex-col gap-1 px-2 flex-1">
+<!-- Active Tab -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm text-primary bg-surface-container-high border-l-2 border-primary scale-95 duration-100 group" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider">Overview</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider group-hover:text-on-surface transition-colors">Terminals</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider group-hover:text-on-surface transition-colors">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider group-hover:text-on-surface transition-colors">Alerts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider group-hover:text-on-surface transition-colors">Network</span>
+</a>
+</div>
+<!-- Footer Tabs -->
+<div class="flex flex-col gap-1 px-2 mt-auto pt-4 border-t border-outline-variant mx-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-label-caps text-label-caps hidden lg:block uppercase tracking-wider">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col ml-[64px] lg:ml-[220px] bg-background h-screen overflow-hidden">
+<!-- Shared Component: TopNavBar -->
+<header class="bg-surface-dim dark:bg-surface-dim border-b border-outline-variant flex justify-between items-center w-full px-gutter h-14 flex-shrink-0 docked full-width top-0 z-40 flat no shadows">
+<!-- Left: Brand / Title (Fallback if sidebar collapsed, or specific context) -->
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">Risk Sentinel</span>
+<div class="h-4 w-px bg-outline-variant mx-2 hidden sm:block"></div>
+<!-- Navigation Links / Filters -->
+<nav class="hidden sm:flex items-center gap-6 h-full pt-1">
+<a class="h-full flex items-center text-primary font-bold border-b-2 border-primary pb-1 font-label-caps text-label-caps uppercase opacity-80" href="#">
+                        Time Filter: Last 24h
+                    </a>
+</nav>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-surface-dim"></span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="w-7 h-7 rounded-full overflow-hidden bg-surface-container-highest border border-outline-variant ml-2">
+<img alt="Analyst Profile" class="w-full h-full object-cover grayscale" data-alt="A clinical, high-contrast, black and white portrait of a professional fraud analyst in a dark control room setting, minimal lighting, operational aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpU2lv6Y0J3NgvbSKShyUVzN8ktOJ1KFi44LErVPvp8bijSkKh7DXIfLaapUSp6VjOHRn5YNAa77l2k5wg86SJyNE0A_dbjAEdzsioykmq-YjmQ_wYHdcHcR3VEm5s9KUi582HqiG4cpddgbsBEJ-Ncb7Ysg4CqqNIO_MRYwYon-OSgeOI44BSJVI6kB7YWm3piEmw9cez2ng0Gh20FBKW3EecPuM0S3DKuZRFCXF6mRNr7OwsWI0NdA">
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto p-container-padding flex flex-col gap-6">
+<!-- Top Row: 4 Key Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Metric 1 -->
+<div class="bg-surface-container-low border border-outline-variant rounded p-4 flex flex-col justify-between h-28 relative overflow-hidden group hover:border-outline transition-colors opacity-80">
+<div class="flex justify-between items-start z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Overall Risk Index</span>
+<span class="material-symbols-outlined text-[16px] text-error">trending_up</span>
+</div>
+<div class="z-10 flex items-baseline gap-2">
+<span class="font-score-display text-error text-[40px]">84</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">/ 100</span>
+</div>
+<!-- Subtle background element to prevent boxiness -->
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-low border border-outline-variant rounded p-4 flex flex-col justify-between h-28 opacity-80">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Active Alerts</span>
+<span class="material-symbols-outlined text-[16px] text-primary">notifications_active</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-score-display text-on-surface text-[40px]">1,248</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-low border border-outline-variant rounded p-4 flex flex-col justify-between h-28 opacity-80">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Suspect Terminals</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">terminal</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-score-display text-tertiary text-[40px]">42</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">flagged</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container-low border border-outline-variant rounded p-4 flex flex-col justify-between h-28 opacity-80">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Velocity</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">speed</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-score-display text-on-surface text-[40px]">+3.2</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">% / hr</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace Flex Layout -->
+<div class="flex flex-col xl:flex-row gap-6 flex-1">
+<!-- Main Section: High Deviation Terminals (Takes ~2/3 width) -->
+<div class="flex-[2] flex flex-col border border-outline-variant bg-surface-container-lowest rounded min-h-[400px]">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low rounded-t">
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">High Deviation Terminals</h2>
+<button class="text-label-caps font-label-caps uppercase text-primary hover:text-on-surface transition-colors flex items-center gap-1">
+                            Export <span class="material-symbols-outlined text-[14px]">download</span>
+</button>
+</div>
+<!-- Dense List -->
+<div class="flex-1 overflow-y-auto">
+<!-- List Header -->
+<div class="grid grid-cols-12 gap-4 px-4 py-2 border-b border-outline-variant bg-surface-dim font-label-caps text-label-caps text-on-surface-variant uppercase sticky top-0 z-10">
+<div class="col-span-3">Terminal ID</div>
+<div class="col-span-3">Location</div>
+<div class="col-span-2 text-right">Baseline Rate</div>
+<div class="col-span-2 text-right">Current Rate</div>
+<div class="col-span-2 text-right">Deviation</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 px-4 border-b border-outline-variant hover:bg-surface-container transition-colors items-center font-data-mono text-data-mono py-4">
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-on-surface">TRM-8921A</span>
+</div>
+<div class="col-span-3 text-on-surface-variant truncate">London, UK</div>
+<div class="col-span-2 text-right text-on-surface-variant">1.8%</div>
+<div class="col-span-2 text-right text-error font-medium">14.7%</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-1 text-error">
+                                +12.9% <span class="material-symbols-outlined text-[14px]">keyboard_double_arrow_up</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 px-4 border-b border-outline-variant hover:bg-surface-container transition-colors items-center font-data-mono text-data-mono py-4">
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-on-surface">TRM-4450X</span>
+</div>
+<div class="col-span-3 text-on-surface-variant truncate">Berlin, DE</div>
+<div class="col-span-2 text-right text-on-surface-variant">2.1%</div>
+<div class="col-span-2 text-right text-error font-medium">11.2%</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-1 text-error">
+                                +9.1% <span class="material-symbols-outlined text-[14px]">keyboard_double_arrow_up</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 px-4 border-b border-outline-variant hover:bg-surface-container transition-colors items-center font-data-mono text-data-mono py-4">
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span class="text-on-surface">TRM-1022B</span>
+</div>
+<div class="col-span-3 text-on-surface-variant truncate">Paris, FR</div>
+<div class="col-span-2 text-right text-on-surface-variant">0.9%</div>
+<div class="col-span-2 text-right text-tertiary font-medium">6.4%</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-1 text-tertiary">
+                                +5.5% <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 gap-4 px-4 border-b border-outline-variant hover:bg-surface-container transition-colors items-center font-data-mono text-data-mono py-4">
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+<span class="text-on-surface">TRM-9930C</span>
+</div>
+<div class="col-span-3 text-on-surface-variant truncate">Madrid, ES</div>
+<div class="col-span-2 text-right text-on-surface-variant">1.5%</div>
+<div class="col-span-2 text-right text-on-surface font-medium">3.8%</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-1 text-on-surface-variant">
+                                +2.3% <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+</div>
+</div>
+</div>
+<!-- Analytical Context Footer Section -->
+<div class="border-t border-outline-variant bg-surface-dim p-4 flex flex-col lg:flex-row gap-8 items-start">
+<!-- Risk Signal Breakdown (Left) -->
+<div class="flex-1 flex flex-col gap-4 lg:pr-8 lg:border-r lg:border-outline-variant min-w-[200px] w-full">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Signal Breakdown</h3>
+<div class="flex flex-col gap-3">
+<!-- Signal 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-end">
+<span class="font-body-md text-[13px] text-on-surface">Transaction</span>
+<span class="font-data-mono text-[11px] text-error">+12%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-error" style="width: 85%"></div>
+</div>
+</div>
+<!-- Signal 2 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-end">
+<span class="font-body-md text-[13px] text-on-surface">Customer</span>
+<span class="font-data-mono text-[11px] text-tertiary">+8%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary" style="width: 60%"></div>
+</div>
+</div>
+<!-- Signal 3 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-end">
+<span class="font-body-md text-[13px] text-on-surface">Terminal</span>
+<span class="font-data-mono text-[11px] text-on-surface-variant">-2%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant" style="width: 30%"></div>
+</div>
+</div>
+<!-- Signal 4 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-end">
+<span class="font-body-md text-[13px] text-on-surface">Temporal</span>
+<span class="font-data-mono text-[11px] text-error">+24%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-error" style="width: 90%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Trend Chart (Right) -->
+<div class="flex-[3] flex flex-col gap-3 w-full">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase flex items-center justify-between">
+<span class="">Risk Trend / Behavioral Shift (24h)</span>
+<span class="text-[10px] text-outline">00:00 - 24:00</span>
+</h3>
+<div class="relative w-full h-28 border-b border-l border-outline-variant mt-2 pt-2 pr-2">
+<!-- Simple SVG Line Chart representing risk over time -->
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 40"><line class="text-outline-variant opacity-40" stroke="currentColor" stroke-width="0.5" x1="0" x2="100" y1="35" y2="35"></line><line class="text-outline-variant opacity-30 stroke-dasharray-4" stroke="currentColor" stroke-dasharray="2,2" stroke-width="0.5" x1="0" x2="100" y1="10" y2="10"></line><line class="text-outline-variant opacity-30 stroke-dasharray-4" stroke="currentColor" stroke-dasharray="2,2" stroke-width="0.5" x1="0" x2="100" y1="20" y2="20"></line><line class="text-outline-variant opacity-30 stroke-dasharray-4" stroke="currentColor" stroke-dasharray="2,2" stroke-width="0.5" x1="0" x2="100" y1="30" y2="30"></line><path class="text-on-surface-variant opacity-40" d="M0 35 L 20 33 L 40 34 L 60 32 L 80 33 L 100 35" fill="none" stroke="currentColor" stroke-width="1"></path><path class="text-error" d="M0 35 L 20 30 L 35 25 L 45 10 L 55 12 L 75 15 L 85 5 L 100 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><circle class="fill-error" cx="45" cy="10" r="1.5"></circle><circle class="fill-error" cx="85" cy="5" r="1.5"></circle></svg>
+<!-- Contextual Labels -->
+<div class="absolute left-[45%] bottom-[-20px] transform -translate-x-1/2 flex flex-col items-center gap-1">
+<div class="h-1.5 w-px bg-outline-variant"></div>
+<span class="font-data-mono text-[10px] text-on-surface-variant whitespace-nowrap">Velocity Spike</span>
+</div>
+<div class="absolute left-[85%] bottom-[-20px] transform -translate-x-1/2 flex flex-col items-center gap-1">
+<div class="h-1.5 w-px bg-outline-variant"></div>
+<span class="font-data-mono text-[10px] text-on-surface-variant whitespace-nowrap">Fraud Shift</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Recent High Risk (Takes ~1/3 width) -->
+<div class="flex-1 flex flex-col border border-outline-variant bg-surface-container-low rounded min-w-[300px] h-full">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-error">warning</span>
+                            Recent High Risk
+                        </h2>
+</div>
+<!-- Timeline Feed -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-0 relative">
+<!-- Timeline track line -->
+<div class="absolute left-6 top-4 bottom-4 w-px bg-outline-variant z-0"></div>
+<!-- Event 1 -->
+<div class="flex gap-4 relative z-10 pb-6 group cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-background border-2 border-error mt-0.5 flex-shrink-0 group-hover:bg-error transition-colors"></div>
+<div class="flex flex-col flex-1">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-data-mono text-data-mono text-error font-medium">TXN-099238</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">10:42:01Z</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Velocity Rule Triggered</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">€12,450.00 • Multiple IPs</span>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="flex gap-4 relative z-10 pb-6 group cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-background border-2 border-error mt-0.5 flex-shrink-0 group-hover:bg-error transition-colors"></div>
+<div class="flex flex-col flex-1">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-data-mono text-data-mono text-error font-medium">TXN-099231</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">10:41:15Z</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Known Bad Entity Match</span>
+<span class="font-body-md text-body-md text-on-surface-variant mt-1">€4,200.00 • Blocked</span>
+</div>
+</div>
+<!-- Event 3 (Neutral/Contextual) -->
+<div class="flex gap-4 relative z-10 pb-6 group cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-background border-2 border-outline mt-0.5 flex-shrink-0 group-hover:bg-outline transition-colors"></div>
+<div class="flex flex-col flex-1 opacity-70">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-data-mono text-data-mono text-on-surface font-medium">SYS-UPDATE</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">10:30:00Z</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Rule Set v1.4 Deployed</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

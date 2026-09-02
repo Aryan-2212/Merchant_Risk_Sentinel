@@ -1,0 +1,89 @@
+.ract {
+  position: relative;
+  width: 100%;
+}
+
+.ract-range {
+  position: absolute;
+  top: -30px;
+  right: 0;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.ract svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.ract-empty {
+  padding: var(--sp-6);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.ract-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.ract-axis-label {
+  font-size: 9px;
+  fill: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.ract-line {
+  fill: none;
+  stroke: var(--risk-high);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ract-dot {
+  fill: var(--risk-high);
+}
+
+.ract-crosshair {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.ract-tooltip {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.ract-tooltip strong {
+  font-size: var(--fs-sm);
+  margin-bottom: 2px;
+}
+
+.ract-tooltip span {
+  color: var(--text-secondary);
+}
+
+.ract-tooltip-total {
+  color: var(--text-muted) !important;
+  border-top: 1px solid var(--border);
+  padding-top: 3px;
+  margin-top: 2px;
+}

@@ -1,0 +1,147 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 3px var(--sp-2) 3px var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-sm {
+  font-size: var(--fs-xs);
+  padding: 2px 6px;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-low {
+  color: var(--risk-low);
+  background: var(--risk-low-dim);
+  border-color: color-mix(in srgb, var(--risk-low) 30%, transparent);
+}
+.risk-low .badge-dot {
+  background: var(--risk-low);
+}
+
+.risk-medium {
+  color: var(--risk-medium);
+  background: var(--risk-medium-dim);
+  border-color: color-mix(in srgb, var(--risk-medium) 30%, transparent);
+}
+.risk-medium .badge-dot {
+  background: var(--risk-medium);
+}
+
+.risk-high {
+  color: var(--risk-high);
+  background: var(--risk-high-dim);
+  border-color: color-mix(in srgb, var(--risk-high) 30%, transparent);
+}
+.risk-high .badge-dot {
+  background: var(--risk-high);
+}
+
+.risk-critical {
+  color: var(--risk-critical);
+  background: var(--risk-critical-dim);
+  border-color: color-mix(in srgb, var(--risk-critical) 45%, transparent);
+}
+.risk-critical .badge-dot {
+  background: var(--risk-critical);
+}
+
+.risk-unknown {
+  color: var(--risk-unknown);
+  background: var(--risk-unknown-dim);
+  border-color: color-mix(in srgb, var(--risk-unknown) 30%, transparent);
+}
+.risk-unknown .badge-dot {
+  background: var(--risk-unknown);
+}
+
+/* behavioral state badges -- distinct visual language from risk-level badges
+   (outline, no dot) so a reader never confuses "state" with "unified risk level" */
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* NORMAL and RECOVERY both read as "trending toward calm" (green) even though
+   RECOVERY shares RISK_RISING's numeric severity tier in mrs.risk.aggregate --
+   that severity number still drives the decomposition meters unchanged; this is a
+   presentation-only distinction reflecting "recovered" being a positive signal to
+   an analyst, per the product's explicit color system (green = normal/recovered). */
+.state-normal,
+.state-recovery {
+  color: var(--risk-low);
+  border-color: color-mix(in srgb, var(--risk-low) 35%, transparent);
+}
+.state-rising {
+  color: var(--risk-medium);
+  border-color: color-mix(in srgb, var(--risk-medium) 35%, transparent);
+}
+.state-high {
+  color: var(--risk-high);
+  border-color: color-mix(in srgb, var(--risk-high) 40%, transparent);
+}
+.state-insufficient {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+/* deterministic policy action badges */
+.action-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  border: 1px solid;
+}
+
+.action-allow {
+  color: var(--risk-low);
+  border-color: color-mix(in srgb, var(--risk-low) 35%, transparent);
+  background: var(--risk-low-dim);
+}
+.action-monitor {
+  color: var(--secondary);
+  border-color: color-mix(in srgb, var(--secondary) 35%, transparent);
+  background: var(--secondary-dim);
+}
+.action-step-up {
+  color: var(--risk-high);
+  border-color: color-mix(in srgb, var(--risk-high) 40%, transparent);
+  background: var(--risk-high-dim);
+}
+.action-review {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--accent-dim);
+}
+.action-escalate {
+  color: var(--risk-critical);
+  border-color: color-mix(in srgb, var(--risk-critical) 45%, transparent);
+  background: var(--risk-critical-dim);
+}

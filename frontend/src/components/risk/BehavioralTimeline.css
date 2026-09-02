@@ -1,0 +1,30 @@
+.btimeline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.btimeline-seg {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.btimeline-arrow {
+  color: var(--text-muted);
+}
+
+.btimeline-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  padding: 4px 8px;
+}
+
+.btimeline-count {
+  font-size: 10px;
+  color: var(--text-muted);
+}

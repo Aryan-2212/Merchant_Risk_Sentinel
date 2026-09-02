@@ -1,0 +1,56 @@
+.state-block {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  justify-content: center;
+  text-align: center;
+}
+
+.state-empty {
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.state-error {
+  color: var(--risk-high);
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.state-retry {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+.state-retry:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.state-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--primary);
+  animation: state-spin 700ms linear infinite;
+}
+
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-spinner {
+    animation-duration: 1400ms;
+  }
+}

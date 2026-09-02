@@ -174,3 +174,132 @@ class PaginatedRiskHistory(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+class AuditLogOut(BaseModel):
+    """One audit_logs row, verbatim (Dev Plan §20 'audit_logs', §33.9). Currently the
+    only event_type the policy engine writes is POLICY_DECISION (mrs.policy.engine) --
+    this schema does not assume that is the only one that will ever exist."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    audit_id: int
+    transaction_id: int | None
+    alert_id: int | None
+    event_type: str
+    payload: dict
+    model_version: str | None
+    created_at: dt.datetime
+
+
+class OverviewStats(BaseModel):
+    """Aggregate counts for the Command Center overview (Dev Plan §21 View 1).
+    Every field is a COUNT/GROUP BY over already-persisted rows -- no risk, behavioral,
+    or policy logic is evaluated here."""
+
+    total_transactions: int
+    total_customers: int
+    total_terminals: int
+    total_risk_scores: int
+    total_alerts: int
+    #: Keyed by mrs.risk.aggregate level (LOW/MEDIUM/HIGH/CRITICAL/INSUFFICIENT_EVIDENCE).
+    #: A level with zero rows is simply absent, never filled in as 0.
+    risk_level_counts: dict[str, int]
+    #: Keyed by mrs.policy.rules.BOUNDED_ACTIONS. ALLOW never appears (Dev Plan Sec 15:
+    #: only a non-ALLOW decision becomes an alerts row).
+    alert_action_counts: dict[str, int]
+    alert_status_counts: dict[str, int]
+    #: Distinct customers/terminals whose MOST RECENT scored transaction has
+    #: customer_risk_state/terminal_risk_state in (RISK_RISING, HIGH_RISK) -- a
+    #: temporal snapshot ("at risk right now"), not a permanent label; RECOVERY is
+    #: deliberately excluded (already improving, per Dev Plan Sec 8).
+    customers_at_risk: int
+    terminals_at_risk: int
+    #: SUM(tx_amount) over transactions whose unified_risk_level is HIGH or CRITICAL --
+    #: real money at elevated risk, never described as confirmed fraud (Dev Plan Sec 25).
+    risk_exposure_amount: float
+
+
+class RiskActivityPoint(BaseModel):
+    """One day's worth of severity-2 ("elevated") component counts (Dev Plan Sec 16:
+    temporal risk activity). Counts, not scores -- how many scored transactions that
+    day had each component at its most severe tier."""
+
+    date: dt.date
+    transaction_high: int
+    customer_high: int
+    terminal_high: int
+    #: Count of transactions that day whose unified_risk_level was HIGH or CRITICAL
+    #: (mrs.risk.aggregate) -- the single "how much elevated risk activity" trend line.
+    elevated_transactions: int
+    total_scored: int
+
+
+class NetworkNode(BaseModel):
+    """One entity in the Command Center's Entity Risk Network (Dev Plan Sec 8: a
+    behavioral STATE, never a permanent label). id is "customer:<id>" or
+    "terminal:<id>" -- unique across both entity types."""
+
+    id: str
+    entity_type: str  # "customer" | "terminal"
+    entity_id: int
+    risk_state: str | None
+    risk_severity: int | None
+    is_focus: bool
+
+
+class NetworkEdge(BaseModel):
+    """A real customer<->terminal relationship, derived from actual shared
+    transactions -- never a fabricated or inferred connection."""
+
+    source: str
+    target: str
+    #: Number of transactions between this exact customer/terminal pair.
+    weight: int
+
+
+class NetworkGraph(BaseModel):
+    nodes: list[NetworkNode]
+    edges: list[NetworkEdge]
+    #: node ids that were chosen as graph focus points (currently most-severe
+    #: entities), vs. neighbors pulled in only because they transacted with one.
+    focus_ids: list[str]
+
+
+class EntityAtRiskRow(BaseModel):
+    """One currently-elevated customer or terminal, with a real, computed behavioral
+    deviation (Dev Plan Sec 8/14: risk as a temporal, moving state -- never a static
+    label). current_rate/baseline_rate are each entity's OWN fraction of its
+    transactions at severity 2 in the recent vs. prior window -- never the ground-truth
+    tx_fraud label, which this system never surfaces as an operational signal."""
+
+    entity_type: str  # "customer" | "terminal"
+    entity_id: int
+    risk_state: str
+    risk_severity: int | None
+    #: Fraction (0-1) of this entity's transactions at severity 2 in the most recent
+    #: window (default 7 days of available data).
+    current_rate: float
+    #: Same fraction, prior window (default the 30 days before the recent window).
+    #: None if the entity has no transactions in the prior window at all (too new to
+    #: have a baseline -- never presented as 0, which would read as "no risk before").
+    baseline_rate: float | None
+    recent_transaction_count: int
+    last_activity: dt.datetime
+
+
+class EntityDeviation(BaseModel):
+    """Real recent-vs-baseline behavioral deviation for ONE arbitrary entity (any
+    state, not just currently-elevated ones) -- GET /terminals/{id}/deviation. Reuses
+    the exact same computation as EntityAtRiskRow (mrs.api.lookups.entity_deviation_rates)
+    so the two views can never disagree with each other."""
+
+    entity_type: str
+    entity_id: int
+    #: Fraction (0-1) of this entity's transactions at severity 2, recent window.
+    current_rate: float | None
+    baseline_rate: float | None
+    current_transaction_count: int
+    baseline_transaction_count: int
+    recent_window_days: int
+    baseline_window_days: int

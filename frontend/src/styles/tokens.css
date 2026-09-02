@@ -1,0 +1,125 @@
+/*
+ * Merchant Risk Sentinel design tokens -- ported directly from the approved Stitch
+ * exports' Tailwind config (merchant_risk_sentinel/DESIGN.md and each reference
+ * screen's code.html <script id="tailwind-config">). These are not an interpretation
+ * -- every hex value below is copied verbatim from that config, mapped onto this
+ * project's existing CSS-custom-property architecture (a full Tailwind migration
+ * wasn't warranted just to reuse the same tokens).
+ *
+ * Semantic risk mapping (this project's own addition, since the Stitch tokens are
+ * generic Material color roles, not risk-specific):
+ *   error (#ffb4ab)     = HIGH_RISK / CRITICAL severity
+ *   tertiary (#d3c4b9)  = RISK_RISING / MEDIUM severity (warm tan, not amber-yellow)
+ *   on-surface-variant  = NORMAL / low severity / neutral
+ *   primary (#c4c6cd)   = UI chrome only (nav, links, buttons) -- never a risk signal
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- surfaces (verbatim from Stitch tailwind config) ---- */
+  --bg: #111316;
+  --surface-1: #1a1c1f;
+  /* surface-container-low */
+  --surface-2: #1e2023;
+  /* surface-container */
+  --surface-3: #282a2d70;
+  /* surface-container-high, translucent for overlays */
+  --surface-lowest: #0c0e11;
+  /* surface-container-lowest -- sidebar rail, table header band */
+  --surface-high: #282a2d;
+  /* surface-container-high -- active nav row */
+  --border: #292d33;
+  /* outline-variant */
+  --border-strong: #45474a;
+
+  /* ---- ink ---- */
+  --text-primary: #e2e2e6;
+  /* on-surface */
+  --text-secondary: #c5c6cb;
+  /* on-surface-variant */
+  --text-muted: #8f9195;
+  /* outline */
+
+  /* ---- brand (UI chrome only -- never a risk signal) ---- */
+  --primary: #c4c6cd;
+  --primary-dim: #c4c6cd22;
+  --on-primary: #2d3136;
+  --secondary: #c4c6cd;
+  --secondary-dim: #c4c6cd22;
+  --accent: #d3c4b9;
+  --accent-dim: #d3c4b922;
+
+  /* ---- AI Risk Analyst accent (Stitch's "secondary" role, used only for the
+   * Decision Console / system-log panel -- distinct from risk severity) ---- */
+  --analyst: #c4c6cd;
+  --analyst-dim: #c4c6cd1a;
+
+  /* ---- status / risk severity (fixed, never re-themed) ----
+   * Four distinct hues per explicit product instruction: green = normal/recovered,
+   * amber/tan = risk rising, coral/orange = high, red = critical. The Stitch
+   * export's own example data never showed a NORMAL/low state, so it only exercised
+   * error (coral) + tertiary (tan) + neutral -- it has no green in its token set.
+   * risk-low here is a real, deliberate addition on top of the Stitch tokens, not a
+   * literal copy of one, because the product's color-system instruction requires it. */
+  --risk-low: #7fa473;
+  --risk-low-dim: #7fa4731a;
+  --risk-medium: #d3c4b9;
+  --risk-medium-dim: #d3c4b91f;
+  --risk-high: #e0916a;
+  --risk-high-dim: #e0916a1f;
+  --risk-critical: #e5534b;
+  --risk-critical-dim: #e5534b26;
+  --risk-unknown: #6f737a;
+  --risk-unknown-dim: #6f737a1a;
+
+  /* ---- spacing (4px scale) ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* ---- type ----
+   * The Stitch tailwind config *declares* IBM Plex Sans (headings/labels) + Inter
+   * (body), but neither entry has a generic fallback ("IBM Plex Sans" / "Inter" with
+   * nothing after it) -- so in the environment that rendered the approved
+   * screen.png reference files, those fonts failed to load and fell back to the
+   * browser default, which is serif. Verified directly: zoomed into "High Deviation
+   * Terminals", "OVERALL RISK INDEX", and "Transaction" in
+   * overview_contextual_risk_drivers_integrated/screen.png -- all render with clear
+   * serifs, not IBM Plex Sans/Inter's clean grotesque letterforms. "Velocity Spike"
+   * (data-mono) renders as true monospace, because that entry uses the generic
+   * "monospace" keyword, which always resolves. Per this project's explicit
+   * instruction to match the rendered screenshots exactly rather than the config's
+   * stated intent, the base font here is serif -- not the sans stack the Tailwind
+   * config declares. */
+  --font: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-headline: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+
+  --fs-xs: 11px;
+  /* label-caps */
+  --fs-sm: 12.5px;
+  --fs-base: 13.5px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  /* headline-md */
+  --fs-xl: 24px;
+  /* headline-lg */
+  --fs-score: 48px;
+  /* score-display */
+
+  /* ---- radius (Stitch's borderRadius override: DEFAULT 2px, lg 4px, xl 8px) ---- */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+}

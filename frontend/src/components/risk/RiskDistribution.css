@@ -1,0 +1,44 @@
+.rdist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.rdist-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.rdist-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.rdist-track {
+  width: 100%;
+  min-width: 0;
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rdist-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease);
+}
+
+.rdist-value {
+  font-size: var(--fs-sm);
+  min-width: 108px;
+  text-align: right;
+}
+
+.rdist-pct {
+  color: var(--text-muted);
+}

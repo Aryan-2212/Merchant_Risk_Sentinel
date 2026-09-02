@@ -204,7 +204,7 @@ def test_analyst_success_path(db_engine, client, monkeypatch):
     assert body["policy_version"] is None  # no audit_log POLICY_DECISION row was seeded in this test
     assert body["is_fallback"] is False
     assert body["fallback_reason"] is None
-    assert body["analyst_model"] == "claude-opus-5"
+    assert body["analyst_model"] == "gemini-3.6-flash"
     assert "confirmed fraud" not in body["summary"].lower()
 
 

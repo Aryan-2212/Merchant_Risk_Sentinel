@@ -1,0 +1,80 @@
+.cinv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  height: 100%;
+}
+
+.cinv-title {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cinv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cinv-entity-type {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: capitalize;
+  margin-right: var(--sp-2);
+}
+
+.cinv-entity-id {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.cinv-level {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3);
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+}
+
+.cinv-level-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.cinv-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cinv-block-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cinv-signals {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cinv-signals li {
+  font-size: var(--fs-sm);
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--primary);
+}
+
+.cinv-link {
+  margin-top: auto;
+  text-align: center;
+}

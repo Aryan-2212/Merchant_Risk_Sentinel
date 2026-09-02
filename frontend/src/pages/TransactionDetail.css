@@ -1,0 +1,37 @@
+.tx-meta {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: var(--sp-6);
+}
+
+.tx-meta p {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .tx-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-4);
+  }
+}
+
+.tx-policy {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.tx-policy-reason {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 200px;
+}
+
+.tx-policy-version {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}

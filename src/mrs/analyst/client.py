@@ -3,8 +3,8 @@ already-computed risk assessment (Dev Plan §16/§41; Phase 8 Step 6).
 
     AnalystEvidence (mrs.analyst.evidence -- already-computed, read-only)
                     v
-        client.messages.parse(output_format=AnalystExplanation)  (ONE call, no tools,
-                    v                                              no loop, no agent)
+        client.models.generate_content(response_schema=AnalystExplanation)  (ONE call,
+                    v                                    no tools, no loop, no agent)
         _check_evidence_grounding  (automated hallucination backstop)
                     v
         AnalystResult (explanation + is_fallback + fallback_reason)
@@ -18,10 +18,10 @@ This module never:
 
 Failure handling (Dev Plan §41: "If the LLM is unavailable or invalid, return
 deterministic risk evidence and a safe fallback"): any exception from the API call,
-a refusal stop_reason, a missing parsed_output, or a grounding-check violation all
-route to the same deterministic _fallback -- built entirely from already-computed
-evidence fields, mirroring mrs.policy.rules.build_reason's own no-fabrication
-discipline. The caller (mrs.api.routers.analyst) always gets a usable
+a blocked/non-STOP finish_reason, a missing parsed output, or a grounding-check
+violation all route to the same deterministic _fallback -- built entirely from
+already-computed evidence fields, mirroring mrs.policy.rules.build_reason's own
+no-fabrication discipline. The caller (mrs.api.routers.analyst) always gets a usable
 AnalystExplanation and never has to handle an LLM exception itself.
 """
 
@@ -30,9 +30,13 @@ from __future__ import annotations
 from mrs.analyst.schemas import AnalystEvidence, AnalystExplanation, AnalystResult
 from mrs.policy.rules import BOUNDED_ACTIONS
 
-#: ALWAYS claude-opus-5 unless a different model is explicitly requested -- no
-#: date-suffixed variant, matching the current model roster.
-ANALYST_MODEL = "claude-opus-5"
+#: Stable GA Gemini model -- no preview/date-suffixed variant, matching the current
+#: model roster. gemini-2.5-flash was retired for new API keys (Google's own 404
+#: points here); this is a reasoning model, so max_output_tokens below must cover its
+#: internal "thinking" tokens as well as the visible structured output. Reads
+#: GEMINI_API_KEY or GOOGLE_API_KEY from the environment (see _call_llm_raw); never
+#: hardcode credentials here.
+ANALYST_MODEL = "gemini-3.6-flash"
 
 SYSTEM_PROMPT = """You are the Merchant Risk Sentinel AI Risk Analyst, a component that sits \
 after a deterministic ML/behavioral risk pipeline and a deterministic policy engine (Dev Plan \
@@ -120,15 +124,23 @@ def _fallback(evidence: AnalystEvidence, *, reason: str) -> AnalystResult:
 def _call_llm_raw(evidence: AnalystEvidence):
     """The actual network call, isolated in its own function so tests can monkeypatch
     exactly this and nothing else (mrs.analyst.client._call_llm_raw)."""
-    import anthropic
+    from google import genai
+    from google.genai import types
 
-    client = anthropic.Anthropic()  # resolves ANTHROPIC_API_KEY from the environment
-    return client.messages.parse(
+    client = genai.Client()  # resolves GEMINI_API_KEY / GOOGLE_API_KEY from the environment
+    return client.models.generate_content(
         model=ANALYST_MODEL,
-        max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": evidence.model_dump_json()}],
-        output_format=AnalystExplanation,
+        contents=evidence.model_dump_json(),
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            response_mime_type="application/json",
+            response_schema=AnalystExplanation,
+            # gemini-3.6-flash spends several hundred tokens on internal "thinking"
+            # before the visible structured output; 1024 was observed truncating
+            # (finish_reason=MAX_TOKENS) mid-response. 4096 comfortably covers
+            # thinking + the small AnalystExplanation JSON payload.
+            max_output_tokens=4096,
+        ),
     )
 
 
@@ -137,20 +149,28 @@ def generate_explanation(evidence: AnalystEvidence) -> AnalystResult:
     raises -- the caller always gets a usable AnalystResult.
 
     A single broad except is deliberate here, not sloppy: every failure mode below
-    (network error, auth error, rate limit, refusal, malformed output) leads to the
-    identical fallback behavior, so there is nothing a narrower exception chain would
-    change -- the Anthropic SDK's own client already retries transient failures
-    (max_retries default) before any exception reaches this function.
+    (network error, auth error, rate limit, safety block, malformed output) leads to
+    the identical fallback behavior, so there is nothing a narrower exception chain
+    would change -- the Gen AI SDK's own client already retries transient failures
+    before any exception reaches this function.
     """
     try:
         response = _call_llm_raw(evidence)
     except Exception as exc:  # noqa: BLE001 -- see docstring
         return _fallback(evidence, reason=f"LLM call failed: {exc.__class__.__name__}: {exc}")
 
-    if response.stop_reason == "refusal":
-        return _fallback(evidence, reason="LLM declined to respond (stop_reason=refusal)")
+    block_reason = getattr(response.prompt_feedback, "block_reason", None) if response.prompt_feedback else None
+    if block_reason:
+        return _fallback(evidence, reason=f"LLM blocked the request (block_reason={block_reason})")
 
-    explanation = response.parsed_output
+    if not response.candidates:
+        return _fallback(evidence, reason="LLM returned no candidates")
+
+    finish_reason = response.candidates[0].finish_reason
+    if finish_reason is not None and finish_reason != "STOP":
+        return _fallback(evidence, reason=f"LLM declined to respond (finish_reason={finish_reason})")
+
+    explanation = response.parsed
     if explanation is None:
         return _fallback(evidence, reason="LLM did not return structured output")
 

@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from mrs.api import schemas
 from mrs.api.deps import get_db
 from mrs.api.lookups import policy_version_for_transaction
-from mrs.db.models import Alert, RiskScore, Transaction
+from mrs.db.models import Alert, AuditLog, RiskScore, Transaction
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -49,3 +49,16 @@ def get_transaction_risk(transaction_id: int, db: Session = Depends(get_db)) -> 
     if risk is None:
         raise HTTPException(status_code=404, detail=f"risk score for transaction_id {transaction_id} not found")
     return risk
+
+
+@router.get("/{transaction_id}/audit", response_model=list[schemas.AuditLogOut])
+def get_transaction_audit(transaction_id: int, db: Session = Depends(get_db)) -> list[AuditLog]:
+    """Full audit trail for one transaction (Dev Plan §21 View 4 'audit history'),
+    oldest first. An empty list is a valid answer (policy has not run for this
+    transaction yet) -- distinct from a 404, since the transaction itself may exist."""
+    if db.get(Transaction, transaction_id) is None:
+        raise HTTPException(status_code=404, detail=f"transaction_id {transaction_id} not found")
+    rows = db.execute(
+        select(AuditLog).where(AuditLog.transaction_id == transaction_id).order_by(AuditLog.created_at, AuditLog.audit_id)
+    ).scalars().all()
+    return list(rows)

@@ -41,7 +41,8 @@ fastapi>=0.115,<1
 uvicorn[standard]>=0.30,<1
 httpx>=0.27,<1
 
-# Phase 8 Step 6 (AI Risk Analyst): official Anthropic SDK. Reads ANTHROPIC_API_KEY
-# from the environment (Dev Plan §33.10) -- never hardcoded, never committed. The
-# analyst never determines risk itself; see src/mrs/analyst/ for the guardrails.
-anthropic>=0.40
+# Phase 8 Step 6 (AI Risk Analyst): official Google Gen AI SDK (Gemini). Reads
+# GEMINI_API_KEY (or GOOGLE_API_KEY) from the environment (Dev Plan §33.10) -- never
+# hardcoded, never committed. The analyst never determines risk itself; see
+# src/mrs/analyst/ for the guardrails.
+google-genai>=1.0

@@ -1,0 +1,74 @@
+.chain {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.chain-node {
+  padding: var(--sp-1) 0;
+}
+
+.chain-node-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.chain-step {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--sp-2);
+}
+
+.chain-node-inline .chain-step {
+  margin-bottom: 0;
+  width: 108px;
+  flex-shrink: 0;
+}
+
+.chain-signals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.chain-signals li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: var(--fs-base);
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--primary);
+}
+
+.chain-signal-label {
+  font-weight: 500;
+}
+
+.chain-signal-rest {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.chain-empty {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.chain-arrow {
+  color: var(--text-muted);
+  font-size: var(--fs-base);
+  padding: 2px 0 2px 20px;
+  line-height: 1;
+}

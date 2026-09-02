@@ -1,0 +1,18 @@
+.entity-meta {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: var(--sp-6);
+}
+
+.entity-meta p {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .entity-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-4);
+  }
+}

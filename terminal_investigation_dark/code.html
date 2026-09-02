@@ -1,0 +1,466 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Risk Sentinel - Terminal Investigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-tertiary": "#382f27",
+                "outline-variant": "#45474a",
+                "on-secondary-fixed-variant": "#44474c",
+                "on-primary-container": "#393d42",
+                "on-secondary-fixed": "#191c21",
+                "inverse-surface": "#e2e2e6",
+                "on-tertiary-container": "#443a33",
+                "surface-variant": "#333538",
+                "surface-container-highest": "#333538",
+                "on-tertiary-fixed": "#221a13",
+                "on-error": "#690005",
+                "secondary-fixed": "#e1e2e9",
+                "primary-fixed": "#e0e2e9",
+                "on-tertiary-fixed-variant": "#4f453d",
+                "secondary": "#c4c6cd",
+                "surface-tint": "#c4c6cd",
+                "outline": "#8f9195",
+                "surface-container": "#1e2023",
+                "surface-bright": "#37393d",
+                "tertiary-fixed-dim": "#d3c4b9",
+                "secondary-container": "#46494f",
+                "error-container": "#93000a",
+                "on-secondary-container": "#b6b8bf",
+                "inverse-primary": "#5b5f64",
+                "primary-fixed-dim": "#c4c6cd",
+                "on-surface-variant": "#c5c6cb",
+                "tertiary-fixed": "#f0e0d5",
+                "secondary-fixed-dim": "#c4c6cd",
+                "tertiary-container": "#b2a49a",
+                "surface-dim": "#111316",
+                "primary": "#c4c6cd",
+                "surface-container-lowest": "#0c0e11",
+                "on-surface": "#e2e2e6",
+                "surface-container-high": "#282a2d",
+                "on-error-container": "#ffdad6",
+                "on-primary": "#2d3136",
+                "on-secondary": "#2e3036",
+                "surface-container-low": "#1a1c1f",
+                "on-primary-fixed": "#181c20",
+                "inverse-on-surface": "#2f3034",
+                "error": "#ffb4ab",
+                "on-background": "#e2e2e6",
+                "tertiary": "#d3c4b9",
+                "on-primary-fixed-variant": "#43474c",
+                "background": "#111316",
+                "surface": "#111316",
+                "primary-container": "#a4a7ad"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-padding": "2rem",
+                "sidebar-expanded": "220px",
+                "stack-default": "1rem",
+                "stack-compact": "0.5rem",
+                "gutter": "1.5rem",
+                "sidebar-width": "64px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "IBM Plex Sans"
+                ],
+                "score-display": [
+                        "IBM Plex Sans"
+                ],
+                "headline-lg": [
+                        "IBM Plex Sans"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "IBM Plex Sans"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "data-mono": [
+                        "monospace"
+                ],
+                "headline-md": [
+                        "IBM Plex Sans"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "score-display": [
+                        "48px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.06em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "data-mono": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        /* Custom styles for specific design requirements */
+        .glass-panel {
+            background-color: #1a1c1f;
+            border: 1px solid #45474a;
+        }
+        
+        .ai-terminal {
+            background-color: #0c0e11;
+            border: 1px solid #45474a;
+        }
+
+        .risk-glow {
+            box-shadow: 0 0 10px rgba(255, 180, 171, 0.1);
+        }
+
+        /* Timeline styles */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #45474a;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-node {
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #111316;
+            border: 2px solid #8f9195;
+            z-index: 10;
+        }
+        
+        .timeline-node.flagged {
+            border-color: #ffb4ab; 
+            background-color: #93000a; 
+        }
+
+        /* Responsive utility classes */
+        .desktop-only {
+            display: none;
+        }
+        @media (min-width: 1280px) {
+            .desktop-only {
+                display: block;
+            }
+            .mobile-only {
+                display: none;
+            }
+        }
+        
+        /* Hide scrollbar for clean aesthetic */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0e11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333538;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex flex-col antialiased">
+<!-- TopNavBar -->
+<header class="bg-surface-dim border-b border-outline-variant flex justify-between items-center w-full px-gutter h-14 z-40 relative">
+<div class="flex items-center gap-4">
+<div class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+                Risk Sentinel
+            </div>
+<nav class="hidden md:flex ml-8 gap-6 h-full items-center">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase flex items-center h-full" href="#">Time Filter: Last 24h</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors opacity-80 p-2">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors opacity-80 p-2">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant ml-2 flex-shrink-0">
+<img alt="Analyst Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbD4ZVFvlTEFuXOFzcD2A_TBno1vW9LQ5c2JdZINmat_M-dO3Uw1cbC-1dFIGYqykltrdfxPK0lSgj5uUPVHwzVtIbjOWjxD6uOk-JQ-rrfp0-Geg87p5Vg4Yo3bmYDkj29jgxqXqi31Xn1ymrtPdXHRyyxjUFjSY8nm4hXD5MXOcySXbGkO5saanIsVjUIXBvMYKLviVJw_M6BOh4nE6lyPiJLS5JWaTPGAp6RWl9GXOVFv1qjhkilw">
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest border-r border-outline-variant w-sidebar-width lg:w-sidebar-expanded flex flex-col py-stack-default pt-6 transition-all duration-300 z-30">
+<div class="hidden lg:flex flex-col px-4 mb-8">
+<div class="font-headline-md text-headline-md text-primary font-bold">Sentinel</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">V2.4.0</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 px-4 py-3 mx-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Overview</span>
+</a>
+<a class="text-primary bg-surface-container-high border-l-2 border-primary flex items-center gap-4 px-4 py-3 mx-2 rounded" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block font-bold">Terminals</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 px-4 py-3 mx-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Customers</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 px-4 py-3 mx-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="warning">warning</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Alerts</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 px-4 py-3 mx-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="hub">hub</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Network</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-2 border-t border-outline-variant pt-4 mx-4">
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 py-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Settings</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-4 py-2 rounded group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="help">help</span>
+<span class="font-label-caps text-label-caps uppercase hidden lg:block">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 bg-surface overflow-y-auto p-container-padding flex flex-col gap-6 relative">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-outline-variant pb-6 gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="terminal">terminal</span>
+                        Terminal Investigation
+                    </h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-2 tracking-wide uppercase">ID: T-0381 | Region: NA-EAST | Status: <span class="text-error">FLAGGED</span></p>
+</div>
+<div class="flex items-center gap-6 bg-surface-container-low p-4 rounded border border-outline-variant">
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Risk Score</span>
+<div class="font-score-display text-score-display text-error leading-none">91</div>
+</div>
+<div class="w-32 md:w-48 flex flex-col justify-center h-full">
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
+<span>Low</span>
+<span class="text-error font-bold">High</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-error" style="width: 91%;"></div>
+</div>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout for Main Content -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1">
+<!-- Section 1: Risk Timeline (Spans 4 cols on desktop) -->
+<section class="xl:col-span-4 glass-panel rounded p-6 flex flex-col relative overflow-hidden">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface mb-6 flex items-center gap-2 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-secondary" data-icon="history">history</span>
+                        Risk Timeline (6 Months)
+                    </h2>
+<div class="relative flex-1 min-h-[400px] mt-4">
+<div class="timeline-line"></div>
+<!-- Event 1 (Newest) -->
+<div class="relative w-full flex items-center justify-start mb-12">
+<div class="w-1/2 pr-6 text-right">
+<div class="font-label-caps text-label-caps text-error uppercase mb-1">Current</div>
+<div class="font-body-md text-body-md text-on-surface">Risk Alert Triggered</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs mt-1">Score &gt; 90 threshold</div>
+</div>
+<div class="timeline-node flagged top-1/2"></div>
+<div class="w-1/2 pl-6">
+<!-- Empty side -->
+</div>
+</div>
+<!-- Event 2 -->
+<div class="relative w-full flex items-center justify-end mb-12">
+<div class="w-1/2 pr-6">
+<!-- Empty side -->
+</div>
+<div class="timeline-node top-1/2" style="border-color: #d3c4b9; background-color: #443a33;"></div>
+<div class="w-1/2 pl-6 text-left">
+<div class="font-label-caps text-label-caps text-tertiary-fixed uppercase mb-1">-2 Weeks</div>
+<div class="font-body-md text-body-md text-on-surface">Fraud Spike Detected</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs mt-1">Pattern match: M-12</div>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="relative w-full flex items-center justify-start mb-12">
+<div class="w-1/2 pr-6 text-right">
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">-1 Month</div>
+<div class="font-body-md text-body-md text-on-surface">Activity Rises</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs mt-1">Volume +40% WoW</div>
+</div>
+<div class="timeline-node top-1/2"></div>
+<div class="w-1/2 pl-6">
+<!-- Empty side -->
+</div>
+</div>
+<!-- Event 4 (Baseline) -->
+<div class="relative w-full flex items-center justify-end">
+<div class="w-1/2 pr-6">
+<!-- Empty side -->
+</div>
+<div class="timeline-node top-1/2"></div>
+<div class="w-1/2 pl-6 text-left opacity-50">
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">-6 Months</div>
+<div class="font-body-md text-body-md text-on-surface">Baseline Established</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column Stack (Spans 8 cols on desktop) -->
+<div class="xl:col-span-8 flex flex-col gap-6">
+<!-- Section 2: Behavioral Evidence -->
+<section class="bg-surface-container-low rounded border border-outline-variant p-6 flex flex-col">
+<div class="flex justify-between items-center border-b border-outline-variant pb-2 mb-6">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="monitoring">monitoring</span>
+                                Behavioral Evidence
+                            </h2>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Current vs Baseline</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Metric 1: Velocity -->
+<div class="bg-surface-container p-4 rounded border border-outline-variant relative overflow-hidden">
+<div class="absolute right-0 top-0 h-full w-1 bg-tertiary-container"></div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Transaction Velocity</div>
+<div class="flex items-end gap-4">
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface">3.2x</div>
+<div class="font-data-mono text-data-mono text-tertiary mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+                                        Above Baseline
+                                    </div>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant">
+<div class="flex justify-between font-data-mono text-data-mono text-xs text-on-surface-variant mb-1">
+<span>Baseline: 45/hr</span>
+<span>Current: 144/hr</span>
+</div>
+</div>
+</div>
+<!-- Metric 2: Fraud Rate -->
+<div class="bg-surface-container p-4 rounded border border-outline-variant relative overflow-hidden risk-glow">
+<div class="absolute right-0 top-0 h-full w-1 bg-error"></div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Fraud Rate Change</div>
+<div class="flex items-end gap-4">
+<div class="font-headline-lg text-headline-lg font-bold text-error">+12.4pp</div>
+<div class="font-data-mono text-data-mono text-error mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="priority_high">priority_high</span>
+                                        Critical
+                                    </div>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant">
+<div class="flex justify-between font-data-mono text-data-mono text-xs text-on-surface-variant mb-1">
+<span>Baseline: 0.8%</span>
+<span>Current: 13.2%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: AI Analyst Interpretation -->
+<section class="ai-terminal rounded p-6 flex flex-col flex-1 relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.3)]">
+<!-- Decorative scanline effect -->
+<div class="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(transparent_50%,rgba(0,0,0,1)_50%)] bg-[length:100%_4px] z-10"></div>
+<div class="flex items-center gap-3 border-b border-outline-variant pb-3 mb-4">
+<span class="material-symbols-outlined text-secondary animate-pulse" data-icon="memory">memory</span>
+<h2 class="font-label-caps text-label-caps font-bold text-secondary uppercase tracking-widest">System Log // AI Analyst Synthesis</h2>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface leading-relaxed space-y-4 opacity-90 z-20">
+<p>&gt; ANALYZING TERMINAL T-0381 EVENT STREAM...</p>
+<p class="text-tertiary">&gt; ANOMALY DETECTED: A structural shift in behavioral patterns emerged approximately 14 days ago. Transaction velocity increased 3.2x relative to the established 6-month baseline.</p>
+<p class="text-error">&gt; CRITICAL FINDING: The spike in velocity correlates tightly (+0.89 Pearson) with a 12.4 percentage point increase in localized fraud attempt rates. The signature matches known automated enumeration attacks (Ref: Pattern M-12).</p>
+<p>&gt; SYNTHESIS: The terminal is likely compromised or actively being utilized as an egress node for organized credential testing. Immediate isolation recommended.</p>
+<p class="text-secondary animate-pulse">&gt; _</p>
+</div>
+<!-- Actions -->
+<div class="mt-auto pt-6 flex gap-4 z-20">
+<button class="bg-primary text-on-primary hover:bg-opacity-90 font-label-caps text-label-caps font-bold uppercase px-6 py-2 rounded transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="block">block</span>
+                                Isolate Terminal
+                            </button>
+<button class="border border-outline-variant text-on-surface hover:bg-surface-variant font-label-caps text-label-caps uppercase px-6 py-2 rounded transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="download">download</span>
+                                Export Log
+                            </button>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</body></html>

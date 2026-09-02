@@ -1,0 +1,118 @@
+.network-graph {
+  position: relative;
+  width: 100%;
+}
+
+.network-graph svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.network-empty {
+  padding: var(--sp-6);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.network-edges line {
+  stroke: var(--border-strong);
+  stroke-opacity: 0.55;
+}
+
+.network-node {
+  cursor: pointer;
+}
+
+.network-node-fill {
+  transition:
+    r var(--dur-base) var(--ease),
+    opacity var(--dur-base) var(--ease);
+  stroke: var(--bg);
+  stroke-width: 2px;
+}
+
+.network-node:not(.is-focus) .network-node-fill {
+  opacity: 0.85;
+}
+
+.network-node.is-focus .network-node-fill {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 60%, transparent));
+}
+
+.network-node-glyph {
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--bg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.network-node-ring {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2px;
+  stroke-dasharray: 3 3;
+}
+
+.network-node:hover .network-node-fill,
+.network-node:focus-visible .network-node-fill {
+  stroke: var(--text-primary);
+}
+
+.network-tooltip {
+  position: absolute;
+  transform: translate(-50%, -140%);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: var(--fs-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.network-tooltip strong {
+  font-size: var(--fs-sm);
+  text-transform: capitalize;
+}
+
+.network-tooltip span {
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.network-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-1) 0;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.network-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.network-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.network-legend-sep {
+  margin-left: auto;
+}

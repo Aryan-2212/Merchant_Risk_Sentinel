@@ -1,8 +1,8 @@
 """Tests for mrs.analyst -- Phase 8 Step 6 AI Risk Analyst (Dev Plan §16/§41).
 
 No test in this module makes a real network call: mrs.analyst.client._call_llm_raw is
-monkeypatched to a stub in every generate_explanation test, so these run without an
-ANTHROPIC_API_KEY and without network access. That is deliberate -- it lets us
+monkeypatched to a stub in every generate_explanation test, so these run without a
+GEMINI_API_KEY and without network access. That is deliberate -- it lets us
 directly simulate the failure modes Dev Plan §41 requires handling (unavailable,
 invalid output, refusal) and the hallucination boundary Step 6 explicitly asks to be
 tested, none of which are reliably reproducible against a real, non-deterministic LLM.
@@ -253,17 +253,28 @@ def test_fallback_handles_insufficient_evidence_level():
 # ------------------------------------------------------------------- generate_explanation
 
 
+class _FakeCandidate:
+    def __init__(self, *, finish_reason="STOP"):
+        self.finish_reason = finish_reason
+
+
 class _FakeResponse:
-    def __init__(self, *, stop_reason="end_turn", parsed_output=None):
-        self.stop_reason = stop_reason
-        self.parsed_output = parsed_output
+    def __init__(self, *, finish_reason="STOP", parsed=None, block_reason=None, candidates=True):
+        self.candidates = [_FakeCandidate(finish_reason=finish_reason)] if candidates else []
+        self.parsed = parsed
+        self.prompt_feedback = _FakePromptFeedback(block_reason) if block_reason else None
+
+
+class _FakePromptFeedback:
+    def __init__(self, block_reason):
+        self.block_reason = block_reason
 
 
 def test_generate_explanation_success_path(monkeypatch):
     good = _explanation(summary="Elevated risk driven by terminal behavior.")
 
     def fake_call(evidence):
-        return _FakeResponse(stop_reason="end_turn", parsed_output=good)
+        return _FakeResponse(finish_reason="STOP", parsed=good)
 
     monkeypatch.setattr("mrs.analyst.client._call_llm_raw", fake_call)
 
@@ -287,18 +298,29 @@ def test_generate_explanation_falls_back_on_exception(monkeypatch):
 
 def test_generate_explanation_falls_back_on_refusal(monkeypatch):
     def fake_call(evidence):
-        return _FakeResponse(stop_reason="refusal", parsed_output=None)
+        return _FakeResponse(finish_reason="SAFETY", parsed=None)
 
     monkeypatch.setattr("mrs.analyst.client._call_llm_raw", fake_call)
 
     result = generate_explanation(_evidence())
     assert result.is_fallback is True
-    assert "refusal" in result.fallback_reason
+    assert "SAFETY" in result.fallback_reason
+
+
+def test_generate_explanation_falls_back_on_blocked_prompt(monkeypatch):
+    def fake_call(evidence):
+        return _FakeResponse(candidates=False, block_reason="SAFETY")
+
+    monkeypatch.setattr("mrs.analyst.client._call_llm_raw", fake_call)
+
+    result = generate_explanation(_evidence())
+    assert result.is_fallback is True
+    assert "block_reason=SAFETY" in result.fallback_reason
 
 
 def test_generate_explanation_falls_back_on_missing_parsed_output(monkeypatch):
     def fake_call(evidence):
-        return _FakeResponse(stop_reason="end_turn", parsed_output=None)
+        return _FakeResponse(finish_reason="STOP", parsed=None)
 
     monkeypatch.setattr("mrs.analyst.client._call_llm_raw", fake_call)
 
@@ -318,7 +340,7 @@ def test_generate_explanation_falls_back_on_hallucinated_fraud_certainty(monkeyp
     )
 
     def fake_call(evidence):
-        return _FakeResponse(stop_reason="end_turn", parsed_output=hallucinated)
+        return _FakeResponse(finish_reason="STOP", parsed=hallucinated)
 
     monkeypatch.setattr("mrs.analyst.client._call_llm_raw", fake_call)
 
@@ -343,4 +365,4 @@ def test_generate_explanation_never_raises_regardless_of_failure_mode(monkeypatc
 
 
 def test_analyst_model_id_has_no_date_suffix():
-    assert ANALYST_MODEL == "claude-opus-5"
+    assert ANALYST_MODEL == "gemini-3.6-flash"

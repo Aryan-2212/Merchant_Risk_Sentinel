@@ -7,7 +7,7 @@ already-persisted rows. It is not a database handle, not raw SQL, not other
 transactions' data -- Dev Plan §41 "receives only structured, computed evidence".
 
 AnalystExplanation is the ONLY thing the LLM is allowed to produce -- validated via
-Anthropic structured outputs (client.messages.parse(output_format=AnalystExplanation)),
+Gemini structured outputs (client.models.generate_content(response_schema=AnalystExplanation)),
 never free-form text. recommended_action is a Literal over the same five bounded
 actions mrs.policy.rules defines (imported, not duplicated), so a value outside that
 set cannot even parse successfully -- Dev Plan §15/§41: "use a strict structured
