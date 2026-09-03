@@ -45,8 +45,11 @@ export function AnalystPanel({ transactionId, actions }: { transactionId: number
 
         {data.is_fallback ? (
           <p className="analyst-line analyst-line-muted">
-            <span className="analyst-prompt">&gt;</span> AI analyst unavailable -- showing deterministic evidence
-            instead of a generated explanation.
+            <span className="analyst-prompt">&gt;</span> AI explanation temporarily unavailable. Showing
+            system-generated evidence instead.
+            {/* fallback_reason is always one of a small set of pre-approved, sanitized category
+                strings (mrs.analyst.client._public_failure_reason) -- never a raw provider
+                error/exception, so it's safe to surface here. */}
             {data.fallback_reason && <span className="analyst-detail"> {data.fallback_reason}</span>}
           </p>
         ) : (

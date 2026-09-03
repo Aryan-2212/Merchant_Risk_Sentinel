@@ -5,6 +5,24 @@ import { EmptyState } from "../common/States";
 import { Icon } from "../common/Icon";
 import "./RecentHighRisk.css";
 
+/** Translates one contributing_signals entry (mrs.risk.aggregate._signal_text syntax,
+ * e.g. "transaction_ml_risk >= 0.97" or "terminal_behavioral_risk: HIGH_RISK") into a
+ * short analyst-facing phrase for this compact feed item -- never the raw
+ * field-name/operator syntax verbatim (mirrors the tone of mrs.analyst.client's own
+ * deterministic-fallback phrasing, kept brief here for a single feed line). */
+function describeSignal(signal: string): string {
+  if (signal.startsWith("transaction_ml_risk")) return "Elevated transaction-level ML risk";
+  if (signal.startsWith("terminal_behavioral_risk")) {
+    const state = signal.split(":")[1]?.trim().replace(/_/g, " ");
+    return state ? `Terminal behavioral state: ${state}` : "Elevated terminal behavioral risk";
+  }
+  if (signal.startsWith("customer_behavioral_risk")) {
+    const state = signal.split(":")[1]?.trim().replace(/_/g, " ");
+    return state ? `Customer behavioral state: ${state}` : "Elevated customer behavioral risk";
+  }
+  return signal;
+}
+
 /** GET /stats/recent-activity?levels=HIGH,CRITICAL -- filtered server-side (sampling
  * the last N transactions overall and filtering client-side can legitimately return
  * zero rows, since elevated transactions are ~1.5% of the stream). The client-side
@@ -35,7 +53,9 @@ export function RecentHighRisk({ items }: { items: ReplayItemOut[] }) {
                     </span>
                     <span className="rhr-time mono">{formatDateTimeCompact(transaction.tx_datetime)}</span>
                   </div>
-                  <p className="rhr-desc">{risk_score?.contributing_signals[0] ?? "Elevated risk detected"}</p>
+                  <p className="rhr-desc">
+                    {risk_score?.contributing_signals[0] ? describeSignal(risk_score.contributing_signals[0]) : "Elevated risk detected"}
+                  </p>
                   <p className="rhr-detail">
                     {formatAmount(transaction.tx_amount)} · CUST_{transaction.customer_id} → TERM_{transaction.terminal_id}
                   </p>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { formatAmount, formatDateTime } from "../lib/format";
 import { Loading, ErrorBlock, EmptyState } from "../components/common/States";
@@ -77,7 +77,7 @@ export function TransactionsExplorer() {
             onChange={(e) => setEnd(e.target.value)}
           />
         </div>
-        <button className="btn btn-primary" type="submit" style={{ marginTop: 18 }}>
+        <button className="btn btn-primary" type="submit">
           Apply
         </button>
       </form>
@@ -108,11 +108,25 @@ export function TransactionsExplorer() {
                     data-clickable="true"
                     onClick={() => navigate(`/transactions/${transaction.transaction_id}`)}
                   >
-                    <td>TX_{transaction.transaction_id}</td>
+                    <td>
+                      <Link className="link-id mono" to={`/transactions/${transaction.transaction_id}`} onClick={(e) => e.stopPropagation()}>
+                        TX_{transaction.transaction_id}
+                      </Link>
+                    </td>
                     <td>{formatDateTime(transaction.tx_datetime)}</td>
                     <td>{formatAmount(transaction.tx_amount)}</td>
-                    <td>CUST_{transaction.customer_id}</td>
-                    <td>TERM_{transaction.terminal_id}</td>
+                    <td>
+                      {/* stopPropagation: the row itself navigates to this transaction; a
+                          nested Link must win over that when clicked directly, not fire both. */}
+                      <Link className="link-id" to={`/customers/${transaction.customer_id}`} onClick={(e) => e.stopPropagation()}>
+                        CUST_{transaction.customer_id}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link className="link-id" to={`/terminals/${transaction.terminal_id}`} onClick={(e) => e.stopPropagation()}>
+                        TERM_{transaction.terminal_id}
+                      </Link>
+                    </td>
                     <td>{risk_score ? <RiskBadge level={risk_score.unified_risk_level} size="sm" /> : "—"}</td>
                     <td>{alert?.recommended_action ? <ActionBadge action={alert.recommended_action} /> : "—"}</td>
                   </tr>

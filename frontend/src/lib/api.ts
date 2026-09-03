@@ -36,7 +36,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
+async function request<T>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
   const url = new URL(API_BASE + path);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -79,6 +79,7 @@ export const api = {
   getCustomer: (id: number) => request<CustomerOut>(`/customers/${id}`),
   getCustomerRiskHistory: (id: number, limit = 50, offset = 0) =>
     request<PaginatedRiskHistory>(`/customers/${id}/risk`, { limit, offset }),
+  getCustomerDeviation: (id: number) => request<EntityDeviation>(`/customers/${id}/deviation`),
 
   getTerminal: (id: number) => request<TerminalOut>(`/terminals/${id}`),
   getTerminalRiskHistory: (id: number, limit = 50, offset = 0) =>
@@ -90,6 +91,13 @@ export const api = {
   getAlert: (id: number) => request<AlertDetailOut>(`/alerts/${id}`),
 
   replayBounds: () => request<ReplayBounds>("/replay/bounds"),
-  replayTransactions: (params: { after_cursor?: string; start?: string; end?: string; limit?: number }) =>
-    request<ReplayPage>("/replay/transactions", params),
+  replayTransactions: (params: {
+    after_cursor?: string;
+    start?: string;
+    end?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    desc?: boolean;
+    limit?: number;
+  }) => request<ReplayPage>("/replay/transactions", params),
 };

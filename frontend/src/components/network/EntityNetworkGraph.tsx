@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY } from "d3-force";
 import type { NetworkGraph, NetworkNode } from "../../lib/types";
-import { stateColor } from "../../lib/riskColor";
+import { severityColor, stateColor } from "../../lib/riskColor";
 import "./EntityNetworkGraph.css";
 
 const WIDTH = 560;
@@ -21,17 +21,32 @@ interface SimLink {
 }
 
 function nodeRadius(node: NetworkNode): number {
-  return node.is_focus ? 15 : 8;
+  return node.is_focus ? 16 : 9;
 }
 
 function nodeGlyph(node: NetworkNode): string {
   return node.entity_type === "terminal" ? "T" : "C";
 }
 
+function nodeLabel(node: NetworkNode): string {
+  return node.entity_type === "terminal" ? `TERM_${node.entity_id}` : `CUST_${node.entity_id}`;
+}
+
+/** A link's color/weight is driven by whichever endpoint carries the higher real
+ * computed severity -- the same risk_severity already used for that node's own fill,
+ * never an invented "link risk tier". */
+function linkColor(s: SimNode, t: SimNode): string {
+  const worse = (s.risk_severity ?? -1) >= (t.risk_severity ?? -1) ? s : t;
+  return severityColor(worse.risk_severity);
+}
+
 interface Props {
   graph: NetworkGraph;
   selectedId?: string;
   onSelect: (node: NetworkNode) => void;
+  /** Suppress the built-in bottom legend bar -- used on Network.tsx, which renders a
+   * richer floating "Network Topology" panel of its own instead. */
+  legend?: boolean;
 }
 
 /**
@@ -41,7 +56,7 @@ interface Props {
  * this component only drives an SVG from its simulated positions, it does not
  * recompute risk or relationships itself.
  */
-export function EntityNetworkGraph({ graph, selectedId, onSelect }: Props) {
+export function EntityNetworkGraph({ graph, selectedId, onSelect, legend = true }: Props) {
   const [nodes, setNodes] = useState<SimNode[]>([]);
   const [links, setLinks] = useState<SimLink[]>([]);
   const [hovered, setHovered] = useState<SimNode | null>(null);
@@ -67,15 +82,18 @@ export function EntityNetworkGraph({ graph, selectedId, onSelect }: Props) {
           .distance(70)
           .strength(0.25),
       )
-      .force("charge", forceManyBody().strength(-110))
+      .force("charge", forceManyBody().strength(-130))
       .force("center", forceCenter(WIDTH / 2, HEIGHT / 2))
       // Gentle constant pull toward center so the cluster can never drift/explode
       // outside the visible viewBox, independent of node/edge count.
       .force("x", forceX(WIDTH / 2).strength(0.03))
       .force("y", forceY(HEIGHT / 2).strength(0.03))
       .force(
+        // Radius padded well past the node's own circle so the persistent ID label
+        // rendered underneath it (see nodeLabel below) has room to clear its
+        // neighbors too, not just the node glyphs themselves.
         "collide",
-        forceCollide<SimNode>((d) => nodeRadius(d) + 6),
+        forceCollide<SimNode>((d) => nodeRadius(d) + 24),
       )
       .alphaDecay(0.045)
       .on("tick", () => {
@@ -106,7 +124,16 @@ export function EntityNetworkGraph({ graph, selectedId, onSelect }: Props) {
             const t = l.target as SimNode;
             if (typeof s !== "object" || typeof t !== "object") return null;
             return (
-              <line key={i} x1={s.x} y1={s.y} x2={t.x} y2={t.y} strokeWidth={Math.min(2.5, 0.6 + l.weight * 0.15)} />
+              <line
+                key={i}
+                x1={s.x}
+                y1={s.y}
+                x2={t.x}
+                y2={t.y}
+                stroke={linkColor(s, t)}
+                className={`network-edge ${s.is_focus || t.is_focus ? "is-focus-link" : ""}`}
+                strokeWidth={Math.min(2.5, 0.6 + l.weight * 0.15)}
+              />
             );
           })}
         </g>
@@ -127,11 +154,23 @@ export function EntityNetworkGraph({ graph, selectedId, onSelect }: Props) {
                 role="button"
                 aria-label={`${n.entity_type} ${n.entity_id}, ${n.risk_state ?? "unavailable"}`}
               >
-                {isSelected && <circle r={r + 5} className="network-node-ring" />}
-                <circle r={r} fill={color} className="network-node-fill" />
+                {isSelected && !n.is_focus && <circle r={r + 5} className="network-node-ring" />}
+                {n.is_focus ? (
+                  <rect x={-r} y={-r} width={r * 2} height={r * 2} rx={5} fill={color} className="network-node-fill" />
+                ) : (
+                  <circle r={r} fill={color} className="network-node-fill" />
+                )}
                 <text dy="0.32em" textAnchor="middle" className="network-node-glyph">
                   {nodeGlyph(n)}
                 </text>
+                <text dy={r + 13} textAnchor="middle" className="network-node-label">
+                  {nodeLabel(n)}
+                </text>
+                {n.is_focus && (
+                  <text dy={r + 25} textAnchor="middle" className="network-node-label network-node-target">
+                    (TARGET)
+                  </text>
+                )}
               </g>
             );
           })}
@@ -150,18 +189,20 @@ export function EntityNetworkGraph({ graph, selectedId, onSelect }: Props) {
         </div>
       )}
 
-      <div className="network-legend">
-        <span>
-          <i style={{ background: "var(--risk-low)" }} /> normal
-        </span>
-        <span>
-          <i style={{ background: "var(--risk-medium)" }} /> rising / recovery
-        </span>
-        <span>
-          <i style={{ background: "var(--risk-high)" }} /> high risk
-        </span>
-        <span className="network-legend-sep">C customer · T terminal</span>
-      </div>
+      {legend && (
+        <div className="network-legend">
+          <span>
+            <i style={{ background: "var(--risk-low)" }} /> normal
+          </span>
+          <span>
+            <i style={{ background: "var(--risk-medium)" }} /> rising / recovery
+          </span>
+          <span>
+            <i style={{ background: "var(--risk-high)" }} /> high risk
+          </span>
+          <span className="network-legend-sep">C customer · T terminal</span>
+        </div>
+      )}
     </div>
   );
 }

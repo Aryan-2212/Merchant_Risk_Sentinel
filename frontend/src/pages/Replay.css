@@ -10,6 +10,17 @@
   gap: var(--sp-3);
 }
 
+.replay-buttons > .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.replay-play-btn {
+  min-width: 84px;
+  justify-content: center;
+}
+
 .replay-speeds {
   display: flex;
   gap: 2px;
@@ -20,6 +31,45 @@
   background: var(--primary-dim);
   border-color: color-mix(in srgb, var(--primary) 45%, transparent);
   color: var(--primary);
+}
+
+/* Deliberately labeled "Replaying", never "Live" -- this is historical replay of
+   simulated benchmark data, not a real-time feed (Dev Plan Sec 22). */
+.replay-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-family: var(--font-headline);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.replay-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: replay-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes replay-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replay-live-dot {
+    animation: none;
+  }
 }
 
 .replay-range {
@@ -41,29 +91,59 @@
   color: var(--text-muted);
 }
 
+.replay-stream-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.replay-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-headline);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+}
+
+.replay-section-icon {
+  color: var(--secondary);
+}
+
 .replay-feed {
   display: flex;
   flex-direction: column;
   gap: 2px;
   max-height: 560px;
   overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-top: 1px solid var(--border);
 }
 
 .replay-row {
   display: grid;
-  grid-template-columns: 170px 100px 90px 190px 90px 150px;
+  grid-template-columns: minmax(140px, 160px) minmax(90px, 110px) minmax(80px, 100px) 1fr minmax(80px, 100px) minmax(140px, 170px);
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-4);
+  padding: var(--sp-2) var(--sp-5);
   font-size: var(--fs-sm);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   animation: replay-enter var(--dur-base) var(--ease);
 }
 
-.replay-row:hover {
+.replay-row-head {
+  font-family: var(--font-headline);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: var(--surface-lowest);
+  cursor: default;
+  animation: none;
+}
+
+.replay-row:not(.replay-row-head):hover {
   background: var(--surface-2);
 }
 
@@ -101,5 +181,8 @@
   .replay-row {
     grid-template-columns: 1fr 1fr;
     row-gap: 4px;
+  }
+  .replay-row-head {
+    display: none;
   }
 }

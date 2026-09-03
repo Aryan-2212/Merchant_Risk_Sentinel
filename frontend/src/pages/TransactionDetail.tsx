@@ -9,6 +9,7 @@ import { RiskDecomposition } from "../components/risk/RiskDecomposition";
 import { EvidenceChain } from "../components/risk/EvidenceChain";
 import { AnalystPanel } from "../components/analyst/AnalystPanel";
 import { AuditTrail } from "../components/audit/AuditTrail";
+import { BackLink } from "../components/common/BackLink";
 import "./TransactionDetail.css";
 
 export function TransactionDetail() {
@@ -34,6 +35,8 @@ export function TransactionDetail() {
 
   return (
     <div className="page">
+      <BackLink to="/transactions" label="Back to Transactions" />
+
       <div className="page-header">
         <div>
           <h1 className="page-title">Transaction #{transaction.transaction_id}</h1>

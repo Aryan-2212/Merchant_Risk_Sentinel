@@ -8,6 +8,7 @@ import { StateBadge } from "../components/risk/StateBadge";
 import { ZigzagTimeline } from "../components/risk/ZigzagTimeline";
 import { AnalystPanel } from "../components/analyst/AnalystPanel";
 import { Icon } from "../components/common/Icon";
+import { BackLink } from "../components/common/BackLink";
 import "./EntityDetail.css";
 import "./TerminalDetail.css";
 
@@ -92,6 +93,8 @@ export function TerminalDetail() {
 
   return (
     <div className="page td">
+      <BackLink to="/terminals" label="Back to Terminals" />
+
       <header className="td-header">
         <div>
           <h1 className="td-title">

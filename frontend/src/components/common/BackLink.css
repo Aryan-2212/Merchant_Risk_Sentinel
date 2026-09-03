@@ -1,0 +1,15 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  width: fit-content;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+}

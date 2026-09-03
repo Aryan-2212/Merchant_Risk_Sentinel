@@ -75,6 +75,14 @@ def replay_transactions(
     ),
     start: dt.datetime | None = Query(None, description="Inclusive lower bound on tx_datetime; ignored if after_cursor is given."),
     end: dt.datetime | None = Query(None, description="Exclusive upper bound on tx_datetime."),
+    customer_id: int | None = Query(None, description="Restrict to one customer's transactions (same filter convention as GET /alerts)."),
+    terminal_id: int | None = Query(None, description="Restrict to one terminal's transactions."),
+    desc: bool = Query(
+        False,
+        description="Most-recent-first instead of the default chronological-forward replay order. Used by callers that "
+        "want 'this entity's N most recent transactions' (e.g. the Network investigation panel) rather than a replay "
+        "window; next_cursor is omitted when true since nothing consumes a descending cursor today.",
+    ),
     limit: int = Query(100, ge=1, le=2000),
     db: Session = Depends(get_db),
 ) -> schemas.ReplayPage:
@@ -100,10 +108,31 @@ def replay_transactions(
 
     if end is not None:
         stmt = stmt.where(Transaction.tx_datetime < end)
+    if customer_id is not None:
+        stmt = stmt.where(Transaction.customer_id == customer_id)
+    if terminal_id is not None:
+        stmt = stmt.where(Transaction.terminal_id == terminal_id)
 
-    # Fetch one extra row to know whether a next page exists, without a second query.
-    stmt = stmt.order_by(Transaction.tx_datetime, Transaction.transaction_id).limit(limit + 1)
+    if desc:
+        # No cursor support in this direction -- every current/planned caller of
+        # desc=True wants a small bounded "N most recent" list, not a paginated
+        # backward stream, so next_cursor is deliberately left None below.
+        stmt = stmt.order_by(Transaction.tx_datetime.desc(), Transaction.transaction_id.desc()).limit(limit)
+    else:
+        # Fetch one extra row to know whether a next page exists, without a second query.
+        stmt = stmt.order_by(Transaction.tx_datetime, Transaction.transaction_id).limit(limit + 1)
     rows = db.execute(stmt).all()
+
+    if desc:
+        items = [
+            schemas.ReplayItemOut(
+                transaction=schemas.TransactionOut.model_validate(tx),
+                risk_score=schemas.RiskScoreOut.model_validate(risk) if risk is not None else None,
+                alert=schemas.AlertSummaryOut.model_validate(alert) if alert is not None else None,
+            )
+            for tx, risk, alert in rows
+        ]
+        return schemas.ReplayPage(items=items, count=len(items), next_cursor=None)
 
     has_more = len(rows) > limit
     rows = rows[:limit]

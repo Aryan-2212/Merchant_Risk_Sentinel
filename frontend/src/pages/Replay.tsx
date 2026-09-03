@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import type { ReplayItemOut } from "../lib/types";
 import { formatAmount, formatCount, formatDateTime, formatDateTimeCompact } from "../lib/format";
-import { Loading, ErrorBlock } from "../components/common/States";
+import { Loading, ErrorBlock, EmptyState } from "../components/common/States";
 import { RiskBadge } from "../components/risk/RiskBadge";
 import { ActionBadge } from "../components/risk/ActionBadge";
+import { Icon } from "../components/common/Icon";
 import "./Replay.css";
 
 const SPEEDS = [1, 5, 20, 100] as const;
@@ -91,15 +92,12 @@ export function Replay() {
       {bounds.data && (
         <div className="card replay-controls">
           <div className="replay-buttons">
-            <button className="btn btn-primary" onClick={() => setPlaying((p) => !p)} disabled={atEnd && !playing}>
+            <button className="btn btn-primary replay-play-btn" onClick={() => setPlaying((p) => !p)} disabled={atEnd && !playing}>
+              <Icon name={playing ? "pause" : "play_arrow"} size={16} />
               {playing ? "Pause" : "Play"}
             </button>
-            <button
-              className="btn"
-              onClick={() => {
-                reset();
-              }}
-            >
+            <button className="btn" onClick={reset}>
+              <Icon name="restart_alt" size={14} />
               Reset
             </button>
             <div className="replay-speeds" role="group" aria-label="Playback speed">
@@ -108,11 +106,18 @@ export function Replay() {
                   key={s}
                   className={`btn replay-speed-btn ${speed === s ? "active" : ""}`}
                   onClick={() => setSpeed(s)}
+                  aria-pressed={speed === s}
                 >
                   {s}×
                 </button>
               ))}
             </div>
+            {playing && (
+              <span className="replay-live-indicator">
+                <span className="replay-live-dot" aria-hidden="true" />
+                Replaying
+              </span>
+            )}
           </div>
           <div className="replay-range">
             <span>{formatDateTime(bounds.data.min_tx_datetime)}</span>
@@ -125,27 +130,45 @@ export function Replay() {
       {error !== null && <ErrorBlock error={error} onRetry={() => setError(null)} />}
       {atEnd && <p className="replay-end-note">Reached the end of the historical stream.</p>}
 
-      <div className="replay-feed">
-        {feed.length === 0 && !playing && (
-          <div className="state-block state-empty">Press Play to begin replaying the historical transaction stream.</div>
-        )}
-        {feed.map((item) => (
-          <div
-            key={item.transaction.transaction_id}
-            className="replay-row"
-            onClick={() => navigate(`/transactions/${item.transaction.transaction_id}`)}
-          >
-            <span className="replay-row-time mono">{formatDateTimeCompact(item.transaction.tx_datetime)}</span>
-            <span className="replay-row-id mono">TX_{item.transaction.transaction_id}</span>
-            <span className="replay-row-amount mono">{formatAmount(item.transaction.tx_amount)}</span>
-            <span className="replay-row-entities mono">
-              CUST_{item.transaction.customer_id} · TERM_{item.transaction.terminal_id}
-            </span>
-            {item.risk_score ? <RiskBadge level={item.risk_score.unified_risk_level} size="sm" /> : <span>—</span>}
-            {item.alert?.recommended_action ? <ActionBadge action={item.alert.recommended_action} /> : <span />}
+      <section className="card replay-stream-card">
+        <h2 className="replay-section-title">
+          <Icon name="history" size={18} className="replay-section-icon" />
+          Transaction Stream
+        </h2>
+
+        {feed.length > 0 && (
+          <div className="replay-row replay-row-head" aria-hidden="true">
+            <span>Timestamp</span>
+            <span>Transaction</span>
+            <span>Amount</span>
+            <span>Customer · Terminal</span>
+            <span>Risk</span>
+            <span>Action</span>
           </div>
-        ))}
-      </div>
+        )}
+
+        <div className="replay-feed">
+          {feed.length === 0 && !playing && (
+            <EmptyState>Press Play to begin replaying the historical transaction stream.</EmptyState>
+          )}
+          {feed.map((item) => (
+            <div
+              key={item.transaction.transaction_id}
+              className="replay-row"
+              onClick={() => navigate(`/transactions/${item.transaction.transaction_id}`)}
+            >
+              <span className="replay-row-time mono">{formatDateTimeCompact(item.transaction.tx_datetime)}</span>
+              <span className="replay-row-id mono">TX_{item.transaction.transaction_id}</span>
+              <span className="replay-row-amount mono">{formatAmount(item.transaction.tx_amount)}</span>
+              <span className="replay-row-entities mono">
+                CUST_{item.transaction.customer_id} · TERM_{item.transaction.terminal_id}
+              </span>
+              {item.risk_score ? <RiskBadge level={item.risk_score.unified_risk_level} size="sm" /> : <span>—</span>}
+              {item.alert?.recommended_action ? <ActionBadge action={item.alert.recommended_action} /> : <span />}
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from mrs.api import schemas
 from mrs.api.deps import get_db
+from mrs.api.lookups import BASELINE_WINDOW_DAYS, RECENT_WINDOW_DAYS, entity_deviation_rates
 from mrs.db.models import Customer, RiskScore, Transaction
 
 router = APIRouter(prefix="/customers", tags=["customers"])
@@ -47,3 +48,27 @@ def get_customer_risk_history(
         .all()
     )
     return schemas.PaginatedRiskHistory(items=list(rows), total=total, limit=limit, offset=offset)
+
+
+@router.get("/{customer_id}/deviation", response_model=schemas.EntityDeviation)
+def get_customer_deviation(customer_id: int, db: Session = Depends(get_db)) -> schemas.EntityDeviation:
+    """Real recent-vs-baseline severity-2 rate for this specific customer -- the
+    customer-side counterpart to GET /terminals/{id}/deviation (identical computation,
+    mrs.api.lookups.entity_deviation_rates, so the two entity types can never drift).
+    Never a "fraud rate": this is this system's own customer_risk_severity, never the
+    ground-truth tx_fraud label."""
+    if db.get(Customer, customer_id) is None:
+        raise HTTPException(status_code=404, detail=f"customer_id {customer_id} not found")
+
+    rates = entity_deviation_rates(db, "customer", [customer_id])
+    row = rates.get(customer_id, {})
+    return schemas.EntityDeviation(
+        entity_type="customer",
+        entity_id=customer_id,
+        current_rate=row.get("current_rate"),
+        baseline_rate=row.get("baseline_rate"),
+        current_transaction_count=int(row.get("current_count", 0)),
+        baseline_transaction_count=int(row.get("baseline_count", 0)),
+        recent_window_days=RECENT_WINDOW_DAYS,
+        baseline_window_days=BASELINE_WINDOW_DAYS,
+    )

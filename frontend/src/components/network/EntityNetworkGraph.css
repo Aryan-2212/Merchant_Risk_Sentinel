@@ -16,9 +16,13 @@
   font-size: var(--fs-sm);
 }
 
-.network-edges line {
-  stroke: var(--border-strong);
-  stroke-opacity: 0.55;
+.network-edge {
+  stroke-opacity: 0.35;
+  transition: stroke-opacity var(--dur-base) var(--ease);
+}
+
+.network-edge.is-focus-link {
+  stroke-opacity: 0.85;
 }
 
 .network-node {
@@ -47,6 +51,24 @@
   fill: var(--bg);
   pointer-events: none;
   user-select: none;
+}
+
+.network-node-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  fill: var(--text-secondary);
+  pointer-events: none;
+  user-select: none;
+}
+
+.network-node.is-focus .network-node-label {
+  fill: var(--text-primary);
+  font-weight: 600;
+}
+
+.network-node-target {
+  fill: var(--risk-high);
+  letter-spacing: 0.04em;
 }
 
 .network-node-ring {

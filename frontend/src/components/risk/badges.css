@@ -145,3 +145,21 @@
   border-color: color-mix(in srgb, var(--risk-critical) 45%, transparent);
   background: var(--risk-critical-dim);
 }
+
+/* text-only counterparts (no pill chrome) -- same severity colors as above, for an
+   inline word that needs to read as urgent without becoming a badge */
+.action-color-allow {
+  color: var(--risk-low);
+}
+.action-color-monitor {
+  color: var(--secondary);
+}
+.action-color-step-up {
+  color: var(--risk-high);
+}
+.action-color-review {
+  color: var(--accent);
+}
+.action-color-escalate {
+  color: var(--risk-critical);
+}

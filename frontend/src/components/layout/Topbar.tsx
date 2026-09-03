@@ -1,37 +1,13 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { useHealth } from "../../lib/hooks";
 import { Icon } from "../common/Icon";
 import "./Topbar.css";
 
-function resolveSearch(raw: string): string | null {
-  const value = raw.trim().toLowerCase();
-  if (!value) return null;
-  const custom = value.match(/^c(?:ustomer)?\s*#?(\d+)$/);
-  if (custom) return `/customers/${custom[1]}`;
-  const term = value.match(/^t(?:erminal)?\s*#?(\d+)$/);
-  if (term) return `/terminals/${term[1]}`;
-  const tx = value.match(/^(?:tx)?\s*#?(\d+)$/);
-  if (tx) return `/transactions/${tx[1]}`;
-  return null;
-}
-
 export function Topbar() {
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
   const { data: health, isError } = useHealth();
   const stats = useQuery({ queryKey: ["stats", "overview"], queryFn: api.overviewStats, staleTime: 30_000 });
-
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const path = resolveSearch(query);
-    if (path) {
-      navigate(path);
-      setQuery("");
-    }
-  }
 
   const connected = !isError && health?.status === "ok";
   const openAlerts = stats.data?.alert_status_counts["OPEN"] ?? 0;
@@ -46,17 +22,10 @@ export function Topbar() {
         <span className="topbar-context">Historical dataset · Apr–Sep 2018</span>
       </div>
 
-      <form className="topbar-search" onSubmit={onSubmit}>
-        <Icon name="search" size={16} className="topbar-search-icon" />
-        <input
-          type="search"
-          placeholder="TX ID, C-id, or T-id…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Jump to transaction, customer, or terminal by ID"
-        />
-      </form>
-
+      {/* Global "jump to ID" search was removed here -- it duplicated the Customers/
+          Terminals per-page ID lookups and, being global, had no way to disambiguate
+          which entity type a bare number meant. Direct lookup by ID still works via
+          those pages' own search boxes (functional, page-scoped, not removed). */}
       <div className="topbar-actions">
         <Link to="/alerts" className="topbar-icon-btn" aria-label={`${openAlerts} open alerts`} title={`${openAlerts} open alerts`}>
           <Icon name="notifications" size={20} />

@@ -41,42 +41,11 @@
   white-space: nowrap;
 }
 
-.topbar-search {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  flex: 1;
-  max-width: 280px;
-  margin-left: auto;
-  background: var(--surface-lowest);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0 var(--sp-3);
-}
-
-.topbar-search-icon {
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.topbar-search input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  padding: 7px 0;
-  font-size: var(--fs-sm);
-  color: var(--text-primary);
-  outline: none;
-}
-
-.topbar-search input::placeholder {
-  color: var(--text-muted);
-}
-
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  margin-left: auto;
 }
 
 .topbar-icon-btn {

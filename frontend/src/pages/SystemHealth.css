@@ -1,33 +1,82 @@
-.health-table td {
-  padding: var(--sp-3);
+.sh-title-icon {
+  color: var(--primary);
+  margin-right: var(--sp-3);
+  vertical-align: -3px;
 }
 
-.health-table tr:last-child td {
-  border-bottom: none;
+.sh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-4);
 }
 
-.health-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
+.sh-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.sh-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.sh-card-icon {
+  color: var(--secondary);
+}
+
+.sh-card-name {
+  font-family: var(--font-headline);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.sh-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-family: var(--font-headline);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  padding: 3px var(--sp-1);
+}
+
+.sh-status-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  margin-right: var(--sp-2);
+  flex-shrink: 0;
 }
 
-.health-ok {
+.sh-status-ok {
+  color: var(--risk-low);
+}
+.sh-status-dot-ok {
   background: var(--risk-low);
 }
 
-.health-degraded {
+.sh-status-degraded {
+  color: var(--risk-medium);
+}
+.sh-status-dot-degraded {
   background: var(--risk-medium);
 }
 
-.health-unknown {
+.sh-status-unknown {
+  color: var(--text-muted);
+}
+.sh-status-dot-unknown {
   background: var(--text-muted);
 }
 
-.health-detail {
+.sh-card-detail {
+  font-size: var(--fs-xs);
   color: var(--text-muted);
-  font-size: var(--fs-sm);
-  text-align: right;
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
 }

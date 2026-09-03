@@ -17,7 +17,14 @@ export function Overview() {
   });
   const terminals = useQuery({ queryKey: ["stats", "terminals-at-risk"], queryFn: () => api.terminalsAtRisk(6) });
 
-  const loading = stats.isLoading || activity.isLoading || feed.isLoading || terminals.isLoading;
+  // Gated on just the two queries the above-the-fold KPI strip needs, not all four --
+  // previously this covered every query on the page, so once the KPI strip and one
+  // panel had already rendered, a slower-loading panel (recent activity/terminals)
+  // kept this full-page "Loading command center…" banner showing ABOVE already-live
+  // content, reading as if the page were stuck. Each remaining panel below now shows
+  // its own inline loading state instead (same pattern as the rest of the app, e.g.
+  // AlertDetail's per-section Loading).
+  const kpiLoading = stats.isLoading || activity.isLoading;
 
   return (
     <div className="page page-wide">
@@ -27,12 +34,13 @@ export function Overview() {
       <h1 className="visually-hidden">Overview</h1>
 
       {stats.isError && <ErrorBlock error={stats.error} onRetry={() => stats.refetch()} />}
-      {loading && !stats.isError && <Loading label="Loading command center…" />}
+      {kpiLoading && !stats.isError && <Loading label="Loading command center…" />}
 
       {stats.data && activity.data && <KpiStrip stats={stats.data} activity={activity.data} />}
 
       <div className="ov-grid">
         <div className="card ov-main">
+          {terminals.isLoading && <Loading label="Loading high deviation terminals…" />}
           {terminals.isError && <ErrorBlock error={terminals.error} onRetry={() => terminals.refetch()} />}
           {terminals.data && <HighDeviationTerminals rows={terminals.data} />}
 
@@ -50,6 +58,7 @@ export function Overview() {
         </div>
 
         <div className="card ov-side">
+          {feed.isLoading && <Loading label="Loading recent high-risk activity…" />}
           {feed.isError && <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />}
           {feed.data && <RecentHighRisk items={feed.data} />}
         </div>

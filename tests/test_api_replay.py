@@ -339,3 +339,51 @@ def test_transaction_fields_exclude_ground_truth_labels(db_engine, client):
     tx = body["items"][0]["transaction"]
     assert "tx_fraud" not in tx
     assert "tx_fraud_scenario" not in tx
+
+
+# --------------------------------------------------------- customer_id/terminal_id/desc
+
+
+def test_customer_id_filter_restricts_to_that_customer(db_engine, client):
+    _seed_chronological_stream(db_engine)
+    resp = client.get("/replay/transactions", params={"customer_id": 2})
+    ids = [item["transaction"]["transaction_id"] for item in resp.json()["items"]]
+    assert ids == [2]
+
+
+def test_terminal_id_filter_restricts_to_that_terminal(db_engine, client):
+    # Every seeded transaction shares terminal_id=1, so this is a same-count sanity
+    # check that the filter is applied (not a no-op) via a terminal with zero matches.
+    _seed_chronological_stream(db_engine)
+    resp = client.get("/replay/transactions", params={"terminal_id": 999})
+    assert resp.json()["items"] == []
+
+    resp = client.get("/replay/transactions", params={"terminal_id": 1})
+    ids = [item["transaction"]["transaction_id"] for item in resp.json()["items"]]
+    assert ids == [1, 2, 3, 4, 5]
+
+
+def test_desc_returns_most_recent_first_with_no_next_cursor(db_engine, client):
+    _seed_chronological_stream(db_engine)
+    resp = client.get("/replay/transactions", params={"desc": True, "limit": 3})
+    body = resp.json()
+    ids = [item["transaction"]["transaction_id"] for item in body["items"]]
+    assert ids == [5, 4, 3]
+    assert body["next_cursor"] is None
+
+
+def test_desc_combines_with_customer_id_for_that_customers_most_recent(db_engine, client):
+    """The actual use case this was added for: Network investigation's 'recent
+    transactions for this entity' panel -- one small, real, bounded query."""
+    _seed_chronological_stream(db_engine)
+    resp = client.get("/replay/transactions", params={"terminal_id": 1, "desc": True, "limit": 2})
+    ids = [item["transaction"]["transaction_id"] for item in resp.json()["items"]]
+    assert ids == [5, 4]
+
+
+def test_desc_default_is_false_existing_callers_unaffected(db_engine, client):
+    _seed_chronological_stream(db_engine)
+    resp = client.get("/replay/transactions", params={"limit": 2})
+    ids = [item["transaction"]["transaction_id"] for item in resp.json()["items"]]
+    assert ids == [1, 2]
+    assert resp.json()["next_cursor"] is not None

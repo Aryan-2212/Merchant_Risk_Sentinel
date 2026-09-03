@@ -103,6 +103,39 @@
   color: var(--secondary);
 }
 
+.ad-synthesis-narrative-loading {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  margin-top: var(--sp-5);
+}
+
+.ad-synthesis-narrative-block {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+
+.ad-synthesis-narrative-label {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--analyst);
+  margin-bottom: var(--sp-2);
+}
+
+.ad-synthesis-narrative-label-fallback {
+  color: var(--text-muted);
+}
+
+.ad-synthesis-narrative {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
 .ad-bullets {
   list-style: none;
   margin: 0;
@@ -144,8 +177,16 @@
 
 .ad-bullet-detail {
   font-size: 13px;
-  color: var(--risk-high);
+  color: var(--text-secondary);
   margin-top: 2px;
+}
+
+.ad-bullet-detail-high {
+  color: var(--risk-high);
+}
+
+.ad-bullet-detail-medium {
+  color: var(--accent);
 }
 
 .ad-empty-note {
@@ -182,6 +223,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 4px var(--sp-2);
 }
 
 .ad-related-table td {
@@ -201,7 +245,8 @@
 }
 
 .ad-confidence-value {
-  color: var(--text-primary);
+  /* color comes from the action-color-* class applied alongside this in JSX,
+     matching the recommended action's severity (mirrors ActionBadge's palette) */
   font-weight: 600;
 }
 
@@ -248,6 +293,12 @@
   text-transform: none;
   letter-spacing: 0;
   margin-top: 2px;
+}
+
+.ad-advisory-rationale {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .ad-authoritative-note {

@@ -334,6 +334,53 @@ def test_get_customer_risk_history_not_found_customer(client):
     assert resp.status_code == 404
 
 
+def test_get_customer_deviation(db_engine, client):
+    _seed_full(db_engine)
+    resp = client.get("/customers/1/deviation")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["entity_type"] == "customer"
+    assert body["entity_id"] == 1
+    # The seeded transaction (customer_risk_severity=0) falls inside its own "recent"
+    # window; no prior-window transactions exist, so baseline is None, never 0.0.
+    assert body["current_rate"] == 0.0
+    assert body["current_transaction_count"] == 1
+    assert body["baseline_rate"] is None
+    assert body["baseline_transaction_count"] == 0
+    assert body["recent_window_days"] == 7
+    assert body["baseline_window_days"] == 30
+
+
+def test_get_customer_deviation_not_found(client):
+    resp = client.get("/customers/999999/deviation")
+    assert resp.status_code == 404
+
+
+def test_get_customer_deviation_no_transactions(db_engine, client):
+    with db_engine.begin() as conn:
+        conn.execute(
+            insert(Customer.__table__),
+            [
+                {
+                    "customer_id": 5,
+                    "x_customer_id": 0.0,
+                    "y_customer_id": 0.0,
+                    "mean_amount": 50.0,
+                    "std_amount": 10.0,
+                    "mean_nb_tx_per_day": 2.0,
+                    "nb_terminals": 1,
+                    "available_terminals": [1],
+                }
+            ],
+        )
+    resp = client.get("/customers/5/deviation")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["current_rate"] is None
+    assert body["baseline_rate"] is None
+    assert body["current_transaction_count"] == 0
+
+
 # -------------------------------------------------------------------------- terminals
 
 
