@@ -31,6 +31,20 @@ from mrs.policy.rules import POLICY_VERSION, evaluate
 
 DEFAULT_CHUNK_SIZE = 50_000
 
+#: Postgres caps a single query at 65,535 bound parameters. audit_logs/alerts rows have
+#: enough columns that a naive one-INSERT-per-50k-row-chunk (this module's original
+#: design) can exceed that on a chunk with unusually high alert density -- surfaced by
+#: the Simulated Recent Operational Stream's much higher alert rate than the frozen
+#: benchmark's, not previously exercised. Sub-batching the INSERT itself (independent of
+#: DEFAULT_CHUNK_SIZE, which still bounds how much is read into memory at once) fixes
+#: this for any future alert-density mix without changing what gets decided or persisted.
+_MAX_INSERT_ROWS = 5_000
+
+
+def _sub_batches(rows: list[dict], size: int = _MAX_INSERT_ROWS) -> Iterator[list[dict]]:
+    for start in range(0, len(rows), size):
+        yield rows[start : start + size]
+
 _RISK_SCORE_COLUMNS = (
     RiskScore.transaction_id,
     RiskScore.customer_id,
@@ -149,15 +163,17 @@ def apply_policy(engine: Engine, *, chunk_size: int = DEFAULT_CHUNK_SIZE) -> dic
 
         if audit_batch:
             with engine.begin() as conn:
-                conn.execute(insert(AuditLog.__table__), audit_batch)
+                for sub_batch in _sub_batches(audit_batch):
+                    conn.execute(insert(AuditLog.__table__), sub_batch)
             n_audit_written += len(audit_batch)
 
         if alert_batch:
             with engine.begin() as conn:
-                stmt = pg_insert(Alert.__table__).values(alert_batch).on_conflict_do_nothing(
-                    index_elements=["transaction_id"]
-                )
-                conn.execute(stmt)
+                for sub_batch in _sub_batches(alert_batch):
+                    stmt = pg_insert(Alert.__table__).values(sub_batch).on_conflict_do_nothing(
+                        index_elements=["transaction_id"]
+                    )
+                    conn.execute(stmt)
             n_alerts_written += len(alert_batch)
 
     return {

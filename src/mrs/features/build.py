@@ -32,13 +32,21 @@ REQUIRED_INPUT_COLUMNS = (
 )
 
 
-def build_feature_frame(transactions: pd.DataFrame) -> pd.DataFrame:
+def build_feature_frame(transactions: pd.DataFrame, *, split_override: str | None = None) -> pd.DataFrame:
     """Build the full feature layer from a processed transactions frame.
 
     `transactions` need not be pre-sorted. The output is in canonical chronological order
     (TX_DATETIME, TRANSACTION_ID) -- not necessarily the input's row order -- since that
     canonical order is what every downstream consumer (models, evaluation, replay) should
     rely on (Dev Plan §5).
+
+    `split_override`: when None (default, every existing caller), behavior is unchanged --
+    every row is labeled via mrs.data.splits.assign_split against the frozen benchmark
+    boundaries, exactly as before. When given a string, every row is labeled with that
+    string instead, and mrs.data.splits.assign_split is not called at all -- this is the
+    one deliberate escape hatch for non-benchmark data (e.g. mrs.data.recent_stream, whose
+    timestamps fall in 2026 and would otherwise raise SplitError), so the frozen
+    train/validation/test boundaries and their semantics stay completely untouched.
     """
     missing = [c for c in REQUIRED_INPUT_COLUMNS if c not in transactions.columns]
     if missing:
@@ -73,7 +81,7 @@ def build_feature_frame(transactions: pd.DataFrame) -> pd.DataFrame:
         ordered[["TRANSACTION_ID", "TX_DATETIME"]], on="TRANSACTION_ID", how="inner",
         validate="one_to_one",
     )
-    result["split"] = assign_split(result["TX_DATETIME"])
+    result["split"] = split_override if split_override is not None else assign_split(result["TX_DATETIME"])
     # TX_DATETIME is kept (not dropped) so a consumer can always recover chronological
     # order and re-sort after loading, without rejoining to the processed layer -- see
     # scripts/05_build_features.py's docstring for why this matters when the output is

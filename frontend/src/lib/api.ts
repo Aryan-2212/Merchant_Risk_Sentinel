@@ -108,4 +108,18 @@ export const api = {
     desc?: boolean;
     limit?: number;
   }) => request<ReplayPage>("/replay/transactions", params),
+
+  // Simulated Recent Operational Stream (mrs.data.recent_stream) -- a separate,
+  // clearly-demarcated 21-day demo dataset, never the frozen benchmark above. Same
+  // response shapes/pagination convention as replay*, deliberately not merged with it
+  // (mrs.api.routers.recent is a permanently-scoped sibling of mrs.api.routers.replay).
+  recentBounds: () => request<ReplayBounds>("/recent/bounds"),
+  recentTransactions: (params: {
+    after_cursor?: string;
+    start?: string;
+    end?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    limit?: number;
+  }) => request<ReplayPage>("/recent/transactions", params),
 };

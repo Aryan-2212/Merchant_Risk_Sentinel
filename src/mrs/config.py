@@ -63,6 +63,30 @@ EXPECTED_START_DATE = "2018-04-01"
 EXPECTED_END_DATE = "2018-09-30"
 EXPECTED_FILE_COUNT = 183
 
+# ------------------------------------------------------------- recent operational stream
+
+#: Simulated Recent Operational Stream (see mrs.data.recent_stream). NOT the frozen
+#: benchmark dataset above, NOT real Razorpay production data -- a separate, clearly
+#: demarcated, deterministically-generated 21-day demo stream, reusing existing
+#: customer/terminal IDs so it flows through the same architecture. Dates are fixed
+#: constants (not computed from "today") so the stream stays reproducible regardless of
+#: when it is generated.
+RECENT_STREAM_START_DATE = "2026-08-14"
+RECENT_STREAM_END_DATE = "2026-09-03"
+RECENT_STREAM_DAYS = 21
+RECENT_STREAM_TX_PER_DAY = 1_800
+RECENT_STREAM_SEED = 20260814
+RECENT_STREAM_SPLIT_LABEL = "recent"
+#: Transaction IDs for the recent stream start here -- far above the frozen benchmark's
+#: max TRANSACTION_ID (1,754,154), so the two can never collide, in Postgres or anywhere
+#: else, regardless of how the benchmark dataset itself is re-derived.
+RECENT_STREAM_TX_ID_OFFSET = 2_000_000_000
+#: How many of the existing 5,000 customers / 10,000 terminals participate in the
+#: recent stream (a demo-sized subset, not the full population -- Dev Plan §26: no
+#: unnecessary scale for a 21-day, ~37.8k-transaction demo).
+RECENT_STREAM_N_CUSTOMERS = 250
+RECENT_STREAM_N_TERMINALS = 100
+
 
 def ensure_dirs() -> None:
     """Create the data directories if they do not exist. Never deletes anything."""

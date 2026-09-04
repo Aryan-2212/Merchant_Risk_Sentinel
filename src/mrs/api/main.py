@@ -15,7 +15,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from mrs.api.routers import alerts, analyst, customers, health, replay, stats, terminals, transactions
+from mrs.api.routers import alerts, analyst, customers, health, recent, replay, stats, terminals, transactions
 
 app = FastAPI(
     title="Merchant Risk Sentinel API",
@@ -50,5 +50,6 @@ app.include_router(customers.router)
 app.include_router(terminals.router)
 app.include_router(alerts.router)
 app.include_router(replay.router)
+app.include_router(recent.router)
 app.include_router(analyst.router)
 app.include_router(stats.router)
