@@ -50,17 +50,8 @@
 .sidebar-brand-name {
   font-family: var(--font-headline);
   font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--primary);
-}
-
-.sidebar-version {
-  font-family: var(--font-headline);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .sidebar-group {

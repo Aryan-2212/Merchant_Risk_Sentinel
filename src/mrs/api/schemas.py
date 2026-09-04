@@ -88,7 +88,15 @@ class AlertSummaryOut(BaseModel):
     severity: str
     recommended_action: str | None
     status: str
+    #: Row-insertion time -- when the pipeline materialised this alert into Postgres,
+    #: NOT when the underlying activity happened. Every alert loaded in the same batch
+    #: shares one value, so it is useless for ordering or for reading as "when this
+    #: happened"; tx_datetime is the analytically meaningful timestamp.
     created_at: dt.datetime
+    #: When the alerting transaction actually occurred. Optional because the same
+    #: schema is reused in replay pages, which are built straight from an Alert row
+    #: and already carry the transaction alongside.
+    tx_datetime: dt.datetime | None = None
 
 
 class AlertDetailOut(AlertSummaryOut):

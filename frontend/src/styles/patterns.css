@@ -131,6 +131,15 @@
   flex-wrap: wrap;
 }
 
+/* A form nested inside a toolbar (e.g. a date range with its own Apply) needs to lay
+ * its own fields out on the same baseline as the toolbar's plain controls. */
+.toolbar-range {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
 .field-label {
   font-family: var(--font-headline);
   font-size: var(--fs-xs);

@@ -15,7 +15,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <span className="topbar-wordmark">Risk Sentinel</span>
+        <span className="topbar-wordmark">Merchant Risk Sentinel</span>
         <div className="topbar-sep" />
         {/* Real data span, not a live "last 24h" claim -- this is historical replay
             data (Apr-Sep 2018), never framed as a real-time feed. */}

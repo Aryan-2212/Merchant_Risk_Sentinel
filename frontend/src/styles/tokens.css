@@ -47,31 +47,40 @@
   --on-primary: #2d3136;
   --secondary: #c4c6cd;
   --secondary-dim: #c4c6cd22;
-  --accent: #d3c4b9;
-  --accent-dim: #d3c4b922;
+  /* Neutral rather than the former warm copper (#d3c4b9): the product palette is
+   * black / grey / white / red only, so UI chrome carries no warm hue. */
+  --accent: #cfd2d8;
+  --accent-dim: #cfd2d822;
 
   /* ---- AI Risk Analyst accent (Stitch's "secondary" role, used only for the
    * Decision Console / system-log panel -- distinct from risk severity) ---- */
   --analyst: #c4c6cd;
   --analyst-dim: #c4c6cd1a;
 
-  /* ---- status / risk severity (fixed, never re-themed) ----
-   * Four distinct hues per explicit product instruction: green = normal/recovered,
-   * amber/tan = risk rising, coral/orange = high, red = critical. The Stitch
-   * export's own example data never showed a NORMAL/low state, so it only exercised
-   * error (coral) + tertiary (tan) + neutral -- it has no green in its token set.
-   * risk-low here is a real, deliberate addition on top of the Stitch tokens, not a
-   * literal copy of one, because the product's color-system instruction requires it. */
-  --risk-low: #7fa473;
-  --risk-low-dim: #7fa4731a;
-  --risk-medium: #d3c4b9;
-  --risk-medium-dim: #d3c4b91f;
-  --risk-high: #e0916a;
-  --risk-high-dim: #e0916a1f;
-  --risk-critical: #e5534b;
-  --risk-critical-dim: #e5534b26;
-  --risk-unknown: #6f737a;
-  --risk-unknown-dim: #6f737a1a;
+  /* ---- status / risk severity ----
+   * Monochrome-to-red severity ramp, per explicit product instruction that the
+   * product read black / grey / white / red only (superseding the earlier
+   * green + amber + coral + red scheme).
+   *
+   * Escalation is carried by BRIGHTNESS first, then hue: a calm state recedes into
+   * the graphite background as mid-grey, an elevated state steps forward as
+   * near-white, and only genuine high/critical risk introduces red. That keeps red
+   * meaningful -- it appears nowhere except real risk -- and keeps the four levels
+   * distinguishable without reintroducing green or orange.
+   *
+   * These four are the single source of truth for severity everywhere: badges,
+   * meters, charts, and the entity network's node/edge fills all read them, so a
+   * colour can never mean one thing in a badge and another in the graph. */
+  --risk-low: #8b8f96;
+  --risk-low-dim: #8b8f961a;
+  --risk-medium: #d6d8dc;
+  --risk-medium-dim: #d6d8dc1f;
+  --risk-high: #cf5f52;
+  --risk-high-dim: #cf5f521f;
+  --risk-critical: #ef5750;
+  --risk-critical-dim: #ef575026;
+  --risk-unknown: #5f636a;
+  --risk-unknown-dim: #5f636a1a;
 
   /* ---- spacing (4px scale) ---- */
   --sp-1: 4px;

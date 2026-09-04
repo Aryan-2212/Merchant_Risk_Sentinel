@@ -26,8 +26,7 @@ export function Sidebar() {
           <Icon name="security" size={18} />
         </div>
         <div className="sidebar-brand-text">
-          <span className="sidebar-brand-name">Sentinel</span>
-          <span className="sidebar-version">V0.1.0</span>
+          <span className="sidebar-brand-name">MRS</span>
         </div>
       </div>
 

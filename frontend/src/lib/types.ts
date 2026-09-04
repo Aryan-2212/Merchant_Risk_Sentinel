@@ -64,7 +64,11 @@ export interface AlertSummaryOut {
   severity: AlertSeverity;
   recommended_action: PolicyAction | null;
   status: string;
+  /** Batch row-insertion time, identical across alerts loaded in the same run --
+   * not when the activity happened. Prefer tx_datetime for display. */
   created_at: string;
+  /** When the alerting transaction actually occurred. */
+  tx_datetime: string | null;
 }
 
 export interface AlertDetailOut extends AlertSummaryOut {

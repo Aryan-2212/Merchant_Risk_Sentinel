@@ -86,8 +86,16 @@ export const api = {
     request<PaginatedRiskHistory>(`/terminals/${id}/risk`, { limit, offset }),
   getTerminalDeviation: (id: number) => request<EntityDeviation>(`/terminals/${id}/deviation`),
 
-  listAlerts: (params: { status?: string; severity?: string; customer_id?: number; terminal_id?: number; limit?: number; offset?: number }) =>
-    request<PaginatedAlerts>("/alerts", params),
+  listAlerts: (params: {
+    status?: string;
+    severity?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    start?: string;
+    end?: string;
+    limit?: number;
+    offset?: number;
+  }) => request<PaginatedAlerts>("/alerts", params),
   getAlert: (id: number) => request<AlertDetailOut>(`/alerts/${id}`),
 
   replayBounds: () => request<ReplayBounds>("/replay/bounds"),

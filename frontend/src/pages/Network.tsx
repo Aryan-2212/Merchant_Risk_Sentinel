@@ -13,14 +13,6 @@ import { AnalystPanel } from "../components/analyst/AnalystPanel";
 import { Icon } from "../components/common/Icon";
 import "./Network.css";
 
-const STATE_LABEL: Record<string, string> = {
-  NORMAL: "Normal",
-  RISK_RISING: "Risk Rising",
-  RECOVERY: "Recovery",
-  HIGH_RISK: "High Risk",
-  INSUFFICIENT_HISTORY: "Insufficient History",
-};
-
 function detailPath(type: EntityType, id: number): string {
   return type === "terminal" ? `/terminals/${id}` : `/customers/${id}`;
 }
@@ -68,6 +60,8 @@ function downloadGraph(label: string, data: unknown) {
 export function Network() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showElevatedOnly, setShowElevatedOnly] = useState(false);
+  // Bumped to discard hand-dragged node positions and re-run the force layout.
+  const [layoutKey, setLayoutKey] = useState(0);
 
   const typeParam = searchParams.get("type");
   const idParam = searchParams.get("id");
@@ -160,6 +154,10 @@ export function Network() {
             <Icon name="filter_alt" size={14} />
             {showElevatedOnly ? "Elevated Only" : "Filter Nodes"}
           </button>
+          <button className="btn" onClick={() => setLayoutKey((k) => k + 1)}>
+            <Icon name="refresh" size={14} />
+            Reset Layout
+          </button>
           <button className="btn" onClick={() => downloadGraph(focus ? idLabel(focus.type, focus.id) : "overview", data)}>
             <Icon name="download" size={14} />
             Export Graph
@@ -167,10 +165,9 @@ export function Network() {
         </div>
       </div>
 
-      <div className="net-bento">
-        <section className="card net-canvas-card">
+        <section className={`card net-canvas-card${focus ? " net-canvas-card-focused" : ""}`}>
           {focusNode && (
-            <div className="net-snapshot">
+            <aside className="net-snapshot" aria-label="Selected entity summary">
               <div className="net-snapshot-header">
                 <Icon name={focus!.type === "terminal" ? "terminal" : "group"} size={16} />
                 <Link className="link-id mono" to={detailPath(focus!.type, focus!.id)}>
@@ -185,7 +182,9 @@ export function Network() {
                 </div>
                 <div>
                   <dt>Status</dt>
-                  <dd>{focusNode.risk_state ? STATE_LABEL[focusNode.risk_state] : "Unscored"}</dd>
+                  <dd>
+                    <StateBadge state={focusNode.risk_state} />
+                  </dd>
                 </div>
               </dl>
 
@@ -216,12 +215,20 @@ export function Network() {
                   <dd className="mono">{linkedTerminals}</dd>
                 </div>
               </dl>
-            </div>
+            </aside>
           )}
-          <EntityNetworkGraph graph={displayGraph} selectedId={focusNode?.id} onSelect={selectNode} legend={!focus} />
+          <div className="net-graph-stage">
+            <EntityNetworkGraph
+            graph={displayGraph}
+            selectedId={focusNode?.id}
+            onSelect={selectNode}
+            legend={!focus}
+            resetKey={layoutKey}
+          />
+          </div>
 
           {focus && (
-            <div className="net-topology">
+            <aside className="net-topology" aria-label="Network topology legend">
               <div className="net-topology-header">
                 <Icon name="hub" size={14} />
                 Network Topology
@@ -240,6 +247,7 @@ export function Network() {
                   Transaction Edge
                 </li>
               </ul>
+              <p className="net-topology-hint">Drag any node to rearrange the layout.</p>
               <ul className="net-topology-rows net-topology-links">
                 <li>
                   <span className="net-topology-line" style={{ background: "var(--risk-high)" }} />
@@ -247,18 +255,18 @@ export function Network() {
                 </li>
                 <li>
                   <span className="net-topology-line" style={{ background: "var(--risk-medium)" }} />
-                  Elevated Risk Link
+                  Risk Rising Link
                 </li>
                 <li>
                   <span className="net-topology-line" style={{ background: "var(--risk-low)" }} />
                   Normal Link
                 </li>
               </ul>
-            </div>
+            </aside>
           )}
         </section>
 
-        <div className="net-side">
+        <div className="net-panels">
           <section className="card net-side-card">
             <h2 className="net-side-title">
               <Icon name="hub" size={16} className="net-side-icon" />
@@ -336,22 +344,25 @@ export function Network() {
               )}
             </section>
           )}
-
-          {focus && (
-            <section className="net-side-card net-analyst-card">
-              <h2 className="net-side-title net-analyst-heading">
-                <Icon name="psychology" size={16} className="net-side-icon" />
-                Analyst Synthesis
-              </h2>
-              {latestTxId !== undefined ? (
-                <AnalystPanel transactionId={latestTxId} />
-              ) : (
-                <p className="net-side-caption">{focusNode ? behavioralFinding(focus.type === "terminal" ? "Terminal" : "Customer", focusNode.risk_state) : "No scored transactions yet for this entity."}</p>
-              )}
-            </section>
-          )}
         </div>
-      </div>
+
+      {focus && (
+        <section className="card net-analyst-card">
+          <h2 className="net-side-title net-analyst-heading">
+            <Icon name="psychology" size={16} className="net-side-icon" />
+            Analyst Synthesis
+          </h2>
+          {latestTxId !== undefined ? (
+            <AnalystPanel transactionId={latestTxId} />
+          ) : (
+            <p className="net-side-caption net-analyst-heading">
+              {focusNode
+                ? behavioralFinding(focus.type === "terminal" ? "Terminal" : "Customer", focusNode.risk_state)
+                : "No scored transactions yet for this entity."}
+            </p>
+          )}
+        </section>
+      )}
     </div>
   );
 }
