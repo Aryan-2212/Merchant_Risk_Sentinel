@@ -41,6 +41,15 @@
   white-space: nowrap;
 }
 
+.topbar-stream-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--risk-low);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--risk-low) 12%, transparent);
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;
