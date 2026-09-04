@@ -60,10 +60,12 @@ def already_decided_transaction_ids(engine: Engine) -> set[int]:
         return {row[0] for row in conn.execute(stmt)}
 
 
-def _iter_risk_score_chunks(engine: Engine, chunk_size: int) -> Iterator[list[dict]]:
+def _iter_risk_score_chunks(
+    engine: Engine, chunk_size: int, *, min_transaction_id: int | None = None
+) -> Iterator[list[dict]]:
     """Keyset pagination on the indexed transaction_id PK -- bounds memory to one
     chunk at a time regardless of table size (Dev Plan §40)."""
-    last_id = -1
+    last_id = min_transaction_id - 1 if min_transaction_id is not None else -1
     while True:
         stmt = (
             select(*_RISK_SCORE_COLUMNS)
@@ -71,6 +73,8 @@ def _iter_risk_score_chunks(engine: Engine, chunk_size: int) -> Iterator[list[di
             .order_by(RiskScore.transaction_id)
             .limit(chunk_size)
         )
+        if min_transaction_id is not None:
+            stmt = stmt.where(RiskScore.transaction_id >= min_transaction_id)
         with engine.connect() as conn:
             rows = [dict(r) for r in conn.execute(stmt).mappings().all()]
         if not rows:
@@ -79,16 +83,18 @@ def _iter_risk_score_chunks(engine: Engine, chunk_size: int) -> Iterator[list[di
         last_id = rows[-1]["transaction_id"]
 
 
-def apply_policy(engine: Engine, *, chunk_size: int = DEFAULT_CHUNK_SIZE) -> dict:
-    """Evaluate policy for every risk_scores row and persist alerts/audit_logs for any
-    not already decided. Safe to call repeatedly (idempotent).
+def apply_policy(
+    engine: Engine,
+    *,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    min_transaction_id: int | None = None,
+) -> dict:
+    """Evaluate policy for risk_scores and persist new decisions.
 
-    Returns a summary dict: n_rows_read, n_newly_decided, n_skipped_already_decided,
-    n_alerts_written, n_audit_written, action_counts (over ALL rows read, not just
-    newly-decided -- a full-population view for reporting), level_counts (ditto),
-    elapsed_seconds. Definitive persisted totals should be read back from the database
-    directly (see scripts/13_run_policy_engine.py), the same pattern
-    scripts/12_populate_db.py used for its own real-data validation.
+    By default all rows are considered, preserving the original Phase 8 behavior. When
+    min_transaction_id is supplied, only that transaction-id range is scanned. This is
+    used by the recent-stream ingestion path so adding a recent window does not rescan
+    the 1.75M-row historical benchmark table.
     """
     t0 = time.time()
     already_decided = already_decided_transaction_ids(engine)
@@ -101,7 +107,7 @@ def apply_policy(engine: Engine, *, chunk_size: int = DEFAULT_CHUNK_SIZE) -> dic
     n_alerts_written = 0
     n_audit_written = 0
 
-    for chunk in _iter_risk_score_chunks(engine, chunk_size):
+    for chunk in _iter_risk_score_chunks(engine, chunk_size, min_transaction_id=min_transaction_id):
         audit_batch = []
         alert_batch = []
 
