@@ -239,3 +239,71 @@ The recent stream is never used for, and must never be cited as, model evaluatio
   never fed to any model as an input feature (`mrs.models.dataset.get_feature_matrix`
   structurally cannot include them; `tests/test_recent_stream.py` asserts this
   explicitly for the recent-stream frame too, not just the benchmark).
+
+## Simulated Live Transaction Ingestion
+
+A third, optional way to get the SAME deterministic recent-stream data into the
+database: instead of one bulk insert (`scripts/14_ingest_recent_stream.py`), release it
+progressively -- a few transactions at a time, paced by a configurable interval -- so a
+dashboard watching the database can show it "arriving" for a demo. See
+`mrs.live.simulate` and `scripts/15_run_live_simulation.py`.
+
+**This is not real payment traffic and not a live production feed** -- it is playback
+of the same 21-day simulated stream, one (or a few) transaction(s) at a time. The
+Entity Network page's "Live" mode is always labeled `SIMULATED LIVE STREAM`, never
+"live production" or any variant implying real traffic.
+
+- **Same pipeline, same source of truth.** `mrs.live.simulate.ingest_batch` calls the
+  identical `mrs.features.build_feature_frame` / frozen `xgboost_v1` / behavioral
+  engines / `mrs.risk.aggregate` / `mrs.db.populate` chain as the batch script -- it is
+  not a second risk engine. A batch-computed reference run and a two-tick live run over
+  the same 15 rows produce bit-identical `transaction_risk` values (verified in
+  `tests/test_live_simulate.py`); the full 41,610-row stream, run entirely through the
+  live path during validation, produced the exact same total transaction (41,610) and
+  alert (12,752) counts as the batch path did.
+- **Temporal correctness.** Each tick recomputes features/behavioral state over
+  `released_so_far + new_batch` (a real, growing, strictly-chronological prefix of the
+  same deterministic stream) -- never anything not yet released. Only `new_batch`'s own
+  rows are ever written; an already-released transaction's persisted risk never changes
+  as later ones arrive (verified directly in `tests/test_live_simulate.py`).
+- **Idempotent / resumable.** `mrs.live.simulate.load_stream_and_pending` regenerates
+  the deterministic stream and filters out whatever `transaction_id`s already exist
+  (from a prior live run, or the batch script) before releasing anything -- a stopped
+  and restarted run picks up exactly where it left off, never duplicating a
+  transaction, risk score, audit entry, or alert.
+- **Policy writes without the batch idempotency scan.** `mrs.policy.engine.apply_policy`
+  (the batch/bulk entry point) scans the entire `audit_logs` table on every call to
+  find already-decided transactions -- appropriate for an occasional bulk run, far too
+  slow to call once per live tick. `mrs.policy.engine.decide_and_persist` (extracted
+  from the same module, sharing the same `_persist_decisions` write path so no decision
+  logic is duplicated) evaluates and writes only the small, already-known-fresh row
+  list a live tick just inserted.
+- **Reset.** `scripts/16_reset_recent_stream.py` deletes only `transaction_id >=
+  mrs.config.RECENT_STREAM_TX_ID_OFFSET` rows (across alerts/audit_logs/risk_scores/
+  transaction_features/transactions) so a live demo can be replayed from the start; it
+  verifies the benchmark's own transaction count is unchanged before exiting. No reset
+  control is exposed in the UI -- this is a script, run deliberately, not a button a
+  demo viewer could click by accident.
+
+Run with, e.g.:
+
+```
+.venv/bin/python scripts/16_reset_recent_stream.py       # start from a clean slate
+.venv/bin/python scripts/15_run_live_simulation.py --interval 2
+```
+
+### Live Entity Network
+
+`GET /stats/network?live_window=N` (N transactions, most recent first, same "last N"
+convention `GET /stats/recent-activity` already uses) restricts the graph to real
+customer/terminal relationships from only that rolling window -- not the entity's full
+history -- and names the single newest transaction in `latest_transaction_id` so a
+client can highlight it. It is a sibling branch inside the existing
+`GET /stats/network` handler (`mrs.api.routers.stats._live_window_network`), not a
+duplicate endpoint; omitting `live_window` leaves the original (default/focus) behavior
+byte-for-byte unchanged. The frontend's Network page gained a minimal "Investigate" /
+"Live" mode toggle plus a Start/Pause control (`frontend/src/pages/Network.tsx`) that
+polls this endpoint every 1.5s while playing, reusing the existing
+`EntityNetworkGraph` component, its existing risk-state color language, and its
+existing `is_focus` (square/glow) styling to highlight the newest arrival's customer
+and terminal -- no new visual language was introduced.
