@@ -1,32 +1,8 @@
-"""Replay API (Dev Plan §22/§39; Phase 8 Step 5).
+"""Historical benchmark replay API.
 
-Approved architecture decision (Phase 8 kickoff, decision 1): Replay reads the
-already-computed, already-validated Phase 5+6+7+8 pipeline output (transactions,
-risk_scores, alerts) back out in strict chronological order. It does NOT recompute
-features, does NOT re-score transactions live, and does NOT re-run the behavioral
-engines or aggregation -- "live online incremental scoring" was explicitly ruled out
-at Phase 8 kickoff in favor of materializing the pipeline into Postgres once (Steps
-2/3) and replaying those records.
-
-Dev Plan §39's replay semantics (build features from prior-state only, score, only
-then reveal the outcome) are satisfied by construction, not by anything in this
-module: every persisted feature/risk value was already computed using only
-strictly-prior information at its own transaction's original scoring time (Phase 3/5
-leakage-safety, independently re-audited in the Phase 5 validation report). This
-module's only job is to reveal those already-correct results one chronological window
-at a time, instead of returning all 1.75M rows at once (Dev Plan §22: "Do not attempt
-to process 1.75M transactions live during the demo").
-
-Pacing ("allow the demo to accelerate time", Dev Plan §22) is left to the client: this
-API introduces no server-side delay, timer, or session state. A client drives its own
-replay speed by choosing how large a window to request and how often to request the
-next one -- keyset pagination (cursor = last row's (tx_datetime, transaction_id)) makes
-each request stateless and independently resumable, avoiding a server-held "replay
-session" that Dev Plan §26 would flag as infrastructure this project does not need.
-
-Deliberately does not duplicate GET /customers/{id}/risk or /terminals/{id}/risk
-(Step 4) -- those already serve one entity's chronological history; this module serves
-the full historical transaction stream Dev Plan §22 describes.
+Replay is intentionally scoped to the frozen Handbook benchmark splits. The separate
+simulated recent stream is exposed through /recent and must not silently alter the
+historical replay semantics.
 """
 
 from __future__ import annotations
@@ -43,6 +19,8 @@ from mrs.db.models import Alert, RiskScore, Transaction
 
 router = APIRouter(prefix="/replay", tags=["replay"])
 
+HISTORICAL_SPLITS = ("train", "validation", "test")
+
 
 def _format_cursor(tx_datetime: dt.datetime, transaction_id: int) -> str:
     return f"{tx_datetime.isoformat()}|{transaction_id}"
@@ -58,41 +36,35 @@ def _parse_cursor(cursor: str) -> tuple[dt.datetime, int]:
 
 @router.get("/bounds", response_model=schemas.ReplayBounds)
 def get_replay_bounds(db: Session = Depends(get_db)) -> schemas.ReplayBounds:
-    """The chronological range available to replay -- lets a client compute how far
-    through the stream a given cursor/time is, e.g. for a progress indicator."""
     min_dt, max_dt, total = db.execute(
-        select(func.min(Transaction.tx_datetime), func.max(Transaction.tx_datetime), func.count())
+        select(
+            func.min(Transaction.tx_datetime),
+            func.max(Transaction.tx_datetime),
+            func.count(),
+        ).where(Transaction.split.in_(HISTORICAL_SPLITS))
     ).one()
     if total == 0:
-        raise HTTPException(status_code=404, detail="no transactions available to replay")
+        raise HTTPException(status_code=404, detail="no historical benchmark transactions available to replay")
     return schemas.ReplayBounds(min_tx_datetime=min_dt, max_tx_datetime=max_dt, total_transactions=total)
 
 
 @router.get("/transactions", response_model=schemas.ReplayPage)
 def replay_transactions(
-    after_cursor: str | None = Query(
-        None, description="Opaque cursor from a previous page's next_cursor. Takes precedence over start."
-    ),
-    start: dt.datetime | None = Query(None, description="Inclusive lower bound on tx_datetime; ignored if after_cursor is given."),
-    end: dt.datetime | None = Query(None, description="Exclusive upper bound on tx_datetime."),
-    customer_id: int | None = Query(None, description="Restrict to one customer's transactions (same filter convention as GET /alerts)."),
-    terminal_id: int | None = Query(None, description="Restrict to one terminal's transactions."),
-    desc: bool = Query(
-        False,
-        description="Most-recent-first instead of the default chronological-forward replay order. Used by callers that "
-        "want 'this entity's N most recent transactions' (e.g. the Network investigation panel) rather than a replay "
-        "window; next_cursor is omitted when true since nothing consumes a descending cursor today.",
-    ),
+    after_cursor: str | None = Query(None),
+    start: dt.datetime | None = Query(None),
+    end: dt.datetime | None = Query(None),
+    customer_id: int | None = Query(None),
+    terminal_id: int | None = Query(None),
+    desc: bool = Query(False),
     limit: int = Query(100, ge=1, le=2000),
     db: Session = Depends(get_db),
 ) -> schemas.ReplayPage:
-    """One chronological window of the historical transaction stream, each item
-    carrying its already-computed risk_score and alert (if any). Keyset-paginated on
-    (tx_datetime, transaction_id) -- stable regardless of how large the table is."""
+    """One chronological window of the frozen historical benchmark only."""
     stmt = (
         select(Transaction, RiskScore, Alert)
         .outerjoin(RiskScore, RiskScore.transaction_id == Transaction.transaction_id)
         .outerjoin(Alert, Alert.transaction_id == Transaction.transaction_id)
+        .where(Transaction.split.in_(HISTORICAL_SPLITS))
     )
 
     if after_cursor is not None:
@@ -114,12 +86,8 @@ def replay_transactions(
         stmt = stmt.where(Transaction.terminal_id == terminal_id)
 
     if desc:
-        # No cursor support in this direction -- every current/planned caller of
-        # desc=True wants a small bounded "N most recent" list, not a paginated
-        # backward stream, so next_cursor is deliberately left None below.
         stmt = stmt.order_by(Transaction.tx_datetime.desc(), Transaction.transaction_id.desc()).limit(limit)
     else:
-        # Fetch one extra row to know whether a next page exists, without a second query.
         stmt = stmt.order_by(Transaction.tx_datetime, Transaction.transaction_id).limit(limit + 1)
     rows = db.execute(stmt).all()
 
@@ -136,7 +104,6 @@ def replay_transactions(
 
     has_more = len(rows) > limit
     rows = rows[:limit]
-
     items = [
         schemas.ReplayItemOut(
             transaction=schemas.TransactionOut.model_validate(tx),
