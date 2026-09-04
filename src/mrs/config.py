@@ -68,11 +68,18 @@ EXPECTED_FILE_COUNT = 183
 #: Simulated Recent Operational Stream (see mrs.data.recent_stream). NOT the frozen
 #: benchmark dataset above, NOT real Razorpay production data -- a separate, clearly
 #: demarcated, deterministically-generated 21-day demo stream, reusing existing
-#: customer/terminal IDs so it flows through the same architecture. Dates are fixed
-#: constants (not computed from "today") so the stream stays reproducible regardless of
-#: when it is generated.
-RECENT_STREAM_START_DATE = "2026-08-14"
-RECENT_STREAM_END_DATE = "2026-09-03"
+#: customer/terminal IDs so it flows through the same architecture.
+#:
+#: RECENT_STREAM_START_DATE is only the DEFAULT start date, read by
+#: mrs.data.recent_stream.generate_recent_stream when its caller does not pass its own
+#: `start_date` argument -- it is a configuration value, not something hard-coded at
+#: every call site. Either way the value used is always a fixed constant for that run
+#: (never computed from "today"), so a given (seed, start_date) pair stays reproducible
+#: regardless of when it is generated. RECENT_STREAM_END_DATE is documentation only
+#: (start + RECENT_STREAM_DAYS - 1 days) -- it is not read by the generator, which
+#: derives the end of the window from start_date + RECENT_STREAM_DAYS.
+RECENT_STREAM_START_DATE = "2026-08-15"
+RECENT_STREAM_END_DATE = "2026-09-04"
 RECENT_STREAM_DAYS = 21
 RECENT_STREAM_TX_PER_DAY = 1_800
 RECENT_STREAM_SEED = 20260814

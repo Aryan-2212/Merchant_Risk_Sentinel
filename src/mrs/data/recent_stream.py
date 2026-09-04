@@ -114,15 +114,28 @@ def _assign_cohort(rng: np.random.Generator, ids: np.ndarray) -> pd.DataFrame:
     ).set_index("id")
 
 
-def generate_recent_stream(seed: int = config.RECENT_STREAM_SEED) -> pd.DataFrame:
+def generate_recent_stream(
+    seed: int = config.RECENT_STREAM_SEED,
+    *,
+    start_date: str | dt.date | pd.Timestamp | None = None,
+) -> pd.DataFrame:
     """Deterministically generate the Simulated Recent Operational Stream.
 
-    Same seed -> byte-identical output (every random draw goes through the one
-    `np.random.default_rng(seed)` created here). Returns a frame with exactly
-    mrs.data.schema.RAW_COLUMNS, in mrs.data.schema.PROCESSED_DTYPES, chronologically
-    ordered, already passed through validate_processed_frame -- ready to hand to
-    mrs.features.build.build_feature_frame(..., split_override="recent") exactly like
-    any other processed-layer frame.
+    Same (seed, start_date) -> byte-identical output (every random draw goes through
+    the one `np.random.default_rng(seed)` created here; no other source of randomness
+    or "now"-derived value is used anywhere in this function). Returns a frame with
+    exactly mrs.data.schema.RAW_COLUMNS, in mrs.data.schema.PROCESSED_DTYPES,
+    chronologically ordered, already passed through validate_processed_frame -- ready
+    to hand to mrs.features.build.build_feature_frame(..., split_override="recent")
+    exactly like any other processed-layer frame.
+
+    `start_date`: the first calendar day of the 21-day window. Defaults to
+    mrs.config.RECENT_STREAM_START_DATE when not given -- a configuration value, not a
+    value hard-coded at every call site. Passing a different date (e.g. to regenerate
+    the demo stream anchored to a different "today") produces a stream shaped by the
+    exact same seeded cohort/phase logic, just shifted in calendar time; it does not
+    change RECENT_STREAM_DAYS, the transaction-id offset, or anything else about how
+    the stream is built.
     """
     rng = np.random.default_rng(seed)
 
@@ -140,7 +153,7 @@ def generate_recent_stream(seed: int = config.RECENT_STREAM_SEED) -> pd.DataFram
     cust_cohort = _assign_cohort(rng, customer_ids)
     term_cohort = _assign_cohort(rng, terminal_ids)
 
-    start_date = pd.Timestamp(config.RECENT_STREAM_START_DATE)
+    start_date = pd.Timestamp(start_date if start_date is not None else config.RECENT_STREAM_START_DATE)
     weights = cust_profile["mean_nb_tx_per_day"].to_numpy().clip(min=0.05)
     base_p = weights / weights.sum()
 
