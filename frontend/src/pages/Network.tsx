@@ -13,6 +13,18 @@ import { AnalystPanel } from "../components/analyst/AnalystPanel";
 import { Icon } from "../components/common/Icon";
 import "./Network.css";
 
+/** Rolling window size for GET /stats/network?live_window=N -- reused as-is for both
+ * the graph itself and the "recent transactions" side panel's implicit scope. Small
+ * enough to stay readable as a force-directed graph, large enough to reliably show a
+ * terminal-centric cluster (multiple customers sharing one terminal) within it. */
+const LIVE_WINDOW = 30;
+/** Within the 1-2s range the Simulated Live Stream calls for -- polling, not
+ * WebSockets/SSE, matching the existing architecture (Replay already polls its own
+ * bounds/transactions on demand rather than holding a server-pushed connection). */
+const LIVE_POLL_MS = 1500;
+
+type NetworkMode = "investigate" | "live";
+
 function detailPath(type: EntityType, id: number): string {
   return type === "terminal" ? `/terminals/${id}` : `/customers/${id}`;
 }
@@ -63,6 +75,21 @@ export function Network() {
   // Bumped to discard hand-dragged node positions and re-run the force layout.
   const [layoutKey, setLayoutKey] = useState(0);
 
+  // SIMULATED LIVE STREAM: a second graph-canvas mode, off by default. "investigate"
+  // is the page's original, unmodified behavior (global, unwindowed, URL-driven focus
+  // via searchParams); "live" polls GET /stats/network?live_window=N instead -- a
+  // rolling recent-activity view meant to be watched alongside
+  // scripts/15_run_live_simulation.py, never real production traffic.
+  const [mode, setMode] = useState<NetworkMode>("investigate");
+  const [livePlaying, setLivePlaying] = useState(false);
+  // Which API a selected node's "Recent Transactions" panel should read from -- set
+  // at click time from whichever mode was active, so drilling into a node found via
+  // the live canvas correctly shows its Simulated Recent Operational Stream activity
+  // (GET /recent/transactions) rather than the frozen 2018 benchmark
+  // (GET /replay/transactions), which would otherwise come back empty for an entity
+  // whose activity is only in the recent stream.
+  const [focusSource, setFocusSource] = useState<"benchmark" | "recent">("benchmark");
+
   const typeParam = searchParams.get("type");
   const idParam = searchParams.get("id");
   const focus: { type: EntityType; id: number } | undefined =
@@ -70,7 +97,11 @@ export function Network() {
       ? { type: typeParam, id: Number(idParam) }
       : undefined;
 
-  const graph = useQuery({ queryKey: ["network", focus], queryFn: () => api.entityNetwork(focus) });
+  const graph = useQuery({
+    queryKey: mode === "live" ? ["network-live", LIVE_WINDOW] : ["network", focus],
+    queryFn: () => (mode === "live" ? api.entityNetwork(undefined, LIVE_WINDOW) : api.entityNetwork(focus)),
+    refetchInterval: mode === "live" && livePlaying ? LIVE_POLL_MS : false,
+  });
 
   const deviation = useQuery({
     queryKey: ["network-focus-deviation", focus],
@@ -79,18 +110,28 @@ export function Network() {
   });
 
   const recentTx = useQuery({
-    queryKey: ["network-recent-tx", focus],
-    queryFn: () =>
-      api.replayTransactions({
+    queryKey: ["network-recent-tx", focus, focusSource],
+    queryFn: () => {
+      const params = {
         [focus!.type === "terminal" ? "terminal_id" : "customer_id"]: focus!.id,
         desc: true,
         limit: 5,
-      }),
+      };
+      return focusSource === "recent" ? api.recentTransactions(params) : api.replayTransactions(params);
+    },
     enabled: focus !== undefined,
   });
 
   function selectNode(node: NetworkNode) {
+    setFocusSource(mode === "live" ? "recent" : "benchmark");
     setSearchParams({ type: node.entity_type, id: String(node.entity_id) });
+  }
+
+  function selectMode(next: NetworkMode) {
+    if (next === mode) return;
+    setMode(next);
+    setLivePlaying(false);
+    setSearchParams({}); // leaving "investigate" (or entering it) drops any stale focus
   }
 
   if (graph.isLoading) return <Loading label="Loading entity network…" />;
@@ -138,27 +179,62 @@ export function Network() {
       {focus && <BackLink to="/network" label="Back to Network" />}
       <div className="net-header">
         <div>
-          <h1 className="page-title">{focus ? `Investigation: ${idLabel(focus.type, focus.id)} Cluster` : "Entity Network"}</h1>
+          <h1 className="page-title">
+            {mode === "live" ? "Entity Network — Live" : focus ? `Investigation: ${idLabel(focus.type, focus.id)} Cluster` : "Entity Network"}
+          </h1>
           <p className="page-subtitle">
-            {focus
-              ? "Analyzing cross-entity propagation path -- real customer ↔ terminal relationships derived from actual shared transactions."
-              : "Showing the most severe currently at-risk terminals and customers -- select a node to investigate its connections."}
+            {mode === "live"
+              ? "SIMULATED LIVE STREAM · Playback of the recent operational stream (Aug 15 – Sep 04, 2026) -- not real production traffic."
+              : focus
+                ? "Analyzing cross-entity propagation path -- real customer ↔ terminal relationships derived from actual shared transactions."
+                : "Showing the most severe currently at-risk terminals and customers -- select a node to investigate its connections."}
           </p>
         </div>
         <div className="net-header-actions">
-          <button
-            className={`btn ${showElevatedOnly ? "btn-primary" : ""}`}
-            onClick={() => setShowElevatedOnly((v) => !v)}
-            aria-pressed={showElevatedOnly}
-          >
-            <Icon name="filter_alt" size={14} />
-            {showElevatedOnly ? "Elevated Only" : "Filter Nodes"}
-          </button>
+          <div className="toolbar" role="group" aria-label="Network canvas mode">
+            <button
+              className={`btn ${mode === "investigate" ? "btn-primary" : ""}`}
+              onClick={() => selectMode("investigate")}
+              aria-pressed={mode === "investigate"}
+            >
+              Investigate
+            </button>
+            <button
+              className={`btn ${mode === "live" ? "btn-primary" : ""}`}
+              onClick={() => selectMode("live")}
+              aria-pressed={mode === "live"}
+            >
+              <Icon name="bolt" size={14} />
+              Live
+            </button>
+          </div>
+          {mode === "live" && (
+            <>
+              <button className="btn btn-primary replay-play-btn" onClick={() => setLivePlaying((p) => !p)}>
+                <Icon name={livePlaying ? "pause" : "play_arrow"} size={16} />
+                {livePlaying ? "Pause" : "Start Simulation"}
+              </button>
+              <span className="replay-live-indicator">
+                <span className="replay-live-dot" aria-hidden="true" />
+                {livePlaying ? "Live" : "Paused"}
+              </span>
+            </>
+          )}
+          {mode === "investigate" && (
+            <button
+              className={`btn ${showElevatedOnly ? "btn-primary" : ""}`}
+              onClick={() => setShowElevatedOnly((v) => !v)}
+              aria-pressed={showElevatedOnly}
+            >
+              <Icon name="filter_alt" size={14} />
+              {showElevatedOnly ? "Elevated Only" : "Filter Nodes"}
+            </button>
+          )}
           <button className="btn" onClick={() => setLayoutKey((k) => k + 1)}>
             <Icon name="refresh" size={14} />
             Reset Layout
           </button>
-          <button className="btn" onClick={() => downloadGraph(focus ? idLabel(focus.type, focus.id) : "overview", data)}>
+          <button className="btn" onClick={() => downloadGraph(focus ? idLabel(focus.type, focus.id) : mode === "live" ? "live" : "overview", data)}>
             <Icon name="download" size={14} />
             Export Graph
           </button>
@@ -216,6 +292,15 @@ export function Network() {
                 </div>
               </dl>
             </aside>
+          )}
+          {mode === "live" && data.latest_transaction_id !== null && (
+            <p className="net-side-caption">
+              Just arrived:{" "}
+              <Link className="link-id mono" to={`/transactions/${data.latest_transaction_id}`}>
+                TX_{data.latest_transaction_id}
+              </Link>{" "}
+              -- its customer and terminal are outlined below.
+            </p>
           )}
           <div className="net-graph-stage">
             <EntityNetworkGraph

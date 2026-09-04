@@ -213,4 +213,8 @@ export interface NetworkGraph {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
   focus_ids: string[];
+  /** Only set when the live_window query param was used -- the single most recent
+   * transaction_id in that window, so the newest arrival can be highlighted without
+   * a second request. null for the default (unwindowed) graph. */
+  latest_transaction_id: number | null;
 }

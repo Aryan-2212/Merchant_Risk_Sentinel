@@ -68,8 +68,15 @@ export const api = {
   overviewStats: () => request<OverviewStats>("/stats/overview"),
   riskActivity: (days = 30) => request<RiskActivityPoint[]>("/stats/risk-activity", { days }),
   recentActivity: (limit = 20, levels?: string) => request<ReplayItemOut[]>("/stats/recent-activity", { limit, levels }),
-  entityNetwork: (focus?: { type: EntityType; id: number }) =>
-    request<NetworkGraph>("/stats/network", focus ? { focus_type: focus.type, focus_id: focus.id } : undefined),
+  entityNetwork: (focus?: { type: EntityType; id: number }, liveWindow?: number) =>
+    request<NetworkGraph>(
+      "/stats/network",
+      liveWindow !== undefined
+        ? { live_window: liveWindow }
+        : focus
+          ? { focus_type: focus.type, focus_id: focus.id }
+          : undefined,
+    ),
   terminalsAtRisk: (limit = 8) => request<EntityAtRiskRow[]>("/stats/terminals-at-risk", { limit }),
 
   getTransaction: (id: number) => request<TransactionDetailOut>(`/transactions/${id}`),
@@ -120,6 +127,7 @@ export const api = {
     end?: string;
     customer_id?: number;
     terminal_id?: number;
+    desc?: boolean;
     limit?: number;
   }) => request<ReplayPage>("/recent/transactions", params),
 };
