@@ -140,6 +140,12 @@
   flex-wrap: wrap;
 }
 
+.field-error {
+  color: var(--risk-critical);
+  font-size: var(--fs-sm);
+  margin: calc(-1 * var(--sp-2)) 0 var(--sp-2);
+}
+
 .field-label {
   font-family: var(--font-headline);
   font-size: var(--fs-xs);

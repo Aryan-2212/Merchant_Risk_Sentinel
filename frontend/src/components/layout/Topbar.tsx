@@ -17,9 +17,14 @@ export function Topbar() {
       <div className="topbar-left">
         <span className="topbar-wordmark">Merchant Risk Sentinel</span>
         <div className="topbar-sep" />
-        {/* Real data span, not a live "last 24h" claim -- this is historical replay
-            data (Apr-Sep 2018), never framed as a real-time feed. */}
-        <span className="topbar-context">Historical dataset · Apr–Sep 2018</span>
+        {/* Names both datasets the app can show, rather than asserting only one
+            (Apr-Sep 2018) -- several pages (Transactions, Replay) can display either
+            the frozen benchmark or the Simulated Recent Operational Stream, and a
+            single hard-coded claim here would contradict whichever one is on screen.
+            Never framed as a live/real-time feed -- "Simulated" is explicit. Kept
+            short (.topbar-context is white-space: nowrap, no overflow handling) so it
+            doesn't crowd the topbar on narrower widths. */}
+        <span className="topbar-context">Benchmark 2018 · Recent (Simulated) 2026</span>
       </div>
 
       {/* Global "jump to ID" search was removed here -- it duplicated the Customers/
