@@ -22,9 +22,14 @@ truth about real payment activity, and never fed to any model as an input featur
   numbers must never move again. The recent stream is a rolling demo surface whose only
   job is to show the *existing* frozen model and behavioral engines running against a
   fresh window of activity.
-- **Different date range.** 2026-08-14 through 2026-09-03 (`mrs.config.
+- **Different date range.** 2026-08-15 through 2026-09-04 by default (`mrs.config.
   RECENT_STREAM_START_DATE`/`RECENT_STREAM_END_DATE`) vs. the benchmark's
-  2018-04-01 through 2018-09-30.
+  2018-04-01 through 2018-09-30. The start date is configurable --
+  `generate_recent_stream(start_date=...)` -- rather than hard-coded at every call
+  site; `mrs.config.RECENT_STREAM_START_DATE` is only the default used when no
+  `start_date` is passed. Whichever start date is used, it is always a fixed constant
+  for that run (never derived from "today"), so a given (seed, start_date) pair stays
+  reproducible regardless of when it is generated.
 - **Different `split` value.** `split="recent"` (`mrs.config.RECENT_STREAM_SPLIT_LABEL`),
   never `"train"`/`"validation"`/`"test"` -- `mrs.data.splits.assign_split` (the frozen
   benchmark split boundaries) is never called on it. See "How it flows through the
@@ -35,17 +40,19 @@ truth about real payment activity, and never fed to any model as an input featur
 
 ## The 21-day window and deterministic generation
 
-`mrs.data.recent_stream.generate_recent_stream(seed=mrs.config.RECENT_STREAM_SEED)`
-generates exactly `mrs.config.RECENT_STREAM_DAYS` (21) calendar days, targeting
-`mrs.config.RECENT_STREAM_TX_PER_DAY` (1,800) organic transactions per day (injected
-attack traffic, below, adds on top of that budget, so the actual daily/total count is
-"approximately" the target, not exactly it -- the last real run produced 41,610 rows).
+`mrs.data.recent_stream.generate_recent_stream(seed=mrs.config.RECENT_STREAM_SEED,
+start_date=mrs.config.RECENT_STREAM_START_DATE)` generates exactly `mrs.config.
+RECENT_STREAM_DAYS` (21) calendar days, targeting `mrs.config.RECENT_STREAM_TX_PER_DAY`
+(1,800) organic transactions per day (injected attack traffic, below, adds on top of
+that budget, so the actual daily/total count is "approximately" the target, not
+exactly it).
 
 Every random draw goes through one `numpy.random.default_rng(seed)` created at the top
-of the function -- same seed, byte-identical output (`tests/test_recent_stream.py::
-test_same_seed_produces_identical_stream` asserts this with `pandas.testing.
-assert_frame_equal`). The dates are fixed constants, not computed from "today", so the
-stream stays reproducible regardless of when it is generated.
+of the function -- same (seed, start_date), byte-identical output (`tests/
+test_recent_stream.py::test_same_seed_produces_identical_stream` asserts this with
+`pandas.testing.assert_frame_equal`). Both are fixed values for a given call, never
+computed from "today", so the stream stays reproducible regardless of when it is
+generated.
 
 ## Simulated cohorts and the behavioral-evolution narrative
 
@@ -196,6 +203,20 @@ DELETE FROM transactions WHERE transaction_id >= 2000000000;
 Does **not** call `mrs.db.populate.populate_customers_and_terminals` -- the recent
 stream reuses customer/terminal ids already present in those tables from the benchmark
 load; re-inserting them would violate their primary keys.
+
+**Discovered while reloading the stream during development:** `DELETE FROM alerts`
+was effectively hanging on a database already holding the 1.75M-row benchmark, because
+`audit_logs.alert_id` (a foreign key to `alerts.alert_id`) had no index -- Postgres
+must sequentially scan the whole referencing table once per deleted row to check that
+FK, and `audit_logs` is the largest table in the schema. `mrs.db.models.AuditLog` now
+declares `Index("ix_audit_logs_alert_id", "alert_id")`; a fresh `scripts/
+11_init_db_schema.py` run picks it up automatically, and an existing database needs a
+one-time `CREATE INDEX IF NOT EXISTS ix_audit_logs_alert_id ON audit_logs (alert_id);`
+(no migration tool is in use in this project; this project has no other schema
+migrations either, so a direct `CREATE INDEX` is consistent with how `scripts/
+11_init_db_schema.py` itself applies schema changes). This is a genuine latent
+performance fix, unrelated to the recent stream's own correctness -- it changes no
+persisted value, only how fast a deletion is.
 
 ## How it differs from official benchmark evaluation
 
