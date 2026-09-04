@@ -32,10 +32,10 @@ from mrs import config  # noqa: E402
 from mrs.behavioral.customer import compute_customer_behavioral_states  # noqa: E402
 from mrs.behavioral.terminal import compute_terminal_behavioral_states  # noqa: E402
 from mrs.data.recent_stream import RecentStreamConfig, build_recent_feature_frame, generate_recent_transactions  # noqa: E402
-from mrs.data.schema import validate_processed_frame  # noqa: E402
+from mrs.data.schema import normalize_dtypes, validate_processed_frame  # noqa: E402
 from mrs.db import populate  # noqa: E402
 from mrs.db.engine import get_database_url, get_engine  # noqa: E402
-from mrs.db.models import RiskScore, Transaction, TransactionFeatures  # noqa: E402
+from mrs.db.models import RiskScore, Transaction  # noqa: E402
 from mrs.models.dataset import get_feature_matrix  # noqa: E402
 from mrs.models.persistence import load_model  # noqa: E402
 from mrs.policy.engine import apply_policy  # noqa: E402
@@ -75,10 +75,8 @@ def main() -> None:
     print("=" * 70)
     t0 = time.time()
     recent = generate_recent_transactions(customer_profiles, terminal_profiles, config=cfg)
+    recent = normalize_dtypes(recent)
     validate_processed_frame(recent, source="recent simulated stream")
-    # The generic processed validator expects TX_TIME_DAYS to be globally ordered only
-    # through TX_DATETIME; it is intentionally not used as a split/evaluation label.
-    recent = recent.copy()
     RECENT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     recent.to_parquet(RECENT_TRANSACTIONS_PATH, index=False)
     print(f"Generated {len(recent):,} rows: {recent.TX_DATETIME.min()} -> {recent.TX_DATETIME.max()}")
@@ -107,8 +105,8 @@ def main() -> None:
     print("=" * 70)
     print("STEP 4: Compute causal customer + terminal behavioral states")
     print("=" * 70)
-    terminal_full = compute_terminal_behavioral_states(recent)
-    customer_full = compute_customer_behavioral_states(recent)
+    terminal_full = compute_terminal_behavioral_states(recent_features)
+    customer_full = compute_customer_behavioral_states(recent_features)
     terminal_df = terminal_full[["TRANSACTION_ID", "terminal_risk_state"]]
     customer_df = customer_full[["TRANSACTION_ID", "customer_risk_state"]]
 
