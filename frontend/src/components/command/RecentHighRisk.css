@@ -22,6 +22,12 @@
   font-weight: 500;
 }
 
+.rhr-dataset-label {
+  margin-left: auto;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .rhr-list {
   list-style: none;
   margin: 0;
