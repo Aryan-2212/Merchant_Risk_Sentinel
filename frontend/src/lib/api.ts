@@ -21,9 +21,6 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
-/** Thrown for any non-2xx response; callers surface `.status`/`.detail` to the user
- * rather than a generic failure so a 404 ("not found") reads differently from a 500
- * ("risk data could not be loaded"). */
 export class ApiError extends Error {
   status: number;
   detail: string;
@@ -100,4 +97,8 @@ export const api = {
     desc?: boolean;
     limit?: number;
   }) => request<ReplayPage>("/replay/transactions", params),
+
+  recentBounds: () => request<ReplayBounds>("/recent/bounds"),
+  recentTransactions: (params: { after_cursor?: string; limit?: number }) =>
+    request<ReplayPage>("/recent/transactions", params),
 };
