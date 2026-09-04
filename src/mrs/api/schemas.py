@@ -272,6 +272,12 @@ class NetworkGraph(BaseModel):
     #: node ids that were chosen as graph focus points (currently most-severe
     #: entities), vs. neighbors pulled in only because they transacted with one.
     focus_ids: list[str]
+    #: Only set when the `live_window` query param was used (GET /stats/network):
+    #: the single most recent transaction_id in that window, so the client can
+    #: identify which node(s) it touches as "just arrived" without a second request.
+    #: None for the default (unwindowed) graph -- there is no one meaningful "latest"
+    #: transaction across the entity's entire history in that mode.
+    latest_transaction_id: int | None = None
 
 
 class EntityAtRiskRow(BaseModel):

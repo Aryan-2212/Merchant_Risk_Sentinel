@@ -60,6 +60,13 @@ def recent_transactions(
     end: dt.datetime | None = Query(None, description="Exclusive upper bound on tx_datetime."),
     customer_id: int | None = Query(None),
     terminal_id: int | None = Query(None),
+    desc: bool = Query(
+        False,
+        description="Most-recent-first instead of the default chronological-forward order -- same convention and "
+        "use case as GET /replay/transactions' desc (e.g. 'this entity's N most recent recent-stream transactions' "
+        "for the Network investigation panel when the focus entity's activity is in the recent stream). No cursor "
+        "support in this direction, same as replay's.",
+    ),
     limit: int = Query(100, ge=1, le=2000),
     db: Session = Depends(get_db),
 ) -> schemas.ReplayPage:
@@ -89,6 +96,19 @@ def recent_transactions(
         stmt = stmt.where(Transaction.customer_id == customer_id)
     if terminal_id is not None:
         stmt = stmt.where(Transaction.terminal_id == terminal_id)
+
+    if desc:
+        stmt = stmt.order_by(Transaction.tx_datetime.desc(), Transaction.transaction_id.desc()).limit(limit)
+        rows = db.execute(stmt).all()
+        items = [
+            schemas.ReplayItemOut(
+                transaction=schemas.TransactionOut.model_validate(tx),
+                risk_score=schemas.RiskScoreOut.model_validate(risk) if risk is not None else None,
+                alert=schemas.AlertSummaryOut.model_validate(alert) if alert is not None else None,
+            )
+            for tx, risk, alert in rows
+        ]
+        return schemas.ReplayPage(items=items, count=len(items), next_cursor=None)
 
     stmt = stmt.order_by(Transaction.tx_datetime, Transaction.transaction_id).limit(limit + 1)
     rows = db.execute(stmt).all()

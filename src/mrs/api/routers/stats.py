@@ -304,10 +304,89 @@ def _states_for_terminals(db: Session, ids: list[int]) -> dict[int, tuple[str | 
     return {r.terminal_id: (r.terminal_risk_state, r.terminal_risk_severity) for r in rows}
 
 
+def _live_window_network(db: Session, live_window: int) -> schemas.NetworkGraph:
+    """Rolling recent-activity graph: nodes/edges derived ONLY from the most recent
+    `live_window` transactions -- real customer<->terminal pairs from those exact
+    rows, never the full history. Reuses _states_for_customers/_states_for_terminals
+    (the same behavioral-state lookups the default graph mode already uses) rather
+    than inventing a second way to read current state."""
+    window_rows = db.execute(
+        select(Transaction.transaction_id, Transaction.customer_id, Transaction.terminal_id)
+        .order_by(Transaction.tx_datetime.desc(), Transaction.transaction_id.desc())
+        .limit(live_window)
+    ).all()
+
+    if not window_rows:
+        return schemas.NetworkGraph(nodes=[], edges=[], focus_ids=[], latest_transaction_id=None)
+
+    latest_transaction_id = window_rows[0].transaction_id
+    newest_customer_id = window_rows[0].customer_id
+    newest_terminal_id = window_rows[0].terminal_id
+
+    pair_weights: dict[tuple[int, int], int] = {}
+    customer_ids: set[int] = set()
+    terminal_ids: set[int] = set()
+    for row in window_rows:
+        customer_ids.add(row.customer_id)
+        terminal_ids.add(row.terminal_id)
+        key = (row.customer_id, row.terminal_id)
+        pair_weights[key] = pair_weights.get(key, 0) + 1
+
+    cust_states = _states_for_customers(db, list(customer_ids))
+    term_states = _states_for_terminals(db, list(terminal_ids))
+
+    nodes: dict[str, schemas.NetworkNode] = {}
+    for cid in customer_ids:
+        node_id = f"customer:{cid}"
+        state, severity = cust_states.get(cid, (None, None))
+        nodes[node_id] = schemas.NetworkNode(
+            id=node_id,
+            entity_type="customer",
+            entity_id=cid,
+            risk_state=state,
+            risk_severity=severity,
+            is_focus=cid == newest_customer_id,
+        )
+    for tid in terminal_ids:
+        node_id = f"terminal:{tid}"
+        state, severity = term_states.get(tid, (None, None))
+        nodes[node_id] = schemas.NetworkNode(
+            id=node_id,
+            entity_type="terminal",
+            entity_id=tid,
+            risk_state=state,
+            risk_severity=severity,
+            is_focus=tid == newest_terminal_id,
+        )
+
+    edges = [
+        schemas.NetworkEdge(source=f"customer:{cid}", target=f"terminal:{tid}", weight=w)
+        for (cid, tid), w in pair_weights.items()
+    ]
+    focus_ids = [f"customer:{newest_customer_id}", f"terminal:{newest_terminal_id}"]
+
+    return schemas.NetworkGraph(nodes=list(nodes.values()), edges=edges, focus_ids=focus_ids, latest_transaction_id=latest_transaction_id)
+
+
 @router.get("/network", response_model=schemas.NetworkGraph)
 def get_entity_network(
     focus_type: str | None = Query(None, pattern="^(customer|terminal)$"),
     focus_id: int | None = Query(None),
+    live_window: int | None = Query(
+        None,
+        ge=1,
+        le=500,
+        description="Restrict the graph to the most recent N transactions overall "
+        "(by tx_datetime desc, tie-broken by transaction_id desc) -- reuses the same "
+        "'last N transactions' convention GET /stats/recent-activity already uses. "
+        "This is the Simulated Recent Operational Stream's rolling live-operations "
+        "view (mrs.data.recent_stream / mrs.live.simulate): nodes are every customer/ "
+        "terminal that appears in that window, edges are their real transaction "
+        "counts within it, and the response's latest_transaction_id names the single "
+        "newest one so a client can highlight it as newly arrived. Takes precedence "
+        "over focus_type/focus_id when given (a different mode, not combined with "
+        "the investigation view in this first cut).",
+    ),
     db: Session = Depends(get_db),
 ) -> schemas.NetworkGraph:
     """A real, bounded neighborhood graph (Dev Plan: signature Entity Risk Network).
@@ -315,9 +394,14 @@ def get_entity_network(
     Default (no params): the 1-2 most severe currently at-risk terminals plus the
     1-2 most severe currently at-risk customers become "focus" hubs. Passing
     focus_type/focus_id centers the graph on one specific entity instead (the
-    Command Center's click-to-investigate interaction). Every edge is a real
-    customer<->terminal pair derived from actual transactions -- nothing inferred.
+    Command Center's click-to-investigate interaction). Passing live_window switches
+    to the rolling recent-activity view instead of either (see that parameter's own
+    description). Every edge is a real customer<->terminal pair derived from actual
+    transactions -- nothing inferred, in any mode.
     """
+    if live_window is not None:
+        return _live_window_network(db, live_window)
+
     focus_terminals: list[tuple[int, str, int]] = []
     focus_customers: list[tuple[int, str, int]] = []
 
