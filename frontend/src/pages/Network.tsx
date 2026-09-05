@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import type { EntityType, NetworkNode } from "../lib/types";
@@ -70,6 +70,7 @@ function downloadGraph(label: string, data: unknown) {
  *   instead, matching Replay's own "never a live stream" convention.
  */
 export function Network() {
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showElevatedOnly, setShowElevatedOnly] = useState(false);
   // Bumped to discard hand-dragged node positions and re-run the force layout.
@@ -78,17 +79,22 @@ export function Network() {
   // SIMULATED LIVE STREAM: a second graph-canvas mode, off by default. "investigate"
   // is the page's original, unmodified behavior (global, unwindowed, URL-driven focus
   // via searchParams); "live" polls GET /stats/network?live_window=N instead -- a
-  // rolling recent-activity view meant to be watched alongside
-  // scripts/15_run_live_simulation.py, never real production traffic.
+  // rolling recent-activity view of the Continuous Simulated Live Stream
+  // (mrs.live.manager/mrs.live.continuous), never real production traffic. "Start
+  // Simulation"/"Pause" call the real backend control plane (GET/POST /live/*) --
+  // there is no separate manual script to run; the button IS the producer's on/off
+  // switch. `livePlaying` reflects the actual backend thread state (liveStatus.data
+  // .running), not a client-side-only toggle, so a reload or a second tab always
+  // agrees with reality.
   const [mode, setMode] = useState<NetworkMode>("investigate");
-  const [livePlaying, setLivePlaying] = useState(false);
   // Which API a selected node's "Recent Transactions" panel should read from -- set
-  // at click time from whichever mode was active, so drilling into a node found via
-  // the live canvas correctly shows its Simulated Recent Operational Stream activity
-  // (GET /recent/transactions) rather than the frozen 2018 benchmark
-  // (GET /replay/transactions), which would otherwise come back empty for an entity
-  // whose activity is only in the recent stream.
-  const [focusSource, setFocusSource] = useState<"benchmark" | "recent">("benchmark");
+  // at click time to whichever mode was active, so drilling into a node found via the
+  // Live canvas correctly shows its Continuous Simulated Live Stream activity
+  // (GET /live/transactions) rather than the frozen 2018 benchmark or the fixed
+  // 21-day recent stream, either of which would come back empty for an entity whose
+  // activity is only in the "live" split (mrs.api.routers.live, a thin sibling of
+  // mrs.api.routers.recent, permanently scoped to split=="live").
+  const [focusSource, setFocusSource] = useState<"benchmark" | "recent" | "live">("benchmark");
 
   const typeParam = searchParams.get("type");
   const idParam = searchParams.get("id");
@@ -96,6 +102,23 @@ export function Network() {
     (typeParam === "customer" || typeParam === "terminal") && idParam && Number.isFinite(Number(idParam))
       ? { type: typeParam, id: Number(idParam) }
       : undefined;
+
+  const liveStatus = useQuery({
+    queryKey: ["live-status"],
+    queryFn: api.liveStreamStatus,
+    enabled: mode === "live",
+    refetchInterval: mode === "live" ? LIVE_POLL_MS : false,
+  });
+  const livePlaying = liveStatus.data?.running ?? false;
+
+  const startLive = useMutation({
+    mutationFn: () => api.startLiveStream(),
+    onSuccess: (status) => queryClient.setQueryData(["live-status"], status),
+  });
+  const stopLive = useMutation({
+    mutationFn: () => api.stopLiveStream(),
+    onSuccess: (status) => queryClient.setQueryData(["live-status"], status),
+  });
 
   const graph = useQuery({
     queryKey: mode === "live" ? ["network-live", LIVE_WINDOW] : ["network", focus],
@@ -117,21 +140,34 @@ export function Network() {
         desc: true,
         limit: 5,
       };
-      return focusSource === "recent" ? api.recentTransactions(params) : api.replayTransactions(params);
+      if (focusSource === "live") return api.liveTransactions(params);
+      if (focusSource === "recent") return api.recentTransactions(params);
+      return api.replayTransactions(params);
     },
     enabled: focus !== undefined,
   });
 
   function selectNode(node: NetworkNode) {
-    setFocusSource(mode === "live" ? "recent" : "benchmark");
+    setFocusSource(mode === "live" ? "live" : "benchmark");
     setSearchParams({ type: node.entity_type, id: String(node.entity_id) });
   }
 
   function selectMode(next: NetworkMode) {
     if (next === mode) return;
     setMode(next);
-    setLivePlaying(false);
+    // Deliberately does NOT stop the backend producer -- it is genuinely continuous
+    // (mrs.live.manager runs server-side, independent of which page/mode any client
+    // is currently viewing) and only the Start/Pause button controls it. Switching
+    // canvas mode only changes what this page polls/displays.
     setSearchParams({}); // leaving "investigate" (or entering it) drops any stale focus
+  }
+
+  function toggleLive() {
+    if (livePlaying) {
+      stopLive.mutate();
+    } else {
+      startLive.mutate();
+    }
   }
 
   if (graph.isLoading) return <Loading label="Loading entity network…" />;
@@ -184,7 +220,7 @@ export function Network() {
           </h1>
           <p className="page-subtitle">
             {mode === "live"
-              ? "SIMULATED LIVE STREAM · Playback of the recent operational stream (Aug 15 – Sep 04, 2026) -- not real production traffic."
+              ? "SIMULATED LIVE STREAM · Continuously generated demo transactions from real customer/terminal profiles -- not real production traffic."
               : focus
                 ? "Analyzing cross-entity propagation path -- real customer ↔ terminal relationships derived from actual shared transactions."
                 : "Showing the most severe currently at-risk terminals and customers -- select a node to investigate its connections."}
@@ -210,7 +246,11 @@ export function Network() {
           </div>
           {mode === "live" && (
             <>
-              <button className="btn btn-primary replay-play-btn" onClick={() => setLivePlaying((p) => !p)}>
+              <button
+                className="btn btn-primary replay-play-btn"
+                onClick={toggleLive}
+                disabled={startLive.isPending || stopLive.isPending}
+              >
                 <Icon name={livePlaying ? "pause" : "play_arrow"} size={16} />
                 {livePlaying ? "Pause" : "Start Simulation"}
               </button>
@@ -218,6 +258,10 @@ export function Network() {
                 <span className="replay-live-dot" aria-hidden="true" />
                 {livePlaying ? "Live" : "Paused"}
               </span>
+              {liveStatus.data && liveStatus.data.n_generated > 0 && (
+                <span className="net-side-caption">{liveStatus.data.n_generated} generated this session</span>
+              )}
+              {liveStatus.data?.error && <span className="field-error">{liveStatus.data.error}</span>}
             </>
           )}
           {mode === "investigate" && (
@@ -408,6 +452,11 @@ export function Network() {
                   View All
                 </Link>
               </div>
+              {/* Real source label, not assumed: this entity was drilled into from the
+                  Live canvas, so its transactions here come from GET /live/transactions
+                  (mrs.api.routers.live, split=="live") -- never implied as production
+                  traffic. */}
+              {focusSource === "live" && <p className="net-side-caption">SIMULATED LIVE STREAM transactions</p>}
               {recentTx.isLoading && <Loading label="Loading recent transactions…" />}
               {recentTx.isError && <ErrorBlock error={recentTx.error} onRetry={() => recentTx.refetch()} />}
               {recentTx.data && recentTx.data.items.length === 0 && <EmptyState>No transactions for this entity yet.</EmptyState>}

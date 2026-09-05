@@ -94,6 +94,23 @@ RECENT_STREAM_TX_ID_OFFSET = 2_000_000_000
 RECENT_STREAM_N_CUSTOMERS = 250
 RECENT_STREAM_N_TERMINALS = 100
 
+# --------------------------------------------------------------- simulated live stream
+
+#: Continuous Simulated Live Stream (see mrs.live.continuous). A THIRD split, distinct
+#: from both the frozen benchmark (train/validation/test) and the fixed 21-day recent
+#: stream ("recent") -- new transactions generated at real wall-clock "now" timestamps,
+#: one every LIVE_STREAM_DEFAULT_INTERVAL_SECONDS while a producer is running, reusing
+#: the same real customer/terminal profiles and the identical scoring pipeline. NOT
+#: real payment traffic, NOT real-time production data -- a deterministic-per-tick,
+#: but not deterministic-across-runs, simulated demonstration (unlike the recent
+#: stream, this is not meant to be byte-reproducible: its whole purpose is to feel
+#: "alive" each time it runs, so it is not seeded from a fixed constant).
+LIVE_STREAM_SPLIT_LABEL = "live"
+#: Far above both the benchmark's max id (1,754,154) and the recent stream's own
+#: range (2,000,000,000 + up to ~50,000), so all three id spaces can never collide.
+LIVE_STREAM_TX_ID_OFFSET = 3_000_000_000
+LIVE_STREAM_DEFAULT_INTERVAL_SECONDS = 2.0
+
 
 def ensure_dirs() -> None:
     """Create the data directories if they do not exist. Never deletes anything."""

@@ -119,15 +119,24 @@ def ingest_batch(
     threshold: float,
     released_so_far: pd.DataFrame,
     new_batch: pd.DataFrame,
+    *,
+    split_label: str = config.RECENT_STREAM_SPLIT_LABEL,
 ) -> dict:
     """Score and persist exactly `new_batch` (already known not to exist in the
     database), reusing `released_so_far` only to seed each entity's correct temporal
     history. Returns {"transaction_ids", "unified_risk_levels", "n_alerts_written",
     "action_counts"} -- real, computed values, nothing invented.
+
+    `split_label` is stamped on the persisted `new_batch` rows only (`released_so_far`
+    is never re-persisted here, so whatever split its own rows already carry in the
+    database is untouched). Defaults to "recent" -- the fixed 21-day recent-stream
+    playback this function was originally written for (scripts/15's default mode,
+    and every existing caller/test) -- so that default behavior is unchanged;
+    mrs.live.continuous passes "live" instead for the continuous producer.
     """
     cumulative = pd.concat([released_so_far, new_batch], ignore_index=True)
 
-    features = build_feature_frame(cumulative, split_override=config.RECENT_STREAM_SPLIT_LABEL)
+    features = build_feature_frame(cumulative, split_override=split_label)
     full_df = attach_labels(features, cumulative)
     full_df = full_df.merge(
         cumulative[["TRANSACTION_ID", "TX_TIME_SECONDS", "TX_TIME_DAYS"]],

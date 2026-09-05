@@ -317,3 +317,21 @@ class EntityDeviation(BaseModel):
     baseline_transaction_count: int
     recent_window_days: int
     baseline_window_days: int
+
+
+class LiveStreamStatus(BaseModel):
+    """GET/POST /live/* -- the Continuous Simulated Live Stream's current state
+    (mrs.live.manager). `running` reflects the actual background-thread state, not a
+    client-side toggle, so a page reload or a second browser tab always sees the
+    truth. Every count/id here is real and computed -- nothing invented, exactly like
+    every other response in this API."""
+
+    running: bool
+    interval_seconds: float
+    n_generated: int
+    last_transaction_id: int | None
+    last_tx_datetime: dt.datetime | None
+    started_at: dt.datetime | None
+    #: A short exception summary (type + message, never a full traceback) if the
+    #: producer thread died unexpectedly; None while healthy.
+    error: str | None

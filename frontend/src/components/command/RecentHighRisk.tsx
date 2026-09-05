@@ -51,9 +51,11 @@ export function RecentHighRisk({ items }: { items: ReplayItemOut[] }) {
   return (
     <div className="rhr">
       <div className="rhr-header">
-        <Icon name="warning" size={18} className="rhr-header-icon" />
-        <span className="rhr-title">Recent High Risk</span>
-        {highRisk.length > 0 && <span className="topbar-context rhr-dataset-label">{datasetLabel}</span>}
+        <div className="rhr-header-main">
+          <Icon name="warning" size={18} className="rhr-header-icon" />
+          <span className="rhr-title">Recent High Risk</span>
+        </div>
+        {highRisk.length > 0 && <span className="rhr-dataset-label">{datasetLabel}</span>}
       </div>
 
       {highRisk.length === 0 ? (

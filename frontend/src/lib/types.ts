@@ -218,3 +218,16 @@ export interface NetworkGraph {
    * a second request. null for the default (unwindowed) graph. */
   latest_transaction_id: number | null;
 }
+
+/** GET/POST /live/* -- the Continuous Simulated Live Stream's real backend-thread
+ * state (mrs.live.manager). `running` reflects the actual producer, not a client-side
+ * toggle, so a reload or a second tab always sees the truth. */
+export interface LiveStreamStatus {
+  running: boolean;
+  interval_seconds: number;
+  n_generated: number;
+  last_transaction_id: number | null;
+  last_tx_datetime: string | null;
+  started_at: string | null;
+  error: string | null;
+}

@@ -2,18 +2,30 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .rhr-header {
   display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   padding: var(--sp-4) var(--sp-5);
   border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+.rhr-header-main {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
 }
 
 .rhr-header-icon {
   color: var(--risk-high);
+  flex-shrink: 0;
 }
 
 .rhr-title {
@@ -22,10 +34,22 @@
   font-weight: 500;
 }
 
+/* Its own full-width line under the icon/title (rhr-header is a column flex, so this
+   always wraps below rather than fighting for space on the same row) -- and, unlike
+   .topbar-context (built for the wide, single-line Topbar), free to wrap internally
+   too, so this never pushes past the card's right edge regardless of card width. */
 .rhr-dataset-label {
-  margin-left: auto;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-family: var(--font-headline);
   font-size: 10px;
-  white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .rhr-list {
@@ -89,11 +113,15 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-2);
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .rhr-id {
   font-size: var(--fs-sm);
   font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .rhr-id-critical {

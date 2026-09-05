@@ -7,6 +7,7 @@ import type {
   EntityDeviation,
   EntityType,
   HealthOut,
+  LiveStreamStatus,
   NetworkGraph,
   OverviewStats,
   PaginatedAlerts,
@@ -36,7 +37,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+async function request<T>(
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>,
+  method: "GET" | "POST" = "GET",
+): Promise<T> {
   const url = new URL(API_BASE + path);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -45,7 +50,7 @@ async function request<T>(path: string, params?: Record<string, string | number 
   }
   let res: Response;
   try {
-    res = await fetch(url.toString());
+    res = await fetch(url.toString(), { method });
   } catch {
     throw new ApiError(0, "Could not reach the Merchant Risk Sentinel API.");
   }
@@ -130,4 +135,23 @@ export const api = {
     desc?: boolean;
     limit?: number;
   }) => request<ReplayPage>("/recent/transactions", params),
+
+  // Continuous Simulated Live Stream (mrs.live.manager/mrs.live.continuous) -- a
+  // THIRD, distinct stream ("live" split) from real wall-clock "now", generated one
+  // transaction at a time by a real backend thread while running. Never real
+  // production traffic; see mrs.live.continuous's own module docstring.
+  liveStreamStatus: () => request<LiveStreamStatus>("/live/status"),
+  startLiveStream: (intervalSeconds?: number) =>
+    request<LiveStreamStatus>("/live/start", intervalSeconds !== undefined ? { interval_seconds: intervalSeconds } : undefined, "POST"),
+  stopLiveStream: () => request<LiveStreamStatus>("/live/stop", undefined, "POST"),
+  liveBounds: () => request<ReplayBounds>("/live/bounds"),
+  liveTransactions: (params: {
+    after_cursor?: string;
+    start?: string;
+    end?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    desc?: boolean;
+    limit?: number;
+  }) => request<ReplayPage>("/live/transactions", params),
 };

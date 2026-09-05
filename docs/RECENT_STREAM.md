@@ -240,13 +240,20 @@ The recent stream is never used for, and must never be cited as, model evaluatio
   structurally cannot include them; `tests/test_recent_stream.py` asserts this
   explicitly for the recent-stream frame too, not just the benchmark).
 
-## Simulated Live Transaction Ingestion
+## Simulated Live Transaction Ingestion (fixed-stream playback)
 
-A third, optional way to get the SAME deterministic recent-stream data into the
-database: instead of one bulk insert (`scripts/14_ingest_recent_stream.py`), release it
+An optional way to get the SAME deterministic recent-stream data into the database:
+instead of one bulk insert (`scripts/14_ingest_recent_stream.py`), release it
 progressively -- a few transactions at a time, paced by a configurable interval -- so a
 dashboard watching the database can show it "arriving" for a demo. See
 `mrs.live.simulate` and `scripts/15_run_live_simulation.py`.
+
+This mode is finite: once all ~41,610 rows of the fixed 21-day stream have been
+released, there is nothing left to release (`scripts/16_reset_recent_stream.py` clears
+it to demo the playback again from the start). For a producer that never runs out, see
+"Continuous Simulated Live Stream" below -- that is what the dashboard's Network page
+Start/Stop control actually drives; this section's CLI script remains available for
+scripted/headless demos of the fixed stream specifically.
 
 **This is not real payment traffic and not a live production feed** -- it is playback
 of the same 21-day simulated stream, one (or a few) transaction(s) at a time. The
@@ -292,6 +299,61 @@ Run with, e.g.:
 .venv/bin/python scripts/15_run_live_simulation.py --interval 2
 ```
 
+## Continuous Simulated Live Stream
+
+A genuinely continuous producer -- unlike the fixed-stream playback above, this one
+never runs out. While running, it generates ONE new transaction roughly every
+`--interval`/`interval_seconds` (default ~2s), timestamped at the real wall clock
+"now" (not August/September 2026), using a real, randomly-chosen existing customer
+profile and one of that customer's own real `available_terminals` -- never a
+fabricated entity. See `mrs.live.continuous` (generation + one-tick scoring) and
+`mrs.live.manager` (the background-thread controller the API/UI drive).
+
+**This is simulated demo data, not real payment traffic and not a live production
+feed.** Every generated transaction carries `split="live"` (`mrs.config.
+LIVE_STREAM_SPLIT_LABEL`) -- a THIRD split, distinct from both the frozen benchmark
+(`train`/`validation`/`test`) and the fixed 21-day `"recent"` stream, so:
+
+- `GET /replay/*` (scoped to `train`/`validation`/`test`) and `GET /recent/*` (scoped
+  to `"recent"`) never show these rows -- both existing streams stay exactly what they
+  were, with no code change needed in either router.
+- `GET /stats/network` is unscoped by split (already orders by `tx_datetime desc`), so
+  newly-generated `"live"` rows appear there automatically once the fixed recent
+  stream's own end date (Sep 4, 2026) is in the past -- no change was needed there
+  either, beyond the pre-existing `live_window` parameter (see below).
+- Transaction ids start at `mrs.config.LIVE_STREAM_TX_ID_OFFSET` (3,000,000,000), well
+  clear of both the benchmark's and the 21-day stream's own ranges.
+
+**Same pipeline, still no second risk engine.** Each tick calls `mrs.live.simulate.
+ingest_batch` (unmodified, now accepting an optional `split_label` so it can stamp
+`"live"` instead of its original `"recent"` default) -- the identical
+`build_feature_frame` / frozen `xgboost_v1` (inference only) / behavioral engines /
+`aggregate_risk` / `mrs.db.populate` / `decide_and_persist` chain every other
+ingestion path in this project uses. Temporal history for a new transaction comes from
+`mrs.live.continuous.load_live_stream_history` -- every already-persisted `"recent"`
+and `"live"` row, chronologically -- never the frozen benchmark (a separate dataset by
+policy) and never anything not yet generated.
+
+**Backend-controlled start/stop -- no manual script required.** `mrs.live.manager.
+LiveStreamManager` runs the producer as a daemon thread inside the same FastAPI
+process (no Celery/Redis/queue -- a single process-wide singleton, correct for this
+project's single-worker `uvicorn` deployment). `GET /live/status`, `POST /live/start`
+(optional `interval_seconds`, default from `mrs.config.
+LIVE_STREAM_DEFAULT_INTERVAL_SECONDS`), and `POST /live/stop` are the only non-GET
+routes in this API (`mrs.api.routers.live`) -- CORS was extended to allow `POST`
+specifically for these. The Network page's "Live" mode Start Simulation/Pause button
+(`frontend/src/pages/Network.tsx`) calls these directly; `livePlaying` is derived from
+the real polled `/live/status` response, not a client-side-only toggle, so a page
+reload or a second browser tab always agrees with the actual producer state. Clicking
+Start while already running, or Stop while already stopped, is a safe no-op.
+
+**Not seeded.** Unlike the deterministic 21-day recent stream, the continuous
+producer's random generator is intentionally NOT fixed to a constant seed -- its whole
+purpose is to feel like fresh, different activity every time it runs, not to be
+byte-reproducible across runs (`tests/test_live_continuous.py` still proves the
+underlying *generation function* is a pure, deterministic function of whatever
+`rng`/inputs it is given, which is what makes it testable at all).
+
 ### Live Entity Network
 
 `GET /stats/network?live_window=N` (N transactions, most recent first, same "last N"
@@ -301,9 +363,19 @@ history -- and names the single newest transaction in `latest_transaction_id` so
 client can highlight it. It is a sibling branch inside the existing
 `GET /stats/network` handler (`mrs.api.routers.stats._live_window_network`), not a
 duplicate endpoint; omitting `live_window` leaves the original (default/focus) behavior
-byte-for-byte unchanged. The frontend's Network page gained a minimal "Investigate" /
-"Live" mode toggle plus a Start/Pause control (`frontend/src/pages/Network.tsx`) that
-polls this endpoint every 1.5s while playing, reusing the existing
+byte-for-byte unchanged. This endpoint needed no changes at all to support the
+Continuous Simulated Live Stream: it already read the most-recent transactions
+regardless of split, so newly-generated `"live"` rows simply appear as soon as they
+exist. The frontend's Network page gained a minimal "Investigate" / "Live" mode toggle
+plus the Start/Pause control described above (`frontend/src/pages/Network.tsx`), which
+polls this endpoint every 1.5s while the producer is running, reusing the existing
 `EntityNetworkGraph` component, its existing risk-state color language, and its
 existing `is_focus` (square/glow) styling to highlight the newest arrival's customer
 and terminal -- no new visual language was introduced.
+
+**Known limitation:** the Network page's "Recent Transactions" side panel (shown when
+drilling into one node) only queries `GET /replay/transactions` or `GET /recent/
+transactions` -- there is no dedicated `GET /live/transactions` listing endpoint yet,
+so that one panel shows empty for a customer/terminal whose only activity is in the
+`"live"` split. The graph itself, `GET /transactions/{id}`, alerts, and the AI analyst
+all work correctly for `"live"` transactions regardless.

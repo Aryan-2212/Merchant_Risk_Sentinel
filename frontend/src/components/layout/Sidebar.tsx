@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import { Icon } from "../common/Icon";
 import "./Sidebar.css";
 
+const LOGO_SRC = "/logo.png";
+
 const PRIMARY = [
   { to: "/", label: "Overview", icon: "dashboard", end: true },
   { to: "/terminals", label: "Terminals", icon: "terminal" },
@@ -23,10 +25,10 @@ export function Sidebar() {
     <nav className="sidebar" aria-label="Primary">
       <div className="sidebar-brand">
         <div className="sidebar-mark">
-          <Icon name="security" size={18} />
+          <img src={LOGO_SRC} alt="Merchant Risk Sentinel" className="sidebar-mark-img" />
         </div>
         <div className="sidebar-brand-text">
-          <span className="sidebar-brand-name">MRS</span>
+          <span className="sidebar-brand-name">Merchant Risk Sentinel</span>
         </div>
       </div>
 
