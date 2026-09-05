@@ -1,549 +1,789 @@
 # Merchant Risk Sentinel
 
-**An explainable, AI-assisted merchant risk-intelligence system** — not a fraud
-classifier. Merchant Risk Sentinel combines transaction-level machine learning,
-customer behavioral risk, terminal/merchant behavioral risk, temporal context, entity
-network relationships, deterministic policy, and evidence-grounded AI explanation into
-a single unified risk assessment with a bounded, non-executing recommended action.
+**Track 2 — AI Risk Manager**
 
-Built for the Track 2 ("AI Risk Manager") track. See
-`Merchant_Risk_Sentinel_Development_Plan.md` for the full architecture and roadmap, and
-`CLAUDE.md` for the standing engineering rules this project follows.
+Merchant Risk Sentinel is an explainable AI-assisted risk intelligence system designed to detect and investigate suspicious activity across transactions, customers, payment terminals, and changing behavior over time.
 
-> **Data note:** every dataset in this project — the historical benchmark, the recent
-> operational stream, and the live stream — is **simulated**. None of it is real
-> Razorpay production traffic, and it is never presented as such anywhere in the code,
-> API, or UI.
+The system is built around the idea that fraud risk does not always come from a single suspicious transaction. A transaction may look relatively normal by itself while the customer's behavior is changing, a payment terminal is showing abnormal activity, or risk is increasing across connected entities.
+
+Merchant Risk Sentinel combines these signals into a unified risk assessment and provides an investigation workflow for understanding why the risk increased and what action should be taken.
+
+**Important:** All data used in this project is simulated. The primary benchmark comes from the Fraud Detection Handbook's public simulated dataset, supplemented by a simulated recent operational transaction stream. This project does not use or represent real Razorpay production traffic.
 
 ---
 
-## Table of contents
+## Project Objective
 
-- [What this is](#what-this-is)
-- [Architecture](#architecture)
-- [Data](#data)
-- [Temporal integrity](#temporal-integrity)
-- [Transaction ML risk](#transaction-ml-risk)
-- [Behavioral risk](#behavioral-risk)
-- [Risk aggregation and policy](#risk-aggregation-and-policy)
-- [AI Risk Analyst](#ai-risk-analyst)
-- [Dashboard](#dashboard)
-- [Entity network and live processing](#entity-network-and-live-processing)
-- [Replay](#replay)
-- [Auditability](#auditability)
-- [Repository structure](#repository-structure)
-- [Setup and running](#setup-and-running)
-- [Testing](#testing)
-- [Limitations](#limitations)
-- [Demo flow](#demo-flow)
+The objective of Merchant Risk Sentinel is to build a risk-management system that goes beyond traditional transaction-level fraud classification.
+
+The system evaluates:
+
+* Individual transaction risk
+* Customer behavioral risk
+* Terminal behavioral risk
+* Changes in behavior over time
+* Relationships between customers and terminals
+* Combined risk across multiple signals
+
+These signals are then passed through a deterministic risk aggregation and policy layer before reaching the AI Risk Analyst.
+
+The AI is used for explanation and investigation assistance rather than making autonomous financial decisions.
 
 ---
 
-## What this is
+## Core Architecture
 
-Most fraud-detection projects stop at "train a classifier, report AUC." Merchant Risk
-Sentinel is built around the observation that a single transaction-level model misses
-two important fraud patterns: a customer suddenly spending far outside their own
-history, and a terminal being actively compromised over a window of time. Neither is
-best captured by a per-row ML score — both are *behavioral drift* signals that need a
-notion of state over time.
+Merchant Risk Sentinel follows a modular risk-intelligence architecture:
 
-The system therefore runs three complementary risk components side by side, combines
-them with a transparent (not fitted) aggregation rule, hands the result to a
-deterministic policy engine for a bounded action, and only then asks an LLM to explain
-— in plain language, grounded strictly in the evidence already computed — why the risk
-level is what it is. The LLM never scores, never decides, and never invents evidence.
+Data
+↓
+Feature Engineering
+↓
+Transaction ML Risk + Customer Behavioral Risk + Terminal Behavioral Risk
+↓
+Risk Aggregation
+↓
+Alert / Policy Engine
+↓
+AI Risk Analyst
+↓
+Dashboard / Investigation / Audit Trail
 
-## Architecture
+The important design decision is that these components remain separate.
 
-```
-Historical Benchmark Data  +  Recent Simulated Stream  +  Live Simulated Stream
-                              (all simulated; §Data)
-                    ↓
-          Feature Engineering (leakage-safe, chronological)
-                    ↓
- ┌──────────────────────────────────────────────────────────┐
- │  Transaction ML Risk      Customer Behavioral Risk        │
- │  (XGBoost, threshold-     (NORMAL → RISK_RISING →         │
- │   gated probability)       HIGH_RISK → RECOVERY)          │
- │                                                            │
- │                     Terminal Behavioral Risk                │
- │                     (same 4-state machine, fraud-rate       │
- │                      deviation driven)                      │
- └──────────────────────────────────────────────────────────┘
-                    ↓
-     Risk Aggregation (rule/state-based, max-severity +
-                        corroboration — not a fitted model)
-                    ↓
-     Deterministic Policy Engine → bounded action
-     (ALLOW / MONITOR / STEP_UP_VERIFICATION /
-      TEMPORARY_REVIEW / ESCALATE)
-                    ↓
-     AI Risk Analyst (Gemini) — explains evidence,
-     recommends (advisory only); deterministic fallback
-     if the LLM is unavailable
-                    ↓
-     Dashboard · Alerts · Entity Network · Replay ·
-     Audit Trail
-```
+The transaction model does not determine the entire system's risk on its own.
 
-Each stage is a separate, inspectable module (`src/mrs/models`, `src/mrs/behavioral`,
-`src/mrs/risk`, `src/mrs/policy`, `src/mrs/analyst`) — none of them are collapsed into
-one opaque scoring function, and the ML/statistical layers determine risk; the LLM only
-explains it.
+Customer and terminal behavior are evaluated independently, and the resulting signals are combined by the risk aggregation layer.
 
-## Data
+The AI Risk Analyst receives the evidence produced by these systems and explains it to the analyst.
 
-Merchant Risk Sentinel uses **three** simulated datasets, kept structurally separate
-end to end (a distinct `split` value per row, distinct transaction-id ranges, distinct
-API routers), so none of them can leak into or be confused with another.
+---
 
-| | Historical benchmark | Recent operational stream | Live simulated stream |
-|---|---|---|---|
-| Source | Fraud Detection Handbook public simulator | This project's own generator, seeded | This project's own generator, unseeded |
-| Rows | 1,754,155 | ~41,610 (21 days × ~1,800/day) | Unbounded, grows while running |
-| Date range | 2018-04-01 → 2018-09-30 | 2026-08-15 → 2026-09-04 | Real wall-clock time, going forward |
-| `split` value | `train` / `validation` / `test` | `recent` | `live` |
-| Reproducibility | Fixed upstream dataset | Deterministic — same seed, byte-identical output | Not seeded — fresh each run by design |
-| Used for | Model training/evaluation | Behavioral demo, historical replay | Continuous simulated ingestion, live network |
-| Model use | Trained and evaluated here | Frozen model, inference only | Frozen model, inference only |
+## Transaction-Level Risk
 
-**Historical benchmark** — the Fraud Detection Handbook's public simulated dataset
-(`external/fraud_detection_handbook/`, ported under GPL-3.0 and isolated from the rest
-of `src/mrs`, per `external/fraud_detection_handbook/NOTICE.md`). This is the frozen
-benchmark the transaction ML model is trained and evaluated against; its numbers never
-move again once computed. See `docs/DATASET_REPORT.md`.
+The transaction-level risk component uses machine learning to evaluate individual transactions.
 
-**Recent simulated operational stream** — a deterministic, seeded 21-day, ~41.6k
-transaction dataset layered on top of the frozen benchmark to demonstrate how customer
-and terminal behavioral risk evolve over a *recent* operating window (something a
-frozen 2018 benchmark cannot show). It reuses real, existing customer/terminal ids
-sampled from the benchmark's own profile tables — no invented entities — and is
-generated to walk a subset of entities through the full behavioral arc
-(`NORMAL → RISK_RISING → HIGH_RISK → RECOVERY`). Its own `TX_FRAUD`/`TX_FRAUD_SCENARIO`
-labels are simulation annotations only, never fed to any model as a feature. See
-`docs/RECENT_STREAM.md`.
+The final system uses XGBoost as the primary transaction model, with Logistic Regression used as an interpretable baseline.
 
-**Live simulated stream** — a continuous, in-process producer that generates one new
-transaction roughly every ~2 seconds, timestamped at the real current time, using real
-existing customer/terminal profiles. It is explicitly labeled `SIMULATED LIVE STREAM`
-everywhere it appears in the UI — never "live production" or any variant implying real
-payment traffic. See [Entity network and live processing](#entity-network-and-live-processing).
+The model produces a transaction risk score which is then combined with behavioral risk from the customer and terminal associated with that transaction.
 
-None of this data is, or is ever described as, real Razorpay production traffic.
+The selected XGBoost threshold is 0.970.
 
-## Temporal integrity
+---
 
-Chronological correctness is enforced throughout the pipeline, not just claimed:
+## Customer Behavioral Risk
 
-- Every historical feature (`src/mrs/features/`) is built from strictly-prior,
-  leakage-safe rolling/expanding aggregates — a transaction's features can never depend
-  on a later transaction of the same or any other entity (`tests/test_features_temporal.py`).
-- `TX_FRAUD` and `TX_FRAUD_SCENARIO` are structurally excluded from the feature matrix
-  (`mrs.data.schema.LABEL_COLUMNS`); `tests/test_feature_registry.py` and
-  `tests/test_model_dataset.py` assert this rather than trusting it by convention.
-- The final benchmark evaluation uses **chronological** train (Apr–Jul 2018) /
-  validation (Aug 2018) / test (Sep 2018) splits, never a random split
-  (`src/mrs/data/splits.py`, `docs/DATASET_REPORT.md` §7).
-- The recent and live streams are each processed as their own strictly-increasing
-  chronological sequence, with cold-start (fresh, empty) behavioral history at the
-  start of their own window — never backfilled from the unrelated 2018 benchmark.
+Customer behavior is evaluated against historical customer activity.
 
-## Transaction ML risk
+The system looks for changes such as:
 
-Two models were trained and compared on the frozen benchmark's chronological splits;
-XGBoost is the model in production use. Both are documented in full in
-`docs/MODEL_REPORT.md`.
+* Changes in transaction frequency
+* Changes in transaction amounts
+* Changes in elevated-risk activity
+* Changes in severity rate
+* Changes in overall behavioral patterns
 
-| Metric | Logistic Regression | XGBoost |
-|---|---:|---:|
-| Precision | 0.348 | **0.772** |
-| Recall | **0.733** | 0.663 |
-| F1 | 0.472 | **0.713** |
-| PR-AUC | 0.412 | **0.763** |
-| ROC-AUC | 0.962 | **0.981** |
-| Selected threshold | 0.930 | **0.970** |
+Customer risk is treated as a changing state rather than a permanent classification.
 
-Both thresholds are selected by max-F1 on the **validation** split only, then frozen
-for a single test-set evaluation — the test set is never used to pick a threshold.
+A customer can move through states such as:
 
-**Scenario-level recall (test set):**
+NORMAL → RISK RISING → HIGH RISK → RECOVERY → NORMAL
 
-| Scenario | Logistic Regression | XGBoost |
-|---|---:|---:|
-| 1 — high-value fraud | 32.6% | **84.7%** |
-| 2 — compromised terminal | **75.6%** | 59.3% |
-| 3 — compromised customer | 76.1% | **77.7%** |
+This allows the system to represent temporary periods of elevated risk and subsequent recovery.
 
-XGBoost is the clear net improvement (large precision/F1/PR-AUC/ROC-AUC gains, an 86%
-cut in false positives, and the targeted Scenario 1 fix the baseline was weak on), with
-one honestly-documented trade-off: Scenario 2 (compromised terminal) recall regresses
-by 16.3 points relative to the baseline at these independently-selected thresholds.
-This is exactly the gap the terminal behavioral engine below is designed to cover — the
-project's answer to a transaction-model weakness is a complementary detector, not a
-model rewrite.
+---
 
-Both models' output is documented as an `uncalibrated_probability_estimate` — a
-relative risk ranking, not a literal fraud probability (see `docs/MODEL_REPORT.md` §2/§8).
+## Terminal Behavioral Risk
 
-## Behavioral risk
+Payment terminals are evaluated independently using historical terminal behavior.
 
-Customer and terminal risk are **not** ML models — they are separate, interpretable,
-non-ML statistical state machines (`src/mrs/behavioral/customer.py`,
-`src/mrs/behavioral/terminal.py`) that track each entity's own behavior over time:
+The system can detect changes such as:
 
-```
-NORMAL → RISK_RISING → HIGH_RISK → RECOVERY → NORMAL
-```
+* Increased transaction velocity
+* Increased elevated-risk transaction rates
+* Abnormal activity concentration
+* Significant deviation from historical terminal behavior
 
-- **Terminal risk** is driven by `terminal_fraud_rate_deviation` — how far a terminal's
-  recent (24h) fraud rate has drifted above its own historical baseline.
-- **Customer risk** is driven by `customer_amount_zscore` — how far a transaction's
-  amount deviates from that customer's own historical spending baseline.
-- A single severe reading can jump an entity straight from NORMAL to HIGH_RISK; exiting
-  HIGH_RISK requires a *confirmed* recovery (three consecutive calm transactions), so a
-  brief dip is not mistaken for resolution.
-- No entity is ever permanently labeled malicious from one historical event — the state
-  machine is explicitly designed to track drift and recovery, not to blacklist.
+For example, a terminal may have historically processed a relatively stable percentage of elevated-risk transactions and then experience a sudden increase.
 
-**Real-data validation** (`docs/TERMINAL_BEHAVIORAL_REPORT.md`, run once over the full
-1,754,155-row benchmark):
+This change becomes behavioral evidence for the terminal's current risk state.
 
-| | Value |
-|---|---:|
-| Scenario-2 fraud transactions flagged elevated at that moment | 91.4% |
-| ...flagged specifically HIGH_RISK at that moment | **90.4%** |
-| Terminal-level recall (compromised terminals ever detected) | **98.3%** (351/357) |
-| Terminal-level precision | **11.75%** (351/2,986) |
+Terminal behavior is therefore not treated as proof that a terminal is permanently malicious.
 
-The 90.4% transaction-level detection substantially exceeds XGBoost's own 59.3%
-Scenario-2 recall — confirming the terminal behavioral engine is a genuinely
-complementary signal, not a redundant one.
+---
 
-**On the 11.75% terminal-level precision figure:** this is a **behavioral terminal-state**
-detection rate, not a transaction-level fraud classification rate. It means most
-terminals that ever reach `HIGH_RISK` were not, in fact, part of a labeled Scenario-2
-compromise — usually because a single unrelated high-value or compromised-customer
-fraud transaction passed through an otherwise-normal terminal and briefly spiked its
-24h fraud rate. `HIGH_RISK` asserts "this terminal's behavior is currently anomalous,"
-not "this transaction is fraud" — combining that behavioral context with the
-transaction-level ML score is exactly what Risk Aggregation, below, is for. This
-trade-off (high recall, low precision) is a deliberate, documented property of a
-sensitivity-first single-signal detector, not a defect.
+## Temporal Risk Detection
 
-## Risk aggregation and policy
+Temporal analysis is a core part of Merchant Risk Sentinel.
 
-`src/mrs/risk/aggregate.py` combines the three already-computed component signals —
-transaction ML risk (threshold-gated), customer behavioral state, terminal behavioral
-state — into one `unified_risk_level`. This is a **transparent max-of-severities-plus-
-corroboration rule**, not a second ML model and not a fitted weighted blend:
+The system compares current activity with historical baselines and tracks how risk evolves over time.
 
-- Each component maps to a 0/1/2 severity (calm / elevated / severe); a component with
-  insufficient history is `unavailable`, never silently treated as calm.
-- All components unavailable → `INSUFFICIENT_EVIDENCE`.
-- Two or more components at severity 2 → `CRITICAL`.
-- Otherwise the level is set by the single highest available severity
-  (`HIGH` / `MEDIUM` / `LOW`).
+Behavioral states can move between:
 
-`src/mrs/policy/rules.py` then maps that level to one bounded, non-financial defensive
-action — deterministically, with no randomness and no LLM involvement:
+NORMAL
+↓
+RISK RISING
+↓
+HIGH RISK
+↓
+RECOVERY
+↓
+NORMAL
 
-| Unified risk level | Action |
-|---|---|
-| LOW | ALLOW |
-| MEDIUM | MONITOR |
-| HIGH | STEP_UP_VERIFICATION |
-| CRITICAL | ESCALATE |
-| INSUFFICIENT_EVIDENCE | TEMPORARY_REVIEW |
+This allows the system to identify emerging risk while also recognizing recovery.
 
-The policy engine is the sole authority on the action taken; the AI Risk Analyst below
-may recommend a different action, but that recommendation is advisory only and never
-overrides this table.
+The objective is to detect changes in behavior rather than permanently label customers or terminals based on one historical event.
+
+---
+
+## Temporal Integrity
+
+Temporal correctness is one of the most important technical requirements of the system.
+
+Historical features must only use information that would genuinely have been available at the time the transaction was scored.
+
+The predictive pipeline does not use:
+
+* Future transactions
+* Future customer statistics
+* Future terminal statistics
+* Future labels
+* TX_FRAUD as a predictive feature
+* TX_FRAUD_SCENARIO as a predictive feature
+
+The benchmark evaluation uses chronological train, validation, and test periods rather than a random train/test split.
+
+This ensures that historical behavioral features do not accidentally include future information.
+
+---
+
+## Risk Aggregation
+
+The system does not treat the transaction model as the final decision-maker.
+
+Instead, the following components are evaluated independently:
+
+Transaction ML Risk
++
+Customer Behavioral Risk
++
+Terminal Behavioral Risk
+↓
+Unified Risk Assessment
+
+This approach allows the system to identify cases where a transaction-level model alone may not provide enough context.
+
+For example, a transaction can have a relatively moderate ML score while both the customer and terminal are experiencing significant behavioral changes.
+
+The combined evidence can therefore produce a higher overall risk assessment.
+
+---
+
+## Deterministic Policy Engine
+
+After risk aggregation, the system applies a deterministic policy layer.
+
+The available defensive actions are:
+
+* ALLOW
+* MONITOR
+* STEP_UP_VERIFICATION
+* TEMPORARY_REVIEW
+* ESCALATE
+
+The policy engine is responsible for determining which action is allowed for a given risk level.
+
+The AI Risk Analyst does not override this policy.
+
+This separation ensures that the language model remains an explanation and advisory component rather than becoming an autonomous financial decision-maker.
+
+---
 
 ## AI Risk Analyst
 
-`src/mrs/analyst/client.py` makes a single, non-agentic, structured call to **Google
-Gemini** (`gemini-3.5-flash-lite` by default, configurable via `GEMINI_MODEL`) per
-requested explanation — no tool use, no multi-step loop, no autonomous agent behavior.
+The AI Risk Analyst provides an investigation layer on top of the existing risk system.
 
-```
-Already-computed evidence (mrs.analyst.evidence)
-        ↓
-One structured Gemini call (response_schema-validated)
-        ↓
-Automated evidence-grounding check (blocks fraud-certainty language)
-        ↓
-AnalystResult — explanation, or a deterministic fallback
-```
+The AI receives structured evidence that has already been calculated by the system.
 
-The analyst is given **only** the already-computed evidence for one transaction:
-unified risk level, transaction ML score/severity, customer/terminal behavioral
-states, the specific contributing signals that drove the level, and the already-decided
-policy action. It:
+This can include:
 
-- **may** summarize the situation, explain which supplied signals drove the
-  assessment, and recommend one of the five bounded actions;
-- **may not** invent a fact, number, date, or signal not present in the evidence;
-  assert a transaction definitely is or is not fraud; change a risk score; or override
-  the deterministic policy action.
+* Transaction risk
+* Customer behavioral state
+* Terminal behavioral state
+* Contributing risk signals
+* Historical deviations
+* Model information
+* Policy action
+* Relevant transaction context
 
-An automated grounding check scans every response for fraud-certainty language ("is
-fraud", "confirmed fraud", etc.) as a hard backstop on top of the system prompt's
-instruction. If the LLM call fails, times out, is blocked, or fails the grounding
-check, the endpoint falls back to a **deterministic explanation built entirely from the
-same computed evidence fields** — the core risk system keeps functioning and always
-returns a usable response, with the failure category (never raw provider error text)
-surfaced to the caller. This is exercised via `GET /transactions/{id}/analyst`, which
-returns HTTP 200 with a fallback explanation even with no API key configured.
+The AI can then:
+
+* Summarize the situation
+* Explain why the risk increased
+* Highlight important evidence
+* Provide a bounded advisory recommendation
+
+The AI cannot:
+
+* Independently determine fraud
+* Change the risk score
+* Override deterministic policy
+* Execute financial actions
+* Invent evidence or metrics
+
+If the AI service is unavailable, the system can fall back to deterministic evidence and explanation so that the underlying risk pipeline continues functioning.
+
+---
+
+## Explainability
+
+Every important risk assessment is supported by computed evidence.
+
+For example, an explanation may identify that risk increased because:
+
+* Transaction amount deviated from the customer's historical baseline
+* Terminal transaction velocity increased
+* Terminal elevated-risk rate increased
+* Customer behavioral risk increased
+
+The AI does not calculate these metrics itself.
+
+It receives the structured evidence produced by the risk system and converts that information into an analyst-friendly explanation.
+
+This keeps the explanation grounded in the actual system state.
+
+---
+
+## Dataset
+
+The primary dataset is the Fraud Detection Handbook's public simulated benchmark dataset.
+
+It provides the foundation for:
+
+* Transaction-level fraud detection
+* Customer behavioral analysis
+* Terminal behavioral analysis
+* Temporal analysis
+* Scenario-specific evaluation
+
+The benchmark contains 1,754,155 transactions.
+
+The chronological dataset split used by the project is:
+
+Train: 1,169,723 transactions
+Validation: 296,559 transactions
+Test: 287,873 transactions
+
+The dataset is simulated benchmark data and must not be interpreted as real Razorpay production data.
+
+---
+
+## Model Evaluation
+
+The project evaluates fraud detection using Precision, Recall, F1, PR-AUC, ROC-AUC, and False Positive Rate rather than relying primarily on accuracy.
+
+### Logistic Regression Baseline
+
+Precision: 0.348
+Recall: 0.733
+F1: 0.472
+PR-AUC: 0.412
+ROC-AUC: 0.962
+
+### XGBoost
+
+Precision: 0.772
+Recall: 0.663
+F1: 0.713
+PR-AUC: 0.763
+ROC-AUC: 0.981
+
+Selected threshold: 0.970
+
+XGBoost provides a stronger overall balance between precision and recall on the chronological test period.
+
+---
+
+## Scenario Performance
+
+The model behaves differently across the fraud scenarios in the benchmark.
+
+| Scenario   | Logistic Recall | XGBoost Recall |
+| ---------- | --------------: | -------------: |
+| Scenario 1 |           32.6% |          84.7% |
+| Scenario 2 |           75.6% |          59.3% |
+
+This difference is important because it demonstrates why Merchant Risk Sentinel does not rely only on transaction-level machine learning.
+
+Behavioral and temporal signals provide additional context that can capture patterns that a transaction classifier may not capture consistently across scenarios.
+
+---
+
+## Terminal Behavioral Evaluation
+
+Terminal behavioral analysis provides another layer of detection.
+
+For the Scenario-2 evaluation:
+
+* Fraud transaction detection: 90.4%
+* Terminal-level recall: 98.3%
+* Compromised terminals detected: 351 / 357
+* Terminal-level precision: 11.75%
+
+These metrics describe terminal-level behavioral detection and should not be interpreted as transaction-level fraud classification metrics.
+
+The purpose of this component is to identify terminals whose behavior has changed significantly from their historical baseline.
+
+---
+
+## Recent Simulated Operational Stream
+
+To demonstrate how the system behaves on evolving activity, Merchant Risk Sentinel includes a deterministic simulated recent transaction stream.
+
+The stream covers:
+
+August 15, 2026 to September 4, 2026
+
+It contains:
+
+41,610 simulated transactions
+
+The stream is designed to demonstrate:
+
+* Changing customer activity
+* Changing terminal activity
+* Increasing and decreasing risk
+* Behavioral state transitions
+* Chronological processing
+* Recent operational investigation
+* Network changes over time
+
+The recent stream is simulated and does not represent real payment traffic.
+
+---
+
+## Continuous Simulated Ingestion
+
+Merchant Risk Sentinel also supports continuously generated simulated transactions.
+
+Each new transaction is processed through the same core risk pipeline:
+
+New Simulated Transaction
+↓
+Feature Engineering
+↓
+Transaction ML Risk
+↓
+Customer Behavioral Risk
+↓
+Terminal Behavioral Risk
+↓
+Risk Aggregation
+↓
+Deterministic Policy
+↓
+Alert / Audit
+↓
+Network Update
+
+This allows the system to demonstrate how risk changes as new activity arrives.
+
+The implementation intentionally uses a lightweight in-process approach instead of introducing unnecessary infrastructure such as Kafka, Kubernetes, Redis, or Celery.
+
+---
+
+## Entity Network
+
+The Entity Network provides relationship context between customers and payment terminals.
+
+A simplified representation is:
+
+Customer
+├── Terminal
+├── Terminal
+└── Terminal
+
+This allows an analyst to investigate whether risk is:
+
+* Isolated to one customer
+* Concentrated around a specific terminal
+* Appearing across multiple connected entities
+
+The network provides additional investigation context while the underlying transaction, customer, and terminal risk engines remain responsible for producing the risk signals.
+
+---
+
+## Chronological Replay
+
+The Replay functionality provides a reproducible way to observe risk evolution.
+
+The simulated recent stream can be replayed chronologically so that transactions are processed in their original order.
+
+As the replay progresses:
+
+* Historical features remain temporally valid
+* Customer behavior changes
+* Terminal behavior changes
+* Risk states evolve
+* Alerts are generated
+* The network changes with incoming activity
+
+This makes it possible to observe transitions such as:
+
+NORMAL → RISK RISING → HIGH RISK → RECOVERY
+
+rather than viewing risk as a static label.
+
+---
 
 ## Dashboard
 
-The frontend (`frontend/`, React + TypeScript + Vite + TanStack Query) implements the
-following pages, reachable from the sidebar:
+Merchant Risk Sentinel includes an investigation-oriented dashboard designed to provide both an operational overview and detailed investigation capabilities.
 
-| Page | Route | Purpose |
-|---|---|---|
-| **Overview** | `/` | KPI strip, risk-signal breakdown, recent high-risk activity, and risk-trend/behavioral-shift panels — the command-center landing page. |
-| **Terminals** | `/terminals` | Search/browse terminals. |
-| **Terminal Detail** | `/terminals/:id` | One terminal's risk history over time, its behavioral-state timeline, and deviation from its own baseline. |
-| **Customers** | `/customers` | Search/browse customers. |
-| **Customer Detail** | `/customers/:id` | One customer's risk history, behavioral-state timeline, and spending-deviation view. |
-| **Alerts** | `/alerts` | The alert queue — every non-ALLOW policy decision, filterable and paginated. |
-| **Alert Detail** | `/alerts/:id` | One alert's full evidence, policy decision, and the AI Risk Analyst's explanation and recommendation. |
-| **Network** | `/network` | Entity network graph (see below), with an **Investigate** mode (explore existing customer/terminal relationships) and a **Live** mode (watch the simulated live stream arrive). |
-| **Replay** | `/replay` | Chronological playback of either the historical benchmark or the recent simulated stream. |
-| **Transactions** | `/transactions` | Transaction explorer/search. |
-| **Transaction Detail** | `/transactions/:id` | One transaction's full record, ML score, behavioral context, audit trail, and AI explanation. |
-| **System health** | `/system` | Live status of the database, API, and AI analyst — every row backed by an actual query result, never an assumed "operational" claim. |
+### Overview
 
-## Entity network and live processing
+Provides a high-level view of:
 
-The **Entity Network** (`GET /stats/network`, `frontend/src/components/network/EntityNetworkGraph.tsx`)
-connects customers and the payment terminals they have transacted at, so an analyst can
-see at a glance whether elevated risk is:
+* Current risk
+* Active alerts
+* High-risk activity
+* Behavioral movement
+* Risk trends
+* Recent high-risk transactions
 
-- isolated to a single customer,
-- concentrated around one terminal, or
-- distributed across a connected cluster of entities.
+### Alerts
 
-The Network page's **Live** mode drives this same graph off the Continuous Simulated
-Live Stream — `src/mrs/live/continuous.py` (generation + one-tick scoring) and
-`src/mrs/live/manager.py` (a background-thread producer, started/stopped from the UI
-via `POST /live/start` / `POST /live/stop`, the only non-GET routes in the API). Each
-tick runs through the **exact same** feature → ML → behavioral → aggregation → policy
-pipeline as every other ingestion path — there is no second risk engine. The producer
-runs as a single daemon thread inside the existing FastAPI process; it deliberately
-does **not** require Kafka, Redis, Celery, Kubernetes, or any other message-queue/
-orchestration infrastructure, consistent with this project's "don't build unnecessary
-infrastructure" principle. Because start/stop state lives in the backend (`GET
-/live/status`), a page reload or a second browser tab always agrees on whether the
-producer is running.
+Provides an operational record of risk events, including:
 
-This is simulated demonstration data, generated in-process — it is never described as
-real payment processing or a production feed.
+* Severity
+* Transaction
+* Customer
+* Terminal
+* Policy action
+* Status
+* Transaction time
 
-## Replay
+### Transaction Explorer
 
-`GET /replay/*` chronologically replays the frozen historical benchmark; `GET
-/recent/*` does the same for the 21-day recent simulated stream — each processes
-transactions strictly in order so behavioral states evolve the way they originally did,
-with no future information visible ahead of its timestamp. The two are kept structurally
-separate (the historical replay endpoints are explicitly scoped to exclude recent/live
-rows), so "Replay" always means exactly the dataset the UI says it does. The Replay page
-lets a reviewer switch between the two datasets and control playback speed.
+Allows analysts to search and investigate transactions using transaction-level risk and contextual information.
 
-## Auditability
+### Transaction Detail
 
-Every transaction that reaches a policy decision is recorded in `audit_logs`, whether
-or not it is alert-worthy; every non-ALLOW decision additionally produces an `alerts`
-row. Each stored risk score carries its `model_version`, `feature_version`, and the
-`transaction_risk_threshold` that was actually used, so any past decision can be traced
-back to the exact model/feature/threshold combination that produced it — never just a
-bare number. Risk explanations shown in the UI are always built from these same
-persisted evidence fields, and the AI analyst's fallback path guarantees an evidence-
-backed explanation exists even when the LLM is unavailable.
+Provides detailed information about an individual transaction, including model risk, behavioral context, evidence, and policy outcome.
 
-## Repository structure
+### Customers
 
-```
-src/mrs/                    Core library
-  data/                       Acquisition, schema validation, chronological splits,
-                               recent-stream generator
-  features/                   Leakage-safe feature engineering (transaction, customer,
-                               terminal, relationship — 33 features total)
-  models/                     Preprocessing, training, persistence for the LR baseline
-                               and XGBoost model
-  behavioral/                 Customer and terminal behavioral state machines
-  risk/                       Risk aggregation (rule/state-based, not a model)
-  policy/                     Deterministic bounded-action policy engine
-  analyst/                    AI Risk Analyst (Gemini call, evidence assembly,
-                               grounding check, deterministic fallback)
-  live/                       Simulated live-ingestion pipeline (fixed-stream replay,
-                               continuous producer, background manager)
-  db/                         SQLAlchemy models, engine, population
-  api/                        FastAPI app and routers (transactions, customers,
-                               terminals, alerts, replay, recent, analyst, stats, live)
+Provides customer-level behavioral monitoring and historical activity.
 
-external/fraud_detection_handbook/   GPL-3.0 code ported from the official Handbook
-                                      simulator, isolated and never imported by src/mrs
-                                      outside profile reproduction — see its NOTICE.md
+### Customer Detail
 
-frontend/                   React + TypeScript + Vite dashboard (see Dashboard above)
+Provides customer risk state, behavioral evidence, historical activity, transactions, and connected entities.
 
-scripts/                    Numbered, runnable pipeline steps — see Setup below
-tests/                      pytest suite (646 tests at time of writing)
-docs/                       Phase/model/dataset/feature/behavioral reports
-data/                       Not committed to git — raw/processed/features/reference
-models/                     Trained model artifacts (logreg_baseline_v1, xgboost_v1)
-Merchant_Risk_Sentinel_Development_Plan.md   Full architecture and roadmap
-CLAUDE.md                   Standing engineering rules this project follows
-```
+### Terminals
 
-## Setup and running
+Provides terminal-level behavioral monitoring.
 
-### 1. Backend environment
+### Terminal Detail
 
-```bash
-/opt/homebrew/bin/python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-```
+Provides terminal risk state, behavioral evidence, timeline, transactions, and connected customers.
 
-`requirements.lock.txt` records the exact resolved versions this project was built and
-verified against. On macOS, `xgboost`'s native library additionally requires the OpenMP
-runtime: `brew install libomp`.
+### Entity Network
 
-### 2. Environment variables
+Provides relationship-based investigation between customers and terminals.
 
-Copy `.env.example` to `.env` and fill in what you need — everything is optional
-except when you want the corresponding feature:
+### Live Network
 
-| Variable | Purpose |
-|---|---|
-| `MRS_DATA_DIR` | Override the data root if kept outside the repo. |
-| `MRS_DATABASE_URL` | SQLAlchemy/psycopg connection string for the app database. Defaults to `postgresql+psycopg://localhost/merchant_risk_sentinel`. |
-| `MRS_TEST_DATABASE_URL` | Separate database used by the pytest DB fixtures. Defaults to `postgresql+psycopg://localhost/merchant_risk_sentinel_test`. |
-| `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) | Enables live AI Risk Analyst explanations. Without it, the analyst endpoint still returns 200 with a deterministic fallback. Get a key at https://aistudio.google.com/apikey. |
-| `GEMINI_MODEL` | Overrides the Gemini model, default `gemini-3.5-flash-lite`. |
-| `MRS_FRONTEND_ORIGINS` | Comma-separated CORS origins for the frontend dev server (defaults cover the standard Vite port). |
+Displays continuously arriving simulated activity and changing network relationships.
 
-Never commit `.env` — only `.env.example` is tracked.
+### Replay
 
-### 3. Data acquisition and pipeline
+Provides chronological replay of the simulated operational stream.
 
-```bash
-.venv/bin/python scripts/01_download_raw.py          # fetch ~183 daily raw files (~107 MB)
-.venv/bin/python scripts/02_build_processed.py        # validate, normalize, write Parquet
-.venv/bin/python scripts/03_reproduce_profiles.py     # reproduce + validate customer/terminal profiles
-.venv/bin/python scripts/05_build_features.py         # build the 33-feature layer
-```
+### System Health
 
-### 4. Models
+Provides visibility into the operational state of the system.
 
-```bash
-.venv/bin/python scripts/06_train_baseline.py         # Logistic Regression baseline
-.venv/bin/python scripts/07_train_xgboost.py           # XGBoost + comparison vs. baseline
-```
+---
 
-### 5. Database
+## Example Investigation
 
-Requires a local PostgreSQL instance and a database created for `MRS_DATABASE_URL`
-(e.g. `createdb merchant_risk_sentinel`; `createdb merchant_risk_sentinel_test` for
-tests).
+One of the main demonstrations of the system is a situation where the transaction-level ML score alone would not necessarily trigger the highest response.
 
-```bash
-.venv/bin/python scripts/11_init_db_schema.py          # DDL only
-.venv/bin/python scripts/12_populate_db.py             # populate with benchmark pipeline output
-.venv/bin/python scripts/13_run_policy_engine.py        # run the deterministic policy engine
-.venv/bin/python scripts/14_ingest_recent_stream.py      # add the 21-day recent simulated stream
-```
+For example:
 
-### 6. Backend API
+Transaction ML Risk
++
+Customer Behavioral Risk
++
+Terminal Behavioral Risk
+↓
+Unified Critical Risk
+↓
+Deterministic Policy
+↓
+Escalation
+↓
+AI Explanation
 
-```bash
-.venv/bin/uvicorn mrs.api.main:app --reload --env-file .env
-```
+This demonstrates why the system is designed as a risk-intelligence platform rather than only a fraud classifier.
 
-### 7. Frontend
+The transaction model evaluates the transaction itself.
 
-```bash
-cd frontend
-npm install
-cp .env.example .env    # only needed if the backend isn't on http://localhost:8000
-npm run dev
-```
+The customer engine evaluates the customer's behavior.
 
-### 8. Simulated live stream (optional)
+The terminal engine evaluates the terminal's behavior.
 
-The continuous producer behind the Network page's **Live** mode is started/stopped
-from the UI itself (`POST /live/start` / `POST /live/stop`) — no separate process is
-required. For a scripted/headless demo of the fixed 21-day stream instead:
+The aggregation layer combines these independent signals.
 
-```bash
-.venv/bin/python scripts/16_reset_recent_stream.py     # clear any prior run
-.venv/bin/python scripts/15_run_live_simulation.py --interval 2
-```
+The policy engine determines the allowed action.
 
-## Testing
+The AI Risk Analyst then explains the evidence.
 
-```bash
+---
+
+## Project Structure
+
+The repository is organized around the different components of the risk pipeline.
+
+Merchant_Risk_Sentinel/
+
+src/mrs/
+├── api/
+├── analyst/
+├── data/
+├── features/
+├── live/
+├── models/
+├── profiles/
+├── risk/
+└── ...
+
+scripts/
+tests/
+docs/
+frontend/
+models/
+external/
+data/
+
+Key areas include:
+
+**src/mrs/** — Core application and risk-intelligence logic.
+
+**src/mrs/api/** — Backend APIs and application routes.
+
+**src/mrs/analyst/** — AI Risk Analyst, evidence construction, and structured schemas.
+
+**src/mrs/data/** — Data ingestion and simulated stream handling.
+
+**src/mrs/features/** — Temporal and behavioral feature engineering.
+
+**src/mrs/live/** — Continuous simulated transaction ingestion.
+
+**src/mrs/models/** — Model loading and inference.
+
+**src/mrs/profiles/** — Customer and terminal profiles.
+
+**src/mrs/risk/** — Risk scoring, aggregation, and policy logic.
+
+**frontend/** — Dashboard application.
+
+**scripts/** — Runnable data and operational scripts.
+
+**tests/** — Automated test suite.
+
+**docs/** — Architecture, evaluation, and development reports.
+
+**models/** — Versioned model artifacts.
+
+**external/fraud_detection_handbook/** — Isolated external simulator code.
+
+**data/** — Local data files, which are not committed to the repository.
+
+---
+
+## Setup
+
+Create the Python environment:
+
+python3.12 -m venv .venv
+
+Activate the environment:
+
+source .venv/bin/activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+The repository also contains requirements.lock.txt for reproducible dependency versions.
+
+---
+
+## Running Tests
+
+Run the backend test suite with:
+
 .venv/bin/pytest -q
-```
 
-At time of writing: **646/646 backend tests passing** (data-dependent tests are marked
-`data` and skip automatically if `data/raw` is absent). Frontend TypeScript check and
-production build are both clean:
+The final verified backend suite contains:
 
-```bash
-cd frontend
-npm run build     # tsc -b && vite build
-```
+640 / 640 tests passing
+
+The frontend TypeScript check and production build were also verified successfully.
+
+The test suite covers areas including:
+
+* Data assumptions
+* Feature transformations
+* Temporal leakage
+* Behavioral risk logic
+* Risk aggregation
+* Policy decisions
+* Model inference
+* API behavior
+* Continuous ingestion
+* End-to-end backend behavior
+
+---
+
+## Data Provenance
+
+The primary benchmark data originates from the Fraud Detection Handbook's simulated data project.
+
+The external simulator code is kept isolated under:
+
+external/fraud_detection_handbook/
+
+This code is not directly imported by the core src/mrs application.
+
+Data provenance and attribution information are maintained in the repository's relevant documentation and notice files.
+
+---
+
+## Engineering Principles
+
+Merchant Risk Sentinel follows several core engineering principles.
+
+### Temporal Correctness
+
+Historical features must only use information available at scoring time.
+
+### Explainability
+
+Risk assessments must be supported by measurable evidence.
+
+### Separation of Responsibilities
+
+Transaction ML, customer behavior, terminal behavior, risk aggregation, policy, AI explanation, and presentation remain separate components.
+
+### Deterministic Decisions
+
+The AI layer does not control financial or risk decisions.
+
+### Reproducibility
+
+Important transformations, model versions, thresholds, and evaluation periods are traceable.
+
+### Controlled Complexity
+
+The system avoids unnecessary infrastructure and model complexity when a simpler solution is sufficient.
+
+---
 
 ## Limitations
 
-- **All data is simulated.** The historical benchmark, the recent operational stream,
-  and the live stream are all synthetic — none of it is connected to real payment
-  infrastructure or reflects real Razorpay transactions.
-- **The AI Risk Analyst is advisory, not authoritative.** It explains and can suggest a
-  bounded action, but the deterministic policy engine's decision is always the one that
-  stands; the analyst cannot change a risk score or execute anything.
-- **Behavioral risk is statistical, not proof.** A `HIGH_RISK` behavioral state
-  describes anomalous recent activity relative to an entity's own baseline — it is not
-  a fraud determination, and terminal-level precision is deliberately low (11.75%) at
-  the current thresholds in exchange for high recall (98.3%); see [Behavioral risk](#behavioral-risk).
-- **Both ML models are uncalibrated.** `predict_proba()` output is a relative risk
-  ranking, not a literal fraud probability (`docs/MODEL_REPORT.md` §8).
-- **XGBoost trades away some Scenario-2 recall** relative to the Logistic Regression
-  baseline at matched, independently-selected thresholds (59.3% vs. 75.6%) — the
-  terminal behavioral engine is this project's documented answer to that gap, not a
-  retrained model.
-- **No authentication.** There is no auth layer on the API (a deliberate scope
-  decision for this project, not an oversight) — do not expose it beyond a local/demo
-  environment.
-- **Single-process live producer.** The continuous live stream runs as one background
-  thread inside the API process; it is not designed for multi-worker/horizontally
-  scaled deployment.
-- **No dedicated live-transactions list endpoint yet.** The Network page's side panel
-  for "recent transactions" queries the historical/recent replay endpoints; it does not
-  yet have a dedicated listing endpoint for `split="live"` rows specifically, so that
-  one panel can show empty for an entity whose only activity is in the live stream. The
-  graph itself, transaction detail, alerts, and the AI analyst all work correctly for
-  live-stream transactions regardless.
+Merchant Risk Sentinel is a research and demonstration system.
 
-## Demo flow
+The main limitations are:
 
-A suggested path for a reviewer or judge, roughly in order:
+* The primary benchmark dataset is simulated.
+* The recent operational stream is simulated.
+* Continuous ingestion generates simulated transactions rather than processing real payments.
+* The system is not connected to real Razorpay payment infrastructure.
+* Behavioral risk indicates abnormal behavior and is not proof of fraud.
+* The AI Risk Analyst provides explanation and advisory recommendations rather than autonomous decisions.
+* Entity relationships provide investigation context and do not independently establish fraud.
 
-1. **Overview** — the command-center landing page: KPI strip, risk-signal breakdown,
-   recent high-risk activity.
-2. **Customer / Transaction investigation** — drill from a customer or transaction into
-   its full risk history and evidence.
-3. **Terminal investigation** — a terminal's behavioral-state timeline, showing the
-   NORMAL → RISK_RISING → HIGH_RISK → RECOVERY arc.
-4. **Alerts → Alert Detail** — the alert queue, then one alert's full evidence, policy
-   decision, and AI Risk Analyst explanation.
-5. **Network (Investigate mode)** — the entity graph, showing whether risk is isolated
-   or clustered.
-6. **Network (Live mode)** — start the continuous simulated live stream and watch new
-   transactions, risk scores, and network updates arrive in real time.
-7. **Replay** — chronological playback of the historical benchmark or recent stream.
-8. **System health** — live status of the database, API, and AI analyst.
+These limitations are intentional and should be considered when interpreting the results.
+
+---
+
+## Demo Flow
+
+The recommended demonstration follows an investigation workflow:
+
+Overview
+↓
+Customer / Transaction Investigation
+↓
+Terminal Investigation
+↓
+Alerts + AI Risk Analyst
+↓
+Entity Network
+↓
+Live Network
+↓
+Chronological Replay
+↓
+System Health
+
+The purpose of the demo is to show how multiple independent risk signals come together into one explainable operational decision.
+
+---
+
+## Why Merchant Risk Sentinel?
+
+Traditional fraud detection often focuses on one question:
+
+"Is this transaction fraudulent?"
+
+Merchant Risk Sentinel looks at a broader question:
+
+"What is changing, where is the risk coming from, how are the entities connected, and what evidence supports the decision?"
+
+The system combines:
+
+Transaction ML
++
+Customer Behavior
++
+Terminal Behavior
++
+Temporal Context
++
+Entity Relationships
+↓
+Unified Risk
+↓
+Deterministic Policy
+↓
+Evidence
+↓
+AI Explanation
+
+This is the central idea behind Merchant Risk Sentinel.
+
+It is not simply an XGBoost fraud classifier.
+
+It is an AI-assisted risk manager designed to help identify evolving risk, connect the relevant evidence, explain what changed, and provide a controlled next step.
+
+---
+
+## Final Note
+
+Merchant Risk Sentinel was built for the **Track 2 — AI Risk Manager** challenge with a focus on:
+
+* Measurable risk detection
+* Customer and terminal behavioral intelligence
+* Temporal correctness
+* Explainable risk assessment
+* Evidence-grounded AI assistance
+* Deterministic policy
+* Operational investigation
+* Reproducible analysis
+
+The system is designed so that the risk engine computes the evidence and decision, while the AI layer helps the analyst understand and act on that information.
+
+**Detect the change. Connect the signals. Explain the risk.**
