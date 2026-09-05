@@ -35,19 +35,21 @@ The AI is used for explanation and investigation assistance rather than making a
 
 Merchant Risk Sentinel follows a modular risk-intelligence architecture:
 
+```
 Data
-↓
+        ↓
 Feature Engineering
-↓
+        ↓
 Transaction ML Risk + Customer Behavioral Risk + Terminal Behavioral Risk
-↓
+        ↓
 Risk Aggregation
-↓
+        ↓
 Alert / Policy Engine
-↓
+        ↓
 AI Risk Analyst
-↓
+        ↓
 Dashboard / Investigation / Audit Trail
+```
 
 The important design decision is that these components remain separate.
 
@@ -120,15 +122,17 @@ The system compares current activity with historical baselines and tracks how ri
 
 Behavioral states can move between:
 
+```
 NORMAL
-↓
+        ↓
 RISK RISING
-↓
+        ↓
 HIGH RISK
-↓
+        ↓
 RECOVERY
-↓
+        ↓
 NORMAL
+```
 
 This allows the system to identify emerging risk while also recognizing recovery.
 
@@ -163,13 +167,15 @@ The system does not treat the transaction model as the final decision-maker.
 
 Instead, the following components are evaluated independently:
 
+```
 Transaction ML Risk
-+
+        +
 Customer Behavioral Risk
-+
+        +
 Terminal Behavioral Risk
-↓
+        ↓
 Unified Risk Assessment
+```
 
 This approach allows the system to identify cases where a transaction-level model alone may not provide enough context.
 
@@ -270,9 +276,9 @@ The benchmark contains 1,754,155 transactions.
 
 The chronological dataset split used by the project is:
 
-Train: 1,169,723 transactions
-Validation: 296,559 transactions
-Test: 287,873 transactions
+* Train: 1,169,723 transactions
+* Validation: 296,559 transactions
+* Test: 287,873 transactions
 
 The dataset is simulated benchmark data and must not be interpreted as real Razorpay production data.
 
@@ -284,19 +290,19 @@ The project evaluates fraud detection using Precision, Recall, F1, PR-AUC, ROC-A
 
 ### Logistic Regression Baseline
 
-Precision: 0.348
-Recall: 0.733
-F1: 0.472
-PR-AUC: 0.412
-ROC-AUC: 0.962
+* Precision: 0.348
+* Recall: 0.733
+* F1: 0.472
+* PR-AUC: 0.412
+* ROC-AUC: 0.962
 
 ### XGBoost
 
-Precision: 0.772
-Recall: 0.663
-F1: 0.713
-PR-AUC: 0.763
-ROC-AUC: 0.981
+* Precision: 0.772
+* Recall: 0.663
+* F1: 0.713
+* PR-AUC: 0.763
+* ROC-AUC: 0.981
 
 Selected threshold: 0.970
 
@@ -368,23 +374,25 @@ Merchant Risk Sentinel also supports continuously generated simulated transactio
 
 Each new transaction is processed through the same core risk pipeline:
 
+```
 New Simulated Transaction
-↓
+        ↓
 Feature Engineering
-↓
+        ↓
 Transaction ML Risk
-↓
+        ↓
 Customer Behavioral Risk
-↓
+        ↓
 Terminal Behavioral Risk
-↓
+        ↓
 Risk Aggregation
-↓
+        ↓
 Deterministic Policy
-↓
+        ↓
 Alert / Audit
-↓
+        ↓
 Network Update
+```
 
 This allows the system to demonstrate how risk changes as new activity arrives.
 
@@ -398,10 +406,12 @@ The Entity Network provides relationship context between customers and payment t
 
 A simplified representation is:
 
+```
 Customer
 ├── Terminal
 ├── Terminal
 └── Terminal
+```
 
 This allows an analyst to investigate whether risk is:
 
@@ -511,19 +521,21 @@ One of the main demonstrations of the system is a situation where the transactio
 
 For example:
 
+```
 Transaction ML Risk
-+
+        +
 Customer Behavioral Risk
-+
+        +
 Terminal Behavioral Risk
-↓
+        ↓
 Unified Critical Risk
-↓
+        ↓
 Deterministic Policy
-↓
+        ↓
 Escalation
-↓
+        ↓
 AI Explanation
+```
 
 This demonstrates why the system is designed as a risk-intelligence platform rather than only a fraud classifier.
 
@@ -545,26 +557,25 @@ The AI Risk Analyst then explains the evidence.
 
 The repository is organized around the different components of the risk pipeline.
 
+```
 Merchant_Risk_Sentinel/
-
-src/mrs/
-├── api/
-├── analyst/
-├── data/
-├── features/
-├── live/
+├── src/mrs/
+│   ├── api/
+│   ├── analyst/
+│   ├── data/
+│   ├── features/
+│   ├── live/
+│   ├── models/
+│   ├── profiles/
+│   └── risk/
+├── scripts/
+├── tests/
+├── docs/
+├── frontend/
 ├── models/
-├── profiles/
-├── risk/
-└── ...
-
-scripts/
-tests/
-docs/
-frontend/
-models/
-external/
-data/
+├── external/
+└── data/
+```
 
 Key areas include:
 
@@ -606,17 +617,23 @@ Key areas include:
 
 Create the Python environment:
 
+```bash
 python3.12 -m venv .venv
+```
 
 Activate the environment:
 
+```bash
 source .venv/bin/activate
+```
 
 Install dependencies:
 
+```bash
 pip install -r requirements.txt
+```
 
-The repository also contains requirements.lock.txt for reproducible dependency versions.
+The repository also contains `requirements.lock.txt` for reproducible dependency versions.
 
 ---
 
@@ -624,11 +641,13 @@ The repository also contains requirements.lock.txt for reproducible dependency v
 
 Run the backend test suite with:
 
+```bash
 .venv/bin/pytest -q
+```
 
 The final verified backend suite contains:
 
-640 / 640 tests passing
+**646 / 646 tests passing**
 
 The frontend TypeScript check and production build were also verified successfully.
 
@@ -653,9 +672,9 @@ The primary benchmark data originates from the Fraud Detection Handbook's simula
 
 The external simulator code is kept isolated under:
 
-external/fraud_detection_handbook/
+`external/fraud_detection_handbook/`
 
-This code is not directly imported by the core src/mrs application.
+This code is not directly imported by the core `src/mrs` application.
 
 Data provenance and attribution information are maintained in the repository's relevant documentation and notice files.
 
@@ -713,21 +732,23 @@ These limitations are intentional and should be considered when interpreting the
 
 The recommended demonstration follows an investigation workflow:
 
+```
 Overview
-↓
+        ↓
 Customer / Transaction Investigation
-↓
+        ↓
 Terminal Investigation
-↓
+        ↓
 Alerts + AI Risk Analyst
-↓
+        ↓
 Entity Network
-↓
+        ↓
 Live Network
-↓
+        ↓
 Chronological Replay
-↓
+        ↓
 System Health
+```
 
 The purpose of the demo is to show how multiple independent risk signals come together into one explainable operational decision.
 
@@ -745,23 +766,25 @@ Merchant Risk Sentinel looks at a broader question:
 
 The system combines:
 
+```
 Transaction ML
-+
+        +
 Customer Behavior
-+
+        +
 Terminal Behavior
-+
+        +
 Temporal Context
-+
+        +
 Entity Relationships
-↓
+        ↓
 Unified Risk
-↓
+        ↓
 Deterministic Policy
-↓
+        ↓
 Evidence
-↓
+        ↓
 AI Explanation
+```
 
 This is the central idea behind Merchant Risk Sentinel.
 
