@@ -9,35 +9,90 @@ import { ActionBadge } from "../components/risk/ActionBadge";
 
 const PAGE_SIZE = 50;
 
+type Source = "benchmark" | "recent";
+
+const DATASET_CONTEXT: Record<Source, string> = {
+  benchmark: "HISTORICAL DATASET · APR–SEP 2018",
+  recent: "SIMULATED RECENT OPERATIONAL STREAM · AUG–SEP 2026",
+};
+
+/** ISO instant -> the local-time value a <input type="datetime-local"> accepts
+ * ("YYYY-MM-DDTHH:mm"), truncated to minutes (that input has no seconds field). */
+function toDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 /**
- * Browses the same chronological stream Replay plays back (GET /replay/transactions)
- * -- there is no separate "list transactions" endpoint, and Dev Plan Sec 22's replay
- * module is explicit that it already serves the full historical stream, so this page
- * reuses it rather than duplicating pagination logic. Replay owns pacing/playback;
- * this page is the static investigation table over the same data.
+ * Browses the same chronological streams Replay plays back (GET /replay/transactions
+ * for the frozen benchmark, GET /recent/transactions for the Simulated Recent
+ * Operational Stream -- see mrs.data.recent_stream) -- there is no separate "list
+ * transactions" endpoint for either, and both routers already serve their own full
+ * stream, so this page reuses them rather than duplicating pagination logic. Replay
+ * owns pacing/playback; this page is the static investigation table over the same
+ * data, with an explicit source toggle (mirroring Replay.tsx's) so the two datasets
+ * are never silently conflated and the recent stream isn't a hidden/undiscoverable URL.
  */
 export function TransactionsExplorer() {
+  const [source, setSource] = useState<Source>("benchmark");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [rangeError, setRangeError] = useState<string | null>(null);
   const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
   const navigate = useNavigate();
 
   const cursor = cursorStack[cursorStack.length - 1];
 
+  const bounds = useQuery({
+    queryKey: ["explorer-bounds", source],
+    queryFn: () => (source === "benchmark" ? api.replayBounds() : api.recentBounds()),
+    retry: false,
+  });
+
   const page = useQuery({
-    queryKey: ["explorer", { start, end, cursor }],
-    queryFn: () =>
-      api.replayTransactions({
+    queryKey: ["explorer", source, { start, end, cursor }],
+    queryFn: () => {
+      const fetchPage = source === "benchmark" ? api.replayTransactions : api.recentTransactions;
+      return fetchPage({
         after_cursor: cursor,
         start: start ? new Date(start).toISOString() : undefined,
         end: end ? new Date(end).toISOString() : undefined,
         limit: PAGE_SIZE,
-      }),
+      });
+    },
     placeholderData: (prev) => prev,
   });
 
+  function selectSource(next: Source) {
+    if (next === source) return;
+    setSource(next);
+    setStart("");
+    setEnd("");
+    setRangeError(null);
+    setCursorStack([undefined]);
+  }
+
+  /** Fills the from/to fields with the active source's own valid bounds -- the
+   * fastest way to reach a working range without hand-typing into a locale-ordered
+   * <input type="datetime-local">, which is exactly what produced the reported
+   * "Please enter valid date and time" browser error when typed in day/month/year
+   * order. This does not bypass validation: the values written here are the real
+   * GET .../bounds values, always valid and always start <= end. */
+  function fillActiveRange() {
+    if (!bounds.data) return;
+    setStart(toDatetimeLocalValue(bounds.data.min_tx_datetime));
+    setEnd(toDatetimeLocalValue(bounds.data.max_tx_datetime));
+    setRangeError(null);
+  }
+
   function applyFilters(e: React.FormEvent) {
     e.preventDefault();
+    if (start && end && new Date(start) > new Date(end)) {
+      setRangeError("From must be on or before To.");
+      return;
+    }
+    setRangeError(null);
     setCursorStack([undefined]);
   }
 
@@ -46,8 +101,27 @@ export function TransactionsExplorer() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Transactions</h1>
-          <p className="page-subtitle">Chronological stream of scored transactions.</p>
+          <p className="page-subtitle">{DATASET_CONTEXT[source]}</p>
         </div>
+      </div>
+
+      <div className="toolbar" role="group" aria-label="Data source">
+        <button
+          className={`btn ${source === "benchmark" ? "btn-primary" : ""}`}
+          type="button"
+          onClick={() => selectSource("benchmark")}
+          aria-pressed={source === "benchmark"}
+        >
+          Benchmark Dataset
+        </button>
+        <button
+          className={`btn ${source === "recent" ? "btn-primary" : ""}`}
+          type="button"
+          onClick={() => selectSource("recent")}
+          aria-pressed={source === "recent"}
+        >
+          Recent Simulated Stream
+        </button>
       </div>
 
       <form className="toolbar" onSubmit={applyFilters}>
@@ -61,6 +135,8 @@ export function TransactionsExplorer() {
             type="datetime-local"
             className="text-input"
             value={start}
+            min={bounds.data ? toDatetimeLocalValue(bounds.data.min_tx_datetime) : undefined}
+            max={bounds.data ? toDatetimeLocalValue(bounds.data.max_tx_datetime) : undefined}
             onChange={(e) => setStart(e.target.value)}
           />
         </div>
@@ -74,13 +150,21 @@ export function TransactionsExplorer() {
             type="datetime-local"
             className="text-input"
             value={end}
+            min={bounds.data ? toDatetimeLocalValue(bounds.data.min_tx_datetime) : undefined}
+            max={bounds.data ? toDatetimeLocalValue(bounds.data.max_tx_datetime) : undefined}
             onChange={(e) => setEnd(e.target.value)}
           />
         </div>
         <button className="btn btn-primary" type="submit">
           Apply
         </button>
+        {bounds.data && (
+          <button className="btn" type="button" onClick={fillActiveRange}>
+            Use full {source === "benchmark" ? "benchmark" : "recent"} range
+          </button>
+        )}
       </form>
+      {rangeError && <p className="field-error">{rangeError}</p>}
 
       {page.isLoading && <Loading label="Loading transactions…" />}
       {page.isError && <ErrorBlock error={page.error} onRetry={() => page.refetch()} />}

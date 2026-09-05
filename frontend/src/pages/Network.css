@@ -9,6 +9,7 @@
 .net-header-actions {
   display: flex;
   gap: var(--sp-3);
+  flex-wrap: wrap;
 }
 
 .net-header-actions .btn {
@@ -17,33 +18,66 @@
   gap: 6px;
 }
 
-.net-bento {
+/* The graph gets the full page width and the first screen to itself; the supporting
+ * evidence panels sit below it and are reached by scrolling. Side-by-side columns
+ * left the canvas cramped and the two columns wildly unequal in height. */
+.net-panels {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: var(--sp-6);
   align-items: start;
 }
 
 .net-canvas-card {
+  min-height: 500px;
+  padding: var(--sp-5);
+}
+
+.net-canvas-card-focused {
   position: relative;
-  min-height: 460px;
+  min-height: 700px;
+}
+
+.net-graph-stage {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Reserve the left gutter occupied by the absolutely-positioned snapshot/topology
+ * panels. The graph measures this (already-inset) box to build its coordinate
+ * space, so nodes can never be simulated underneath those panels. */
+.net-canvas-card-focused .net-graph-stage {
   display: flex;
-  align-items: center;
+  min-height: 660px;
+  align-items: stretch;
+  padding-left: calc(220px + var(--sp-6));
+}
+
+.net-canvas-card-focused .net-graph-stage > .network-graph {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ------------------------------------------------------------- focus snapshot card */
 
 .net-snapshot {
-  position: absolute;
-  top: var(--sp-5);
-  left: var(--sp-5);
-  z-index: 3;
-  width: 220px;
   background: var(--surface-2);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   padding: var(--sp-4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  align-self: start;
+}
+
+.net-canvas-card-focused .net-snapshot,
+.net-canvas-card-focused .net-topology {
+  position: absolute;
+  left: var(--sp-5);
+  z-index: 2;
+  width: 220px;
+}
+
+.net-canvas-card-focused .net-snapshot {
+  top: var(--sp-5);
 }
 
 .net-snapshot-header {
@@ -93,7 +127,6 @@
 }
 
 .net-snapshot-rows dd {
-  font-size: var(--fs-sm);
   color: var(--text-primary);
   margin: 0;
   text-align: right;
@@ -102,16 +135,15 @@
 /* --------------------------------------------------------------- topology legend */
 
 .net-topology {
-  position: absolute;
-  bottom: var(--sp-5);
-  left: var(--sp-5);
-  z-index: 3;
-  width: 190px;
   background: var(--surface-2);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   padding: var(--sp-4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  align-self: end;
+}
+
+.net-canvas-card-focused .net-topology {
+  bottom: var(--sp-5);
 }
 
 .net-topology-header {
@@ -163,13 +195,15 @@
   border-radius: 999px;
 }
 
-/* ---------------------------------------------------------------------- side panels */
-
-.net-side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
+.net-topology-hint {
+  margin: var(--sp-3) 0 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
 }
+
+/* -------------------------------------------------------------- evidence panels */
 
 .net-side-card {
   display: flex;
@@ -202,10 +236,15 @@
   margin-top: -var(--sp-2);
 }
 
+/* Flows into columns as the card gets wider, so a long neighbour list stays compact
+ * instead of stretching one entity across the full page width per row. */
 .net-connected-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-4) var(--sp-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .net-connected-row {
@@ -213,10 +252,8 @@
   border-bottom: 1px solid var(--border);
 }
 
-.net-connected-row:last-child {
-  padding-bottom: 0;
-  border-bottom: none;
-}
+/* No :last-child exception -- in a multi-column grid the final item is rarely the
+ * last one visually, so dropping its rule there would leave one ragged cell. */
 
 .net-connected-head {
   display: flex;
@@ -272,6 +309,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .net-tx-row {
@@ -316,10 +356,15 @@
 
 .net-analyst-card {
   padding: 0;
+  overflow: hidden;
 }
 
 .net-analyst-heading {
   padding: var(--sp-5) var(--sp-5) 0;
+}
+
+.net-analyst-card .net-side-caption {
+  padding-bottom: var(--sp-5);
 }
 
 .net-analyst-card .analyst {
@@ -329,18 +374,49 @@
 }
 
 @media (max-width: 1100px) {
-  .net-bento {
-    grid-template-columns: 1fr;
+  .net-canvas-card-focused {
+    position: static;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(400px, auto) auto;
   }
-  .net-snapshot,
-  .net-topology {
+  .net-canvas-card-focused .net-snapshot,
+  .net-canvas-card-focused .net-topology {
     position: static;
     width: auto;
-    margin-bottom: var(--sp-4);
-    box-shadow: none;
+  }
+  .net-canvas-card-focused .net-snapshot {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .net-canvas-card-focused .net-graph-stage {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 400px;
+    padding-left: 0;
+  }
+  .net-canvas-card-focused .net-topology {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 520px) {
+  .net-header-actions {
+    width: 100%;
+  }
+  .net-header-actions .btn {
+    flex: 1;
+    justify-content: center;
   }
   .net-canvas-card {
-    flex-direction: column;
-    align-items: stretch;
+    padding: var(--sp-4);
+  }
+  .net-canvas-card-focused {
+    grid-template-rows: auto minmax(280px, auto) auto;
+  }
+  .net-canvas-card-focused .net-graph-stage {
+    min-height: 280px;
   }
 }

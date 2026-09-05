@@ -1,12 +1,39 @@
+/* The container's height is always set by CSS, never derived from the SVG's own
+ * content -- the component measures this box to build its viewBox, so a
+ * content-driven height would feed back into its own measurement. */
+/* Tall enough that the canvas owns the first screen on a laptop viewport, with the
+ * evidence panels sitting below the fold. */
 .network-graph {
   position: relative;
   width: 100%;
+  height: 620px;
+  container-type: inline-size;
 }
 
 .network-graph svg {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+}
+
+/* Height comes from the flex stage stretching this box (a CSS-driven size), not
+ * from an explicit value, so it fills the tall investigation canvas. */
+.net-canvas-card-focused .network-graph {
+  height: auto;
+  align-self: stretch;
+}
+
+@media (max-width: 1100px) {
+  .net-canvas-card-focused .network-graph {
+    height: 400px;
+  }
+}
+
+@media (max-width: 520px) {
+  .network-graph,
+  .net-canvas-card-focused .network-graph {
+    height: 300px;
+  }
 }
 
 .network-empty {
@@ -16,17 +43,57 @@
   font-size: var(--fs-sm);
 }
 
+/* Blueprint grid. `currentColor` on the pattern resolves against this rule, so the
+ * grid inherits the project's border tone rather than hard-coding a colour. */
+.network-grid {
+  color: var(--border);
+  /* Barely-there structure: enough to give the canvas depth, not enough to compete
+   * with the nodes and edges drawn on top of it. */
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Edges stay deliberately dim. They carry the same risk colour as their worse
+ * endpoint, but the node fills are what should register risk at a glance -- at full
+ * strength a hub's spokes turn the whole canvas red and drown that signal out. */
 .network-edge {
-  stroke-opacity: 0.35;
-  transition: stroke-opacity var(--dur-base) var(--ease);
+  stroke-opacity: 0.22;
+  stroke-linecap: round;
+  transition:
+    stroke-opacity var(--dur-base) var(--ease),
+    stroke-width var(--dur-base) var(--ease);
 }
 
 .network-edge.is-focus-link {
-  stroke-opacity: 0.85;
+  stroke-opacity: 0.45;
+}
+
+/* Hovering a node spotlights the relationships it actually has and pushes the rest
+ * of the canvas back -- the main defence against a dense graph reading as clutter. */
+.network-edge.is-hot {
+  stroke-opacity: 0.95;
+}
+
+.network-edge.is-muted {
+  stroke-opacity: 0.06;
 }
 
 .network-node {
-  cursor: pointer;
+  cursor: grab;
+  /* Let the node consume touch drags instead of the browser scrolling the page. */
+  touch-action: none;
+}
+
+.network-node:active {
+  cursor: grabbing;
+}
+
+/* Chrome draws a light-blue 5px auto outline around a focusable <g>'s bounding box,
+ * which appeared as a stray blue square on the canvas and is off-palette. Replaced
+ * with a themed ring on the node itself -- suppressed only for pointer focus, so
+ * keyboard users still get a clear indicator (see :focus-visible below). */
+.network-node:focus {
+  outline: none;
 }
 
 .network-node-fill {
@@ -41,12 +108,66 @@
   opacity: 0.85;
 }
 
+/* Whole-node fade for everything unrelated to the hovered entity. */
+.network-node {
+  transition: opacity var(--dur-base) var(--ease);
+}
+
+.network-node.is-muted {
+  opacity: 0.18;
+}
+
+.network-node.is-hovered .network-node-fill,
+.network-node.is-hovered .network-node-label {
+  opacity: 1;
+}
+
+.network-node.is-hovered .network-node-fill {
+  stroke: var(--text-primary);
+}
+
+/* High-risk entities get a soft static glow plus a slowly blinking boundary ring, so
+ * they can be picked out of a dense canvas at a glance.
+ *
+ * The blink is opacity-only and never changes the ring's size. An earlier version
+ * animated scale as well, which made the ring expand away from the node and read as
+ * loose red dots drifting on the canvas. */
+.network-node-halo {
+  pointer-events: none;
+  opacity: 0.16;
+}
+
+.network-node-alert {
+  fill: none;
+  stroke-width: 1.5px;
+  pointer-events: none;
+  animation: network-alert-blink 1.9s ease-in-out infinite;
+}
+
+@keyframes network-alert-blink {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Respect a reduced-motion preference: keep the ring, drop the blink. */
+@media (prefers-reduced-motion: reduce) {
+  .network-node-alert {
+    animation: none;
+    opacity: 0.55;
+  }
+}
+
 .network-node.is-focus .network-node-fill {
   filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 60%, transparent));
 }
 
 .network-node-glyph {
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 700;
   fill: var(--bg);
   pointer-events: none;
@@ -55,20 +176,27 @@
 
 .network-node-label {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   fill: var(--text-secondary);
   pointer-events: none;
   user-select: none;
+  /* Knocks the canvas colour out behind the glyphs so IDs stay legible where they
+   * cross a grid line or an edge, instead of visually tangling with them. */
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+@container (max-width: 460px) {
+  .network-node:not(.is-focus):not(.is-selected) .network-node-label {
+    display: none;
+  }
 }
 
 .network-node.is-focus .network-node-label {
   fill: var(--text-primary);
   font-weight: 600;
-}
-
-.network-node-target {
-  fill: var(--risk-high);
-  letter-spacing: 0.04em;
 }
 
 .network-node-ring {
@@ -81,6 +209,13 @@
 .network-node:hover .network-node-fill,
 .network-node:focus-visible .network-node-fill {
   stroke: var(--text-primary);
+}
+
+/* Keyboard focus indicator, in-palette: a crisp warm-white ring drawn on the node
+ * shape itself rather than a browser rectangle around the group's bounding box. */
+.network-node:focus-visible .network-node-fill {
+  stroke-width: 3px;
+  paint-order: stroke;
 }
 
 .network-tooltip {
@@ -108,6 +243,13 @@
 .network-tooltip span {
   color: var(--text-secondary);
   text-transform: capitalize;
+}
+
+.network-tooltip-meta {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: none;
 }
 
 .network-legend {

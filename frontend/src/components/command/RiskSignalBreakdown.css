@@ -2,27 +2,39 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
+  width: 100%;
+  min-width: 0;
 }
 
 .rsb-row {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  min-width: 0;
 }
 
 .rsb-row-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: var(--sp-2);
+  min-width: 0;
 }
 
 .rsb-label {
   font-size: var(--fs-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .rsb-change {
   font-size: var(--fs-sm);
   color: var(--text-secondary);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .rsb-change.rsb-up {
@@ -34,18 +46,20 @@
 }
 
 .rsb-track {
+  width: 100%;
   height: 6px;
   background: var(--surface-2);
   border-radius: 3px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .rsb-fill {
-  width: 100%;
   height: 100%;
+  min-width: 2px;
+  max-width: 100%;
   border-radius: 3px;
-  transform-origin: left;
-  transition: transform var(--dur-base) var(--ease);
+  transition: width var(--dur-base) var(--ease);
 }
 
 .rsb-fill.rsb-up {

@@ -27,6 +27,15 @@ session" that Dev Plan §26 would flag as infrastructure this project does not n
 Deliberately does not duplicate GET /customers/{id}/risk or /terminals/{id}/risk
 (Step 4) -- those already serve one entity's chronological history; this module serves
 the full historical transaction stream Dev Plan §22 describes.
+
+Scoped to the frozen benchmark only (added alongside mrs.data.recent_stream /
+mrs.api.routers.recent): every query below is restricted to
+Transaction.split in mrs.data.splits.SPLIT_ORDER (train/validation/test). Without this,
+inserting the Simulated Recent Operational Stream's 2026-dated rows into the same
+`transactions` table would silently widen /replay/bounds' max_tx_datetime and
+/replay/transactions' stream past September 2018 -- "historical Replay" must keep
+meaning exactly what it always has. The recent stream's own equivalent endpoints
+(GET /recent/bounds, GET /recent/transactions) live in mrs.api.routers.recent.
 """
 
 from __future__ import annotations
@@ -39,6 +48,7 @@ from sqlalchemy.orm import Session
 
 from mrs.api import schemas
 from mrs.api.deps import get_db
+from mrs.data.splits import SPLIT_ORDER
 from mrs.db.models import Alert, RiskScore, Transaction
 
 router = APIRouter(prefix="/replay", tags=["replay"])
@@ -62,6 +72,7 @@ def get_replay_bounds(db: Session = Depends(get_db)) -> schemas.ReplayBounds:
     through the stream a given cursor/time is, e.g. for a progress indicator."""
     min_dt, max_dt, total = db.execute(
         select(func.min(Transaction.tx_datetime), func.max(Transaction.tx_datetime), func.count())
+        .where(Transaction.split.in_(SPLIT_ORDER))
     ).one()
     if total == 0:
         raise HTTPException(status_code=404, detail="no transactions available to replay")
@@ -93,6 +104,7 @@ def replay_transactions(
         select(Transaction, RiskScore, Alert)
         .outerjoin(RiskScore, RiskScore.transaction_id == Transaction.transaction_id)
         .outerjoin(Alert, Alert.transaction_id == Transaction.transaction_id)
+        .where(Transaction.split.in_(SPLIT_ORDER))
     )
 
     if after_cursor is not None:

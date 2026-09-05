@@ -25,20 +25,28 @@
 }
 
 .sidebar-mark {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  background: var(--primary);
-  color: var(--on-primary);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.sidebar-mark-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .sidebar-brand-text {
   display: none;
   flex-direction: column;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -49,18 +57,11 @@
 
 .sidebar-brand-name {
   font-family: var(--font-headline);
-  font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--primary);
-}
-
-.sidebar-version {
-  font-family: var(--font-headline);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
 }
 
 .sidebar-group {

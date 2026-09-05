@@ -53,7 +53,7 @@ export function RiskSignalBreakdown({ data }: { data: RiskActivityPoint[] }) {
             <div className="rsb-track">
               <div
                 className={`rsb-fill ${rising ? "rsb-up" : falling ? "rsb-down" : "rsb-flat"}`}
-                style={{ transform: `scaleX(${Math.max(0.02, width / 100)})` }}
+                style={{ width: `${Math.max(2, width)}%` }}
               />
             </div>
           </div>

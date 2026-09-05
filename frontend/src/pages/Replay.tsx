@@ -14,16 +14,30 @@ const SPEEDS = [1, 5, 20, 100] as const;
 const TICK_MS = 900;
 const FEED_CAP = 120;
 
+type Source = "benchmark" | "recent";
+
+const SOURCE_LABEL: Record<Source, string> = {
+  benchmark: "Fraud Detection Handbook (Apr–Sep 2018) — frozen benchmark",
+  recent: "Simulated Recent Operational Stream (Aug–Sep 2026) — demo data, not real transactions",
+};
+
 /**
  * Historical replay / demo mode -- not a live production stream (Dev Plan Sec 22).
  * The backend owns chronological ordering and cursor semantics (GET /replay/bounds,
- * GET /replay/transactions); this page only owns pacing and presentation. "Speed"
- * controls how many already-computed rows are revealed per tick, not a server-side
- * delay -- there is none to control.
+ * GET /replay/transactions, or their /recent/* siblings for the Simulated Recent
+ * Operational Stream -- see mrs.data.recent_stream); this page only owns pacing,
+ * presentation, and which of the two already-separate backend streams to read from.
+ * "Speed" controls how many already-computed rows are revealed per tick, not a
+ * server-side delay -- there is none to control.
  */
 export function Replay() {
   const navigate = useNavigate();
-  const bounds = useQuery({ queryKey: ["replay-bounds"], queryFn: api.replayBounds });
+  const [source, setSource] = useState<Source>("benchmark");
+  const bounds = useQuery({
+    queryKey: ["replay-bounds", source],
+    queryFn: () => (source === "benchmark" ? api.replayBounds() : api.recentBounds()),
+    retry: false,
+  });
 
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(5);
@@ -42,6 +56,15 @@ export function Replay() {
     cursorRef.current = undefined;
   }, []);
 
+  const selectSource = useCallback(
+    (next: Source) => {
+      if (next === source) return;
+      setSource(next);
+      reset();
+    },
+    [source, reset],
+  );
+
   useEffect(() => {
     if (!playing) return;
     let cancelled = false;
@@ -50,7 +73,8 @@ export function Replay() {
       if (inFlightRef.current) return;
       inFlightRef.current = true;
       try {
-        const page = await api.replayTransactions({ after_cursor: cursorRef.current, limit: speed });
+        const fetchPage = source === "benchmark" ? api.replayTransactions : api.recentTransactions;
+        const page = await fetchPage({ after_cursor: cursorRef.current, limit: speed });
         if (cancelled) return;
         setFeed((prev) => [...page.items].reverse().concat(prev).slice(0, FEED_CAP));
         cursorRef.current = page.next_cursor ?? cursorRef.current;
@@ -75,15 +99,32 @@ export function Replay() {
       window.clearInterval(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, speed]);
+  }, [playing, speed, source]);
 
   return (
     <div className="page">
       <div className="page-header">
         <div>
           <h1 className="page-title">Replay</h1>
-          <p className="page-subtitle">Historical replay of simulated benchmark data -- not a live stream.</p>
+          <p className="page-subtitle">{SOURCE_LABEL[source]} -- not a live stream.</p>
         </div>
+      </div>
+
+      <div className="replay-buttons" role="group" aria-label="Data source">
+        <button
+          className={`btn replay-speed-btn ${source === "benchmark" ? "active" : ""}`}
+          onClick={() => selectSource("benchmark")}
+          aria-pressed={source === "benchmark"}
+        >
+          Benchmark Dataset
+        </button>
+        <button
+          className={`btn replay-speed-btn ${source === "recent" ? "active" : ""}`}
+          onClick={() => selectSource("recent")}
+          aria-pressed={source === "recent"}
+        >
+          Recent Simulated Stream
+        </button>
       </div>
 
       {bounds.isLoading && <Loading label="Loading replay bounds…" />}

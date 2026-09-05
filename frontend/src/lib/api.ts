@@ -7,6 +7,7 @@ import type {
   EntityDeviation,
   EntityType,
   HealthOut,
+  LiveStreamStatus,
   NetworkGraph,
   OverviewStats,
   PaginatedAlerts,
@@ -36,7 +37,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+async function request<T>(
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>,
+  method: "GET" | "POST" = "GET",
+): Promise<T> {
   const url = new URL(API_BASE + path);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -45,7 +50,7 @@ async function request<T>(path: string, params?: Record<string, string | number 
   }
   let res: Response;
   try {
-    res = await fetch(url.toString());
+    res = await fetch(url.toString(), { method });
   } catch {
     throw new ApiError(0, "Could not reach the Merchant Risk Sentinel API.");
   }
@@ -68,8 +73,15 @@ export const api = {
   overviewStats: () => request<OverviewStats>("/stats/overview"),
   riskActivity: (days = 30) => request<RiskActivityPoint[]>("/stats/risk-activity", { days }),
   recentActivity: (limit = 20, levels?: string) => request<ReplayItemOut[]>("/stats/recent-activity", { limit, levels }),
-  entityNetwork: (focus?: { type: EntityType; id: number }) =>
-    request<NetworkGraph>("/stats/network", focus ? { focus_type: focus.type, focus_id: focus.id } : undefined),
+  entityNetwork: (focus?: { type: EntityType; id: number }, liveWindow?: number) =>
+    request<NetworkGraph>(
+      "/stats/network",
+      liveWindow !== undefined
+        ? { live_window: liveWindow }
+        : focus
+          ? { focus_type: focus.type, focus_id: focus.id }
+          : undefined,
+    ),
   terminalsAtRisk: (limit = 8) => request<EntityAtRiskRow[]>("/stats/terminals-at-risk", { limit }),
 
   getTransaction: (id: number) => request<TransactionDetailOut>(`/transactions/${id}`),
@@ -86,8 +98,16 @@ export const api = {
     request<PaginatedRiskHistory>(`/terminals/${id}/risk`, { limit, offset }),
   getTerminalDeviation: (id: number) => request<EntityDeviation>(`/terminals/${id}/deviation`),
 
-  listAlerts: (params: { status?: string; severity?: string; customer_id?: number; terminal_id?: number; limit?: number; offset?: number }) =>
-    request<PaginatedAlerts>("/alerts", params),
+  listAlerts: (params: {
+    status?: string;
+    severity?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    start?: string;
+    end?: string;
+    limit?: number;
+    offset?: number;
+  }) => request<PaginatedAlerts>("/alerts", params),
   getAlert: (id: number) => request<AlertDetailOut>(`/alerts/${id}`),
 
   replayBounds: () => request<ReplayBounds>("/replay/bounds"),
@@ -100,4 +120,38 @@ export const api = {
     desc?: boolean;
     limit?: number;
   }) => request<ReplayPage>("/replay/transactions", params),
+
+  // Simulated Recent Operational Stream (mrs.data.recent_stream) -- a separate,
+  // clearly-demarcated 21-day demo dataset, never the frozen benchmark above. Same
+  // response shapes/pagination convention as replay*, deliberately not merged with it
+  // (mrs.api.routers.recent is a permanently-scoped sibling of mrs.api.routers.replay).
+  recentBounds: () => request<ReplayBounds>("/recent/bounds"),
+  recentTransactions: (params: {
+    after_cursor?: string;
+    start?: string;
+    end?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    desc?: boolean;
+    limit?: number;
+  }) => request<ReplayPage>("/recent/transactions", params),
+
+  // Continuous Simulated Live Stream (mrs.live.manager/mrs.live.continuous) -- a
+  // THIRD, distinct stream ("live" split) from real wall-clock "now", generated one
+  // transaction at a time by a real backend thread while running. Never real
+  // production traffic; see mrs.live.continuous's own module docstring.
+  liveStreamStatus: () => request<LiveStreamStatus>("/live/status"),
+  startLiveStream: (intervalSeconds?: number) =>
+    request<LiveStreamStatus>("/live/start", intervalSeconds !== undefined ? { interval_seconds: intervalSeconds } : undefined, "POST"),
+  stopLiveStream: () => request<LiveStreamStatus>("/live/stop", undefined, "POST"),
+  liveBounds: () => request<ReplayBounds>("/live/bounds"),
+  liveTransactions: (params: {
+    after_cursor?: string;
+    start?: string;
+    end?: string;
+    customer_id?: number;
+    terminal_id?: number;
+    desc?: boolean;
+    limit?: number;
+  }) => request<ReplayPage>("/live/transactions", params),
 };

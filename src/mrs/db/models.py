@@ -242,4 +242,13 @@ class AuditLog(Base):
     __table_args__ = (
         Index("ix_audit_logs_created_at", "created_at"),
         Index("ix_audit_logs_transaction_id", "transaction_id"),
+        # Without this, deleting a row from `alerts` makes Postgres sequentially scan
+        # the entire audit_logs table once per deleted row to check the alert_id FK
+        # (`SELECT 1 FROM audit_logs WHERE alert_id = ... FOR KEY SHARE`) -- harmless
+        # at small scale, but on a multi-million-row audit_logs table it makes even a
+        # modest DELETE FROM alerts effectively hang. Discovered while clearing a
+        # demo/recent-stream reload during development; audit_logs is append-only in
+        # normal operation, so this index costs write overhead only on the rare
+        # DELETE FROM alerts path, never on the hot append path.
+        Index("ix_audit_logs_alert_id", "alert_id"),
     )

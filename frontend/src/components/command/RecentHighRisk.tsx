@@ -23,6 +23,15 @@ function describeSignal(signal: string): string {
   return signal;
 }
 
+/** True dataset-source labels for this panel's contextual tag -- computed from
+ * transaction.split (already returned by every ReplayItemOut), never assumed. "recent"
+ * is the Simulated Recent Operational Stream (mrs.data.recent_stream); every other
+ * split value ("train"/"validation"/"test") is the frozen Apr-Sep 2018 benchmark. */
+const DATASET_LABEL = {
+  recent: "SIMULATED RECENT ACTIVITY · AUG 15 – SEP 04, 2026",
+  benchmark: "HISTORICAL BENCHMARK · APR–SEP 2018",
+} as const;
+
 /** GET /stats/recent-activity?levels=HIGH,CRITICAL -- filtered server-side (sampling
  * the last N transactions overall and filtering client-side can legitimately return
  * zero rows, since elevated transactions are ~1.5% of the stream). The client-side
@@ -30,11 +39,23 @@ function describeSignal(signal: string): string {
 export function RecentHighRisk({ items }: { items: ReplayItemOut[] }) {
   const highRisk = items.filter((i) => i.risk_score?.unified_risk_level === "HIGH" || i.risk_score?.unified_risk_level === "CRITICAL").slice(0, 4);
 
+  // Once any Simulated Recent Operational Stream data exists, this feed (sorted
+  // newest-first) is dominated by it -- 2026 transactions always sort after every 2018
+  // one, so a blanket "which dataset is this" label at the panel level is accurate
+  // without labeling each row individually. Computed from real split values, not
+  // assumed: falls back to the historical label whenever no shown row is actually
+  // "recent" (e.g. before the recent stream is ever ingested).
+  const hasRecent = highRisk.some((i) => i.transaction.split === "recent");
+  const datasetLabel = hasRecent ? DATASET_LABEL.recent : DATASET_LABEL.benchmark;
+
   return (
     <div className="rhr">
       <div className="rhr-header">
-        <Icon name="warning" size={18} className="rhr-header-icon" />
-        <span className="rhr-title">Recent High Risk</span>
+        <div className="rhr-header-main">
+          <Icon name="warning" size={18} className="rhr-header-icon" />
+          <span className="rhr-title">Recent High Risk</span>
+        </div>
+        {highRisk.length > 0 && <span className="rhr-dataset-label">{datasetLabel}</span>}
       </div>
 
       {highRisk.length === 0 ? (

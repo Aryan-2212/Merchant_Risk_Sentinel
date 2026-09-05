@@ -451,6 +451,171 @@ def test_list_alerts(db_engine, client):
     assert "reason" not in body["items"][0]
 
 
+def test_list_alerts_carries_transaction_time_not_batch_insert_time(db_engine, client):
+    """Alert.created_at is the row-insertion time and is identical for every alert
+    loaded in one batch, which made the whole list read as a single date. The list
+    must expose when the alerting transaction actually happened."""
+    _seed_full(db_engine)
+    item = client.get("/alerts").json()["items"][0]
+    assert item["tx_datetime"] == "2018-04-01T12:00:00"
+    # created_at is still reported, but it is a different (ingest-time) value.
+    assert item["tx_datetime"] != item["created_at"]
+
+
+def test_get_alert_detail_carries_transaction_time(db_engine, client):
+    _seed_full(db_engine)
+    body = client.get("/alerts/1").json()
+    assert body["tx_datetime"] == "2018-04-01T12:00:00"
+
+
+def test_list_alerts_ordered_by_transaction_time_not_insert_order(db_engine, client):
+    """Ordering by created_at was a no-op within a batch, leaving alerts effectively
+    ordered by insertion id. The newest transaction must come first."""
+    _seed_full(db_engine)
+    with db_engine.begin() as conn:
+        conn.execute(
+            insert(Transaction.__table__),
+            [
+                {
+                    "transaction_id": 101,
+                    "tx_datetime": dt.datetime(2018, 9, 15, 8, 30, 0),
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "tx_amount": 500.0,
+                    "tx_time_seconds": 1,
+                    "tx_time_days": 1,
+                    "tx_fraud": 1,
+                    "tx_fraud_scenario": 1,
+                    "split": "train",
+                }
+            ],
+        )
+        conn.execute(
+            insert(RiskScore.__table__),
+            [
+                {
+                    "transaction_id": 101,
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "transaction_risk": 0.98,
+                    "transaction_risk_severity": 2,
+                    "terminal_risk_state": "HIGH_RISK",
+                    "terminal_risk_severity": 2,
+                    "customer_risk_state": "NORMAL",
+                    "customer_risk_severity": 0,
+                    "unified_risk_level": "CRITICAL",
+                    "contributing_signals": ["transaction_ml_risk >= 0.97"],
+                    "model_version": "xgboost_v1",
+                    "transaction_risk_threshold": 0.97,
+                    "feature_version": "phase3_v1",
+                }
+            ],
+        )
+        conn.execute(
+            insert(Alert.__table__),
+            [
+                {
+                    "transaction_id": 101,
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "severity": "CRITICAL",
+                    "reason": "transaction_ml_risk >= 0.97",
+                    "evidence": {"unified_risk_level": "CRITICAL"},
+                    "recommended_action": "ESCALATE",
+                    "status": "OPEN",
+                }
+            ],
+        )
+
+    items = client.get("/alerts").json()["items"]
+    assert [i["transaction_id"] for i in items] == [101, 100]
+    assert items[0]["tx_datetime"] > items[1]["tx_datetime"]
+
+
+def test_list_alerts_date_range_filters_on_transaction_time(db_engine, client):
+    _seed_full(db_engine)  # single alert, tx_datetime 2018-04-01 12:00
+
+    # Window containing the transaction.
+    body = client.get("/alerts", params={"start": "2018-04-01T00:00:00", "end": "2018-04-02T00:00:00"}).json()
+    assert body["total"] == 1
+    assert body["items"][0]["transaction_id"] == 100
+
+    # Window before it.
+    assert client.get("/alerts", params={"end": "2018-04-01T00:00:00"}).json()["total"] == 0
+    # Window after it.
+    assert client.get("/alerts", params={"start": "2018-04-02T00:00:00"}).json()["total"] == 0
+
+    # `end` is exclusive, `start` inclusive.
+    assert client.get("/alerts", params={"end": "2018-04-01T12:00:00"}).json()["total"] == 0
+    assert client.get("/alerts", params={"start": "2018-04-01T12:00:00"}).json()["total"] == 1
+
+
+def test_list_alerts_date_range_total_counts_only_matching_rows(db_engine, client):
+    """The count query must carry the same join/filter as the page query, or a
+    filtered list reports the unfiltered total and paginates into empty pages."""
+    _seed_full(db_engine)
+    with db_engine.begin() as conn:
+        conn.execute(
+            insert(Transaction.__table__),
+            [
+                {
+                    "transaction_id": 102,
+                    "tx_datetime": dt.datetime(2018, 9, 20, 9, 0, 0),
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "tx_amount": 42.0,
+                    "tx_time_seconds": 2,
+                    "tx_time_days": 2,
+                    "tx_fraud": 0,
+                    "tx_fraud_scenario": 0,
+                    "split": "train",
+                }
+            ],
+        )
+        conn.execute(
+            insert(RiskScore.__table__),
+            [
+                {
+                    "transaction_id": 102,
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "transaction_risk": 0.5,
+                    "transaction_risk_severity": 1,
+                    "terminal_risk_state": "NORMAL",
+                    "terminal_risk_severity": 0,
+                    "customer_risk_state": "NORMAL",
+                    "customer_risk_severity": 0,
+                    "unified_risk_level": "MEDIUM",
+                    "contributing_signals": [],
+                    "model_version": "xgboost_v1",
+                    "transaction_risk_threshold": 0.97,
+                    "feature_version": "phase3_v1",
+                }
+            ],
+        )
+        conn.execute(
+            insert(Alert.__table__),
+            [
+                {
+                    "transaction_id": 102,
+                    "customer_id": 1,
+                    "terminal_id": 1,
+                    "severity": "MEDIUM",
+                    "reason": "elevated",
+                    "evidence": {},
+                    "recommended_action": "MONITOR",
+                    "status": "OPEN",
+                }
+            ],
+        )
+
+    assert client.get("/alerts").json()["total"] == 2
+    narrowed = client.get("/alerts", params={"start": "2018-09-01T00:00:00"}).json()
+    assert narrowed["total"] == 1
+    assert len(narrowed["items"]) == 1
+    assert narrowed["items"][0]["transaction_id"] == 102
+
+
 def test_list_alerts_filter_by_severity(db_engine, client):
     _seed_full(db_engine)
     resp = client.get("/alerts", params={"severity": "CRITICAL"})

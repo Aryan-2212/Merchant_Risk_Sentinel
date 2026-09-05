@@ -254,3 +254,43 @@ def test_alert_unique_constraint_backs_idempotency_even_on_direct_conflict(db_en
         rows = conn.execute(select(Alert).where(Alert.transaction_id == 3)).fetchall()
     assert len(rows) == 1
     assert rows[0].reason != "duplicate attempt"
+
+
+def test_apply_policy_handles_a_chunk_with_high_alert_density_past_the_postgres_param_limit(db_engine):
+    """Regression test for a real failure surfaced by the Simulated Recent Operational
+    Stream (mrs.data.recent_stream): a chunk with a much higher alert rate than the
+    frozen benchmark's produced a single INSERT with more than Postgres's 65,535-bound-
+    parameter limit, because the alert/audit INSERTs were not themselves sub-batched
+    (only the outer read-chunking was). 8,000 all-alert-worthy rows, each producing an
+    alerts row (>=9 columns) and an audit_logs row, comfortably exceeds that limit in
+    one un-sub-batched INSERT (8,000 * 9 = 72,000 > 65,535) -- this must not raise, and
+    must write exactly one alert and one audit row per transaction."""
+    n = 8_500  # 8,500 * 8 alerts columns = 68,000 > Postgres's 65,535 bound-parameter cap
+    rows = [
+        {
+            "transaction_id": 100_000 + i,
+            "customer_id": 1,
+            "terminal_id": 1,
+            "unified_risk_level": MEDIUM,
+            "terminal_risk_state": "RISK_RISING",
+            "terminal_risk_severity": 1,
+            "contributing_signals": ["terminal_behavioral_risk: RISK_RISING"],
+        }
+        for i in range(n)
+    ]
+    with db_engine.begin() as conn:
+        _seed(conn, rows)
+
+    summary = apply_policy(db_engine)
+
+    assert summary["n_newly_decided"] == n
+    assert summary["n_alerts_written"] == n
+    assert summary["n_audit_written"] == n
+
+    with db_engine.connect() as conn:
+        alert_count = conn.execute(select(Alert)).fetchall()
+        audit_count = conn.execute(
+            select(AuditLog).where(AuditLog.event_type == "POLICY_DECISION")
+        ).fetchall()
+    assert len(alert_count) == n
+    assert len(audit_count) == n

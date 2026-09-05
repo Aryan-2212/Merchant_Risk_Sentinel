@@ -88,7 +88,15 @@ class AlertSummaryOut(BaseModel):
     severity: str
     recommended_action: str | None
     status: str
+    #: Row-insertion time -- when the pipeline materialised this alert into Postgres,
+    #: NOT when the underlying activity happened. Every alert loaded in the same batch
+    #: shares one value, so it is useless for ordering or for reading as "when this
+    #: happened"; tx_datetime is the analytically meaningful timestamp.
     created_at: dt.datetime
+    #: When the alerting transaction actually occurred. Optional because the same
+    #: schema is reused in replay pages, which are built straight from an Alert row
+    #: and already carry the transaction alongside.
+    tx_datetime: dt.datetime | None = None
 
 
 class AlertDetailOut(AlertSummaryOut):
@@ -264,6 +272,12 @@ class NetworkGraph(BaseModel):
     #: node ids that were chosen as graph focus points (currently most-severe
     #: entities), vs. neighbors pulled in only because they transacted with one.
     focus_ids: list[str]
+    #: Only set when the `live_window` query param was used (GET /stats/network):
+    #: the single most recent transaction_id in that window, so the client can
+    #: identify which node(s) it touches as "just arrived" without a second request.
+    #: None for the default (unwindowed) graph -- there is no one meaningful "latest"
+    #: transaction across the entity's entire history in that mode.
+    latest_transaction_id: int | None = None
 
 
 class EntityAtRiskRow(BaseModel):
@@ -303,3 +317,21 @@ class EntityDeviation(BaseModel):
     baseline_transaction_count: int
     recent_window_days: int
     baseline_window_days: int
+
+
+class LiveStreamStatus(BaseModel):
+    """GET/POST /live/* -- the Continuous Simulated Live Stream's current state
+    (mrs.live.manager). `running` reflects the actual background-thread state, not a
+    client-side toggle, so a page reload or a second browser tab always sees the
+    truth. Every count/id here is real and computed -- nothing invented, exactly like
+    every other response in this API."""
+
+    running: bool
+    interval_seconds: float
+    n_generated: int
+    last_transaction_id: int | None
+    last_tx_datetime: dt.datetime | None
+    started_at: dt.datetime | None
+    #: A short exception summary (type + message, never a full traceback) if the
+    #: producer thread died unexpectedly; None while healthy.
+    error: str | None

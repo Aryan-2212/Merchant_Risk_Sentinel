@@ -64,7 +64,11 @@ export interface AlertSummaryOut {
   severity: AlertSeverity;
   recommended_action: PolicyAction | null;
   status: string;
+  /** Batch row-insertion time, identical across alerts loaded in the same run --
+   * not when the activity happened. Prefer tx_datetime for display. */
   created_at: string;
+  /** When the alerting transaction actually occurred. */
+  tx_datetime: string | null;
 }
 
 export interface AlertDetailOut extends AlertSummaryOut {
@@ -209,4 +213,21 @@ export interface NetworkGraph {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
   focus_ids: string[];
+  /** Only set when the live_window query param was used -- the single most recent
+   * transaction_id in that window, so the newest arrival can be highlighted without
+   * a second request. null for the default (unwindowed) graph. */
+  latest_transaction_id: number | null;
+}
+
+/** GET/POST /live/* -- the Continuous Simulated Live Stream's real backend-thread
+ * state (mrs.live.manager). `running` reflects the actual producer, not a client-side
+ * toggle, so a reload or a second tab always sees the truth. */
+export interface LiveStreamStatus {
+  running: boolean;
+  interval_seconds: number;
+  n_generated: number;
+  last_transaction_id: number | null;
+  last_tx_datetime: string | null;
+  started_at: string | null;
+  error: string | null;
 }

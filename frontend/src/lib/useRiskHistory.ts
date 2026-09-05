@@ -2,7 +2,25 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { PaginatedRiskHistory } from "./types";
 
-const PAGE_SIZE = 50;
+/**
+ * 100, not 50: an entity that participated in BOTH the frozen 2018 benchmark and the
+ * Simulated Recent Operational Stream has its combined history in one paginated list
+ * here (mrs.data.recent_stream reuses existing customer/terminal ids -- see
+ * docs/RECENT_STREAM.md), and recent-stream rows are always the tail (2026 postdates
+ * every 2018 row). At 50, the default "last 50" landing window for several elevated
+ * entities showed only their already-settled final NORMAL state, with the actual
+ * NORMAL -> RISK_RISING -> HIGH_RISK -> RECOVERY arc sitting just out of view one
+ * "Older" click away. Empirically checked against the real recent-stream population
+ * (every terminal/customer whose behavioral state ever reached HIGH_RISK and later
+ * recovered): 50 showed the complete arc in the default window for only 4/15
+ * terminals and 76/210 customers; 100 raises that to 13/15 and 172/210 with no further
+ * gain from going higher (150/200 tested identically at 13/15) -- the remaining few
+ * simply recovered too early in a very long history for any bounded tail window to
+ * reach, which paging back still reaches truthfully. No timestamps are reordered or
+ * fabricated; this only changes how much of the real, already-chronological sequence
+ * is visible without an extra click.
+ */
+const PAGE_SIZE = 100;
 
 /**
  * GET /customers/{id}/risk and /terminals/{id}/risk are ordered oldest-first with no
